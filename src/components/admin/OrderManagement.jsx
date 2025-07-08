@@ -529,6 +529,17 @@ const OrderManagement = () => {
                         </button>
                       )}
 
+                      {/* Rider Assignment Actions */}
+                      {activeTab === 'vendor-assigned' && order.status === 'vendor_assigned' && (
+                        <button
+                          onClick={() => openRiderAssignmentModal(order)}
+                          className="text-blue-600 hover:text-blue-900"
+                          title="Assign Rider"
+                        >
+                          <Truck className="w-4 h-4" />
+                        </button>
+                      )}
+
                       {/* Show delivery partner for assigned orders */}
                       {order.deliveryPartner && (
                         <span className="text-xs text-gray-500">
@@ -558,7 +569,8 @@ const OrderManagement = () => {
             <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500">
               {activeTab === 'new' && 'No new orders found.'}
-              {activeTab === 'accepted' && 'No accepted orders found.'}
+              {activeTab === 'vendor-assigned' && 'No orders awaiting rider assignment.'}
+              {activeTab === 'assigned' && 'No fully assigned orders found.'}
               {activeTab === 'rejected' && 'No rejected orders found.'}
             </p>
           </div>
@@ -693,17 +705,26 @@ const OrderManagement = () => {
         </div>
       )}
 
-      {/* Assign Rider Modal */}
-      {showAssignModal && orderToAssign && (
+      {/* Rider Assignment Modal */}
+      {showRiderModal && orderToAssignRider && riderRecommendations && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-xl font-semibold">Assign Rider</h3>
+                <div>
+                  <h3 className="text-xl font-semibold">Assign Rider for Order #{orderToAssignRider.orderNumber}</h3>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Select the best rider for pickup and delivery
+                  </p>
+                </div>
                 <button
                   onClick={() => {
-                    setShowAssignModal(false);
-                    setOrderToAssign(null);
+                    setShowRiderModal(false);
+                    setOrderToAssignRider(null);
+                    setSelectedRider(null);
+                    setRiderRecommendations(null);
+                    setRiderSearchTerm('');
+                    setRiderSearchResults([]);
                   }}
                   className="text-gray-400 hover:text-gray-600"
                 >
@@ -711,43 +732,228 @@ const OrderManagement = () => {
                 </button>
               </div>
 
-              <div className="mb-4">
-                <p className="text-sm text-gray-600">
-                  Assign order <strong>#{orderToAssign.orderNumber}</strong> to a delivery partner:
-                </p>
+              {/* Order and Route Summary */}
+              <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Pickup Location</p>
+                    <p className="text-sm text-gray-600">
+                      {riderRecommendations.orderAnalysis.pickupLocation.vendor}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {riderRecommendations.orderAnalysis.pickupLocation.address}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Delivery Location</p>
+                    <p className="text-sm text-gray-600">
+                      {riderRecommendations.orderAnalysis.deliveryLocation.address}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      PIN: {riderRecommendations.orderAnalysis.deliveryLocation.pincode}
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-3 flex items-center space-x-4 text-sm">
+                  <span><strong>Order Value:</strong> {formatCurrency(riderRecommendations.orderAnalysis.orderValue)}</span>
+                  <span><strong>Priority:</strong> {riderRecommendations.orderAnalysis.priority}</span>
+                  <span><strong>Est. Distance:</strong> {riderRecommendations.orderAnalysis.estimatedDistance} km</span>
+                </div>
               </div>
 
-              <div className="space-y-3 max-h-64 overflow-y-auto">
-                {deliveryPartners
-                  .filter(partner => partner.currentOrders < partner.maxOrders)
-                  .map(partner => (
-                    <div
-                      key={partner.id}
-                      className="border rounded-lg p-3 hover:bg-gray-50 cursor-pointer"
-                      onClick={() => assignDeliveryPartner(orderToAssign.id, partner.id)}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium">{partner.name}</p>
-                          <p className="text-sm text-gray-500">{partner.location}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-medium">⭐ {partner.rating}</p>
-                          <p className="text-xs text-gray-500">
-                            {partner.currentOrders}/{partner.maxOrders} orders
-                          </p>
+              {/* Search Riders */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Search Riders (Optional)
+                </label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    placeholder="Search by rider name, location, or vehicle type..."
+                    value={riderSearchTerm}
+                    onChange={(e) => handleRiderSearch(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {/* Rider Recommendations */}
+              <div className="space-y-6">
+                {/* Top Matches */}
+                <div>
+                  <h4 className="text-lg font-semibold mb-4 flex items-center">
+                    <TrendingUp className="w-5 h-5 text-emerald-600 mr-2" />
+                    Top Recommended Riders
+                  </h4>
+                  <div className="grid grid-cols-1 gap-4">
+                    {riderRecommendations.topMatches.map((rider, index) => (
+                      <div
+                        key={rider.id}
+                        className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                          selectedRider?.id === rider.id
+                            ? 'border-emerald-500 bg-emerald-50'
+                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        }`}
+                        onClick={() => selectRider(rider)}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <h5 className="font-semibold text-gray-900">{rider.name}</h5>
+                              {index === 0 && (
+                                <span className="bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded-full font-medium">
+                                  Best Match
+                                </span>
+                              )}
+                              <div className="flex items-center space-x-1">
+                                <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                                <span className="text-sm text-gray-600">{rider.rating}</span>
+                              </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                              <div>
+                                <p className="text-sm text-gray-600 flex items-center">
+                                  <MapPin className="w-4 h-4 mr-1" />
+                                  {rider.currentLocation} ({rider.matchData.distance} km away)
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  Vehicle: {rider.vehicleType} • Experience: {rider.experience}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-sm text-gray-600">
+                                  Capacity: {rider.matchData.availableCapacity}/{rider.maxOrders} available
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  Est. Pickup: {rider.matchData.estimatedTime} mins
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* Match Score Breakdown */}
+                            <div className="bg-white rounded-lg p-3 border">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-sm font-medium text-gray-700">Match Score</span>
+                                <span className="text-lg font-bold text-emerald-600">
+                                  {rider.matchData.score}/100
+                                </span>
+                              </div>
+                              <div className="grid grid-cols-3 gap-2 text-xs">
+                                <div>
+                                  <span className="text-gray-600">Available:</span>
+                                  <span className="font-medium ml-1">{rider.matchData.breakdown.availability}</span>
+                                </div>
+                                <div>
+                                  <span className="text-gray-600">Location:</span>
+                                  <span className="font-medium ml-1">{rider.matchData.breakdown.location}</span>
+                                </div>
+                                <div>
+                                  <span className="text-gray-600">Rating:</span>
+                                  <span className="font-medium ml-1">{rider.matchData.breakdown.rating}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {selectedRider?.id === rider.id && (
+                            <div className="ml-4">
+                              <CheckCircle className="w-6 h-6 text-emerald-600" />
+                            </div>
+                          )}
                         </div>
                       </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Search Results */}
+                {riderSearchResults.length > 0 && (
+                  <div>
+                    <h4 className="text-lg font-semibold mb-4 flex items-center">
+                      <Search className="w-5 h-5 text-blue-600 mr-2" />
+                      Search Results
+                    </h4>
+                    <div className="grid grid-cols-1 gap-4">
+                      {riderSearchResults.slice(0, 5).map((rider) => (
+                        <div
+                          key={rider.id}
+                          className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                            selectedRider?.id === rider.id
+                              ? 'border-emerald-500 bg-emerald-50'
+                              : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                          }`}
+                          onClick={() => selectRider(rider)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h5 className="font-semibold text-gray-900">{rider.name}</h5>
+                              <p className="text-sm text-gray-600">
+                                {rider.currentLocation} • {rider.vehicleType} • ⭐ {rider.rating}
+                              </p>
+                              {rider.matchData && (
+                                <p className="text-sm text-emerald-600">
+                                  Match Score: {rider.matchData.score}/100
+                                </p>
+                              )}
+                            </div>
+                            {selectedRider?.id === rider.id && (
+                              <CheckCircle className="w-6 h-6 text-emerald-600" />
+                            )}
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
+                )}
+
+                {/* No Available Riders Warning */}
+                {riderRecommendations.topMatches.length === 0 && (
+                  <div className="text-center py-8">
+                    <AlertCircle className="w-12 h-12 text-orange-500 mx-auto mb-3" />
+                    <p className="text-gray-600 mb-2">No available riders found for this location</p>
+                    <p className="text-sm text-gray-500">
+                      Try searching manually or wait for riders to come online
+                    </p>
+                  </div>
+                )}
               </div>
 
-              {deliveryPartners.filter(partner => partner.currentOrders < partner.maxOrders).length === 0 && (
-                <div className="text-center py-8">
-                  <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-500">No available delivery partners</p>
-                </div>
-              )}
+              {/* Action Buttons */}
+              <div className="flex justify-between items-center mt-8 pt-6 border-t">
+                <button
+                  onClick={() => {
+                    setShowRiderModal(false);
+                    setOrderToAssignRider(null);
+                    setSelectedRider(null);
+                    setRiderRecommendations(null);
+                    setRiderSearchTerm('');
+                    setRiderSearchResults([]);
+                  }}
+                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                
+                <button
+                  onClick={confirmRiderAssignment}
+                  disabled={!selectedRider || assigningRider}
+                  className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+                >
+                  {assigningRider ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Assigning...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Truck className="w-4 h-4" />
+                      <span>Assign to {selectedRider?.name || 'Rider'}</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -906,13 +1112,14 @@ const OrderManagement = () => {
                                 </div>
                               </div>
                             </div>
-         {activeTab === 'assigned' && (
+                          </div>
                           
                           {selectedVendor?.id === vendor.id && (
                             <div className="ml-4">
                               <CheckCircle className="w-6 h-6 text-emerald-600" />
                             </div>
                           )}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -930,16 +1137,6 @@ const OrderManagement = () => {
                         <div
                           key={vendor.id}
                           className={`border rounded-lg p-4 cursor-pointer transition-all ${
-             {activeTab === 'vendor-assigned' && (
-               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                 Vendor
-               </th>
-             )}
-             {activeTab === 'assigned' && (
-               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                 Assigned To
-               </th>
-             )}
                             selectedVendor?.id === vendor.id
                               ? 'border-emerald-500 bg-emerald-50'
                               : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
@@ -978,34 +1175,8 @@ const OrderManagement = () => {
                     </p>
                   </div>
                 )}
-               {activeTab === 'vendor-assigned' && (
-                 <td className="px-6 py-4 whitespace-nowrap">
-                   <div>
-                     <div className="text-sm font-medium text-gray-900">
-                       {order.vendor}
-                     </div>
-                     <div className="text-sm text-gray-500">
-                       {order.vendorDetails?.address}
-                     </div>
-                   </div>
-                 </td>
-               )}
-               {activeTab === 'assigned' && (
-                 <td className="px-6 py-4 whitespace-nowrap">
-                   <div>
-                     <div className="text-sm font-medium text-gray-900">
-                       Vendor: {order.vendor}
-                     </div>
-                     <div className="text-sm text-gray-500">
-                       Rider: {order.deliveryPartner}
-                     </div>
-                   </div>
-                 </td>
-               )}
               </div>
 
-                   {order.status === 'vendor_assigned' ? 'Awaiting Rider' : 
-                    order.status.charAt(0).toUpperCase() + order.status.slice(1).replace('_', ' ')}
               <div className="flex justify-between items-center mt-8 pt-6 border-t">
                 <button
                   onClick={() => {
@@ -1044,14 +1215,14 @@ const OrderManagement = () => {
                     className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
                   >
                     {assigningVendor ? (
-                   {/* Rider Assignment Actions */}
-                   {activeTab === 'vendor-assigned' && order.status === 'vendor_assigned' && (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                         <span>Assigning...</span>
-                       onClick={() => openRiderAssignmentModal(order)}
+                      </>
                     ) : (
                       <>
                         <CheckCircle className="w-4 h-4" />
-                       <Truck className="w-4 h-4" />
+                        <span>Assign to {selectedVendor?.name || 'Vendor'}</span>
                       </>
                     )}
                   </button>
@@ -1065,5 +1236,4 @@ const OrderManagement = () => {
   );
 };
 
-           {activeTab === 'vendor-assigned' && 'No orders awaiting rider assignment.'}
-           {activeTab === 'assigned' && 'No fully assigned orders found.'}
+export default OrderManagement;
