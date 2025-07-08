@@ -98,9 +98,87 @@ const AdminDashboard = () => {
         return <Reports />;
       case 'settings':
         return (
-          <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
-            <h3 className="text-lg font-semibold mb-4">System Settings</h3>
-            <p className="text-gray-600">Settings panel coming soon...</p>
+          <div className="space-y-6 p-4 sm:p-6">
+            <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
+              <h3 className="text-lg font-semibold mb-4">System Settings</h3>
+              
+              {/* General Settings */}
+              <div className="space-y-4 mb-6">
+                <h4 className="text-md font-medium text-gray-900">General Settings</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <ToggleSwitch
+                    enabled={preferences.notifications}
+                    onChange={() => togglePreference('notifications')}
+                    label="Enable Notifications"
+                    id="settings-notifications"
+                  />
+                  <ToggleSwitch
+                    enabled={preferences.autoLogout}
+                    onChange={() => togglePreference('autoLogout')}
+                    label="Auto Logout"
+                    id="settings-auto-logout"
+                  />
+                  <ToggleSwitch
+                    enabled={preferences.twoFactorAuth}
+                    onChange={() => togglePreference('twoFactorAuth')}
+                    label="Two-Factor Authentication"
+                    id="settings-2fa"
+                  />
+                </div>
+              </div>
+
+              {/* Theme Settings */}
+              <div className="space-y-4 mb-6 border-t pt-6">
+                <h4 className="text-md font-medium text-gray-900">Theme Settings</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Theme</label>
+                    <select 
+                      value={preferences.theme}
+                      onChange={(e) => updatePreferences({ theme: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    >
+                      <option value="light">Light</option>
+                      <option value="dark">Dark</option>
+                      <option value="auto">Auto</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Dashboard Preferences */}
+              <div className="space-y-4 border-t pt-6">
+                <h4 className="text-md font-medium text-gray-900">Dashboard Preferences</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <ToggleSwitch
+                    enabled={dashboardPreferences.compactView}
+                    onChange={(newValue) => handleDashboardToggle('compactView', newValue)}
+                    label="Compact View"
+                    id="settings-compact-view"
+                  />
+                  <ToggleSwitch
+                    enabled={dashboardPreferences.autoSave}
+                    onChange={(newValue) => handleDashboardToggle('autoSave', newValue)}
+                    label="Auto Save"
+                    id="settings-auto-save"
+                  />
+                </div>
+              </div>
+
+              {/* Save Button */}
+              <div className="border-t pt-6">
+                <button 
+                  onClick={() => {
+                    if (window.showNotification) {
+                      window.showNotification('Settings Saved', 'Your preferences have been updated successfully', 'success');
+                    }
+                  }}
+                  className="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
+                >
+                  Save Settings
+                </button>
+              </div>
+            </div>
           </div>
         );
       default:
