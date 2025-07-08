@@ -190,15 +190,15 @@ const DashboardOverview = () => {
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-emerald-500 rounded-full"></div>
-                <span className="text-xs sm:text-sm text-gray-600">Delivered</span>
+                <span className="text-xs sm:text-sm text-gray-600">Delivered (50%)</span>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
-                <span className="text-xs sm:text-sm text-gray-600">Pending</span>
+                <span className="text-xs sm:text-sm text-gray-600">Pending (30%)</span>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                <span className="text-xs sm:text-sm text-gray-600">Cancelled</span>
+                <span className="text-xs sm:text-sm text-gray-600">Cancelled (20%)</span>
               </div>
             </div>
             <p className="text-xs text-gray-500 mt-4">Last 7 days</p>
@@ -255,9 +255,18 @@ const DashboardOverview = () => {
       <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
         <h3 className="text-base sm:text-lg font-semibold mb-4">Orders Overview</h3>
         <div className="space-y-2 mb-4">
-          <p className="text-xs sm:text-sm text-gray-600">Express</p>
-          <p className="text-xs sm:text-sm text-gray-600">City Mart</p>
-          <p className="text-xs sm:text-sm text-gray-600">Nationwide</p>
+          <div className="flex items-center justify-between">
+            <p className="text-xs sm:text-sm text-gray-600">Express</p>
+            <span className="text-xs text-emerald-600 font-medium">↗ +15%</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <p className="text-xs sm:text-sm text-gray-600">City Mart</p>
+            <span className="text-xs text-blue-600 font-medium">↗ +8%</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <p className="text-xs sm:text-sm text-gray-600">Nationwide</p>
+            <span className="text-xs text-purple-600 font-medium">↗ +12%</span>
+          </div>
         </div>
         <div className="h-24 sm:h-32 flex items-end justify-between">
           <svg className="w-full h-full" viewBox="0 0 400 100">

@@ -175,6 +175,45 @@ export const mockStoreOwners = [
     monthlyRevenue: 280000,
     monthlyOrders: 320,
     joinedDate: '2023-07-22T00:00:00Z'
+  },
+  {
+    id: 'so3',
+    name: 'Amit Patel',
+    storeName: 'Patel Medical Store',
+    phone: '+919876543232',
+    address: 'Medical Square, Ahmedabad',
+    status: 'pending',
+    storeType: 'Pharmacy',
+    category: 'Healthcare',
+    monthlyRevenue: 95000,
+    monthlyOrders: 180,
+    joinedDate: '2024-01-15T00:00:00Z'
+  },
+  {
+    id: 'so4',
+    name: 'Sunita Devi',
+    storeName: 'Fresh Vegetables',
+    phone: '+919876543233',
+    address: 'Vegetable Market, Pune',
+    status: 'active',
+    storeType: 'Grocery Store',
+    category: 'Fresh Produce',
+    monthlyRevenue: 65000,
+    monthlyOrders: 520,
+    joinedDate: '2023-09-10T00:00:00Z'
+  },
+  {
+    id: 'so5',
+    name: 'Ravi Kumar',
+    storeName: 'Kumar Fashion Hub',
+    phone: '+919876543234',
+    address: 'Fashion Street, Mumbai',
+    status: 'suspended',
+    storeType: 'Fashion Store',
+    category: 'Clothing',
+    monthlyRevenue: 150000,
+    monthlyOrders: 280,
+    joinedDate: '2023-03-20T00:00:00Z'
   }
 ];
 
