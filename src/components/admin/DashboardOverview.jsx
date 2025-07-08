@@ -66,7 +66,7 @@ const DashboardOverview = () => {
   ];
 
   return (
-    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Dashboard Settings */}
       <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
         <h3 className="text-base sm:text-lg font-semibold mb-4">Dashboard Settings</h3>

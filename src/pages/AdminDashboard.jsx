@@ -98,7 +98,7 @@ const AdminDashboard = () => {
         return <Reports />;
       case 'settings':
         return (
-          <div className="space-y-6 p-4 sm:p-6">
+          <div className="space-y-6">
             <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
               <h3 className="text-lg font-semibold mb-4">System Settings</h3>
               
@@ -316,8 +316,8 @@ const AdminDashboard = () => {
         </header>
 
         {/* Content */}
-        <main className="flex-1 bg-gray-50 overflow-auto">
-          <div className="h-full">
+        <main className="flex-1 bg-gray-50 overflow-auto min-h-screen">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             {renderContent()}
           </div>
         </main>

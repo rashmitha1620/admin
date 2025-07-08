@@ -105,6 +105,12 @@
 
 /* Mobile-first responsive design improvements */
 @media (max-width: 768px) {
+  /* Ensure proper content spacing on mobile */
+  .admin-content {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
   /* Ensure proper touch targets */
   button, a, input, select, textarea {
     min-height: 44px;
@@ -131,6 +137,12 @@
 
 /* Desktop optimizations */
 @media (min-width: 1024px) {
+  /* Better content centering on desktop */
+  .admin-content {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  
   .desktop-grid {
     grid-template-columns: repeat(3, 1fr);
   }

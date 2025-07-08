@@ -107,7 +107,7 @@ const VendorStockPanel = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 admin-content">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Vendor Stock Panel</h1>
