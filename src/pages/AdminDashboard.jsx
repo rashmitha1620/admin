@@ -27,6 +27,7 @@ import Riders from '../components/admin/Riders';
 import AssignOrders from '../components/admin/AssignOrders';
 import Reports from '../components/admin/Reports';
 import NotificationDropdown from '../components/admin/NotificationDropdown';
+import OrderManagement from '../components/admin/OrderManagement';
 import { useAuth } from '../hooks/useAuth';
 import ToggleSwitch from '../components/common/ToggleSwitch';
 
@@ -42,6 +43,7 @@ const AdminDashboard = () => {
 
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'order-management', label: 'Order Management', icon: ClipboardList },
     { id: 'express-orders', label: 'Express Orders', icon: Package },
     { id: 'nationwide-orders', label: 'Nationwide Orders', icon: Package },
     { id: 'city-mart-orders', label: 'City Mart Orders', icon: Package },
@@ -88,6 +90,8 @@ const AdminDashboard = () => {
     switch (activeTab) {
       case 'dashboard':
         return <DashboardOverview />;
+      case 'order-management':
+        return <OrderManagement />;
       case 'express-orders':
         return <ExpressOrders />;
       case 'nationwide-orders':
