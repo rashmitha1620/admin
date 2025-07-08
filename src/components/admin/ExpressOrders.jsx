@@ -3,12 +3,19 @@ import { Search, Filter, Eye, Edit, Truck, Clock, CheckCircle } from 'lucide-rea
 import { ordersApi } from '../../services/api';
 import { formatCurrency, formatDate, getStatusColor } from '../../utils/helpers';
 import LoadingSpinner from '../common/LoadingSpinner';
+import ToggleSwitch from '../common/ToggleSwitch';
 
 const ExpressOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [orderSettings, setOrderSettings] = useState({});
+  const [viewSettings, setViewSettings] = useState({
+    showUrgentOnly: false,
+    autoRefresh: true,
+    soundNotifications: false
+  });
 
   useEffect(() => {
     fetchExpressOrders();
@@ -36,11 +43,29 @@ const ExpressOrders = () => {
     }
   };
 
+  const handleOrderToggle = (orderId, setting, newValue) => {
+    setOrderSettings(prev => ({
+      ...prev,
+      [orderId]: {
+        ...prev[orderId],
+        [setting]: newValue
+      }
+    }));
+  };
+
+  const handleViewToggle = (setting, newValue) => {
+    setViewSettings(prev => ({
+      ...prev,
+      [setting]: newValue
+    }));
+  };
+
   const filteredOrders = orders.filter(order => {
     const matchesSearch = order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          order.customer.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = !statusFilter || order.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesUrgent = !viewSettings.showUrgentOnly || order.priority === 'urgent';
+    return matchesSearch && matchesStatus && matchesUrgent;
   });
 
   if (loading) {
@@ -123,6 +148,34 @@ const ExpressOrders = () => {
             </div>
             <Clock className="w-8 h-8 text-purple-500" />
           </div>
+        </div>
+      </div>
+
+      {/* View Settings */}
+      <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
+        <h3 className="text-lg font-semibold mb-4">View Settings</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <ToggleSwitch
+            enabled={viewSettings.showUrgentOnly}
+            onChange={(newValue) => handleViewToggle('showUrgentOnly', newValue)}
+            label="Show Urgent Only"
+            id="express-urgent-only"
+            size="small"
+          />
+          <ToggleSwitch
+            enabled={viewSettings.autoRefresh}
+            onChange={(newValue) => handleViewToggle('autoRefresh', newValue)}
+            label="Auto Refresh"
+            id="express-auto-refresh"
+            size="small"
+          />
+          <ToggleSwitch
+            enabled={viewSettings.soundNotifications}
+            onChange={(newValue) => handleViewToggle('soundNotifications', newValue)}
+            label="Sound Notifications"
+            id="express-sound-notifications"
+            size="small"
+          />
         </div>
       </div>
 
@@ -209,6 +262,13 @@ const ExpressOrders = () => {
                     <button className="text-blue-600 hover:text-blue-900">
                       <Edit className="w-4 h-4" />
                     </button>
+                    <ToggleSwitch
+                      enabled={orderSettings[order.id]?.urgent || false}
+                      onChange={(newValue) => handleOrderToggle(order.id, 'urgent', newValue)}
+                      size="small"
+                      label="Urgent"
+                      id={`express-urgent-${order.id}`}
+                    />
                   </td>
                 </tr>
               ))}

@@ -3,12 +3,19 @@ import { Search, Filter, Eye, Edit, Package, Truck, MapPin } from 'lucide-react'
 import { ordersApi } from '../../services/api';
 import { formatCurrency, formatDate, getStatusColor } from '../../utils/helpers';
 import LoadingSpinner from '../common/LoadingSpinner';
+import ToggleSwitch from '../common/ToggleSwitch';
 
 const NationwideOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [trackingSettings, setTrackingSettings] = useState({});
+  const [viewSettings, setViewSettings] = useState({
+    showInTransitOnly: false,
+    enableTracking: true,
+    smsNotifications: false
+  });
 
   useEffect(() => {
     fetchNationwideOrders();
@@ -36,11 +43,29 @@ const NationwideOrders = () => {
     }
   };
 
+  const handleTrackingToggle = (orderId, setting, newValue) => {
+    setTrackingSettings(prev => ({
+      ...prev,
+      [orderId]: {
+        ...prev[orderId],
+        [setting]: newValue
+      }
+    }));
+  };
+
+  const handleViewToggle = (setting, newValue) => {
+    setViewSettings(prev => ({
+      ...prev,
+      [setting]: newValue
+    }));
+  };
+
   const filteredOrders = orders.filter(order => {
     const matchesSearch = order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          order.customer.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = !statusFilter || order.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesInTransit = !viewSettings.showInTransitOnly || order.status === 'in_transit';
+    return matchesSearch && matchesStatus && matchesInTransit;
   });
 
   if (loading) {
@@ -122,6 +147,34 @@ const NationwideOrders = () => {
             </div>
             <Package className="w-8 h-8 text-purple-500" />
           </div>
+        </div>
+      </div>
+
+      {/* Tracking Settings */}
+      <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
+        <h3 className="text-lg font-semibold mb-4">Tracking Settings</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <ToggleSwitch
+            enabled={viewSettings.showInTransitOnly}
+            onChange={(newValue) => handleViewToggle('showInTransitOnly', newValue)}
+            label="Show In-Transit Only"
+            id="nationwide-in-transit-only"
+            size="small"
+          />
+          <ToggleSwitch
+            enabled={viewSettings.enableTracking}
+            onChange={(newValue) => handleViewToggle('enableTracking', newValue)}
+            label="Enable Tracking"
+            id="nationwide-enable-tracking"
+            size="small"
+          />
+          <ToggleSwitch
+            enabled={viewSettings.smsNotifications}
+            onChange={(newValue) => handleViewToggle('smsNotifications', newValue)}
+            label="SMS Notifications"
+            id="nationwide-sms-notifications"
+            size="small"
+          />
         </div>
       </div>
 
@@ -211,6 +264,13 @@ const NationwideOrders = () => {
                     <button className="text-blue-600 hover:text-blue-900">
                       <Edit className="w-4 h-4" />
                     </button>
+                    <ToggleSwitch
+                      enabled={trackingSettings[order.id]?.priority || false}
+                      onChange={(newValue) => handleTrackingToggle(order.id, 'priority', newValue)}
+                      size="small"
+                      label="Priority"
+                      id={`nationwide-priority-${order.id}`}
+                    />
                   </td>
                 </tr>
               ))}

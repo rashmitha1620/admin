@@ -1,9 +1,16 @@
 import { useState, useEffect } from 'react';
 import { USER_ROLES } from '../utils/constants';
+import { authApi } from '../services/api';
 
 export const useAuth = () => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [preferences, setPreferences] = useState({
+    theme: 'light',
+    notifications: true,
+    autoLogout: false,
+    twoFactorAuth: false
+  });
 
   useEffect(() => {
     const savedUser = localStorage.getItem('grooso-admin-user');
@@ -13,6 +20,15 @@ export const useAuth = () => {
       } catch (error) {
         console.error('Error parsing saved user:', error);
         localStorage.removeItem('grooso-admin-user');
+      }
+    }
+    
+    const savedPreferences = localStorage.getItem('grooso-admin-preferences');
+    if (savedPreferences) {
+      try {
+        setPreferences(JSON.parse(savedPreferences));
+      } catch (error) {
+        console.error('Error parsing saved preferences:', error);
       }
     }
     setIsLoading(false);
@@ -40,12 +56,25 @@ export const useAuth = () => {
     localStorage.setItem('grooso-admin-user', JSON.stringify(updatedUser));
   };
 
+  const updatePreferences = (newPreferences) => {
+    const updatedPreferences = { ...preferences, ...newPreferences };
+    setPreferences(updatedPreferences);
+    localStorage.setItem('grooso-admin-preferences', JSON.stringify(updatedPreferences));
+  };
+
+  const togglePreference = (key) => {
+    updatePreferences({ [key]: !preferences[key] });
+  };
+
   return {
     user,
+    preferences,
     isLoading,
     login,
     logout,
     updateUser,
+    updatePreferences,
+    togglePreference,
     isAdmin,
     isAuthenticated: !!user
   };

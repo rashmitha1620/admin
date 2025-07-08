@@ -3,12 +3,19 @@ import { Search, Filter, Eye, Edit, Store, Clock, CheckCircle } from 'lucide-rea
 import { ordersApi } from '../../services/api';
 import { formatCurrency, formatDate, getStatusColor } from '../../utils/helpers';
 import LoadingSpinner from '../common/LoadingSpinner';
+import ToggleSwitch from '../common/ToggleSwitch';
 
 const CityMartOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [orderSettings, setOrderSettings] = useState({});
+  const [viewSettings, setViewSettings] = useState({
+    showPickupOnly: false,
+    autoAssign: true,
+    storeNotifications: false
+  });
 
   useEffect(() => {
     fetchCityMartOrders();
@@ -36,11 +43,29 @@ const CityMartOrders = () => {
     }
   };
 
+  const handleOrderToggle = (orderId, setting, newValue) => {
+    setOrderSettings(prev => ({
+      ...prev,
+      [orderId]: {
+        ...prev[orderId],
+        [setting]: newValue
+      }
+    }));
+  };
+
+  const handleViewToggle = (setting, newValue) => {
+    setViewSettings(prev => ({
+      ...prev,
+      [setting]: newValue
+    }));
+  };
+
   const filteredOrders = orders.filter(order => {
     const matchesSearch = order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          order.customer.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = !statusFilter || order.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesPickup = !viewSettings.showPickupOnly || order.orderType === 'pickup';
+    return matchesSearch && matchesStatus && matchesPickup;
   });
 
   if (loading) {
@@ -122,6 +147,34 @@ const CityMartOrders = () => {
             </div>
             <CheckCircle className="w-8 h-8 text-emerald-500" />
           </div>
+        </div>
+      </div>
+
+      {/* Store Settings */}
+      <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
+        <h3 className="text-lg font-semibold mb-4">Store Settings</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <ToggleSwitch
+            enabled={viewSettings.showPickupOnly}
+            onChange={(newValue) => handleViewToggle('showPickupOnly', newValue)}
+            label="Show Pickup Only"
+            id="citymart-pickup-only"
+            size="small"
+          />
+          <ToggleSwitch
+            enabled={viewSettings.autoAssign}
+            onChange={(newValue) => handleViewToggle('autoAssign', newValue)}
+            label="Auto Assign"
+            id="citymart-auto-assign"
+            size="small"
+          />
+          <ToggleSwitch
+            enabled={viewSettings.storeNotifications}
+            onChange={(newValue) => handleViewToggle('storeNotifications', newValue)}
+            label="Store Notifications"
+            id="citymart-store-notifications"
+            size="small"
+          />
         </div>
       </div>
 
@@ -212,6 +265,13 @@ const CityMartOrders = () => {
                     <button className="text-blue-600 hover:text-blue-900">
                       <Edit className="w-4 h-4" />
                     </button>
+                    <ToggleSwitch
+                      enabled={orderSettings[order.id]?.readyForPickup || false}
+                      onChange={(newValue) => handleOrderToggle(order.id, 'readyForPickup', newValue)}
+                      size="small"
+                      label="Ready"
+                      id={`citymart-ready-${order.id}`}
+                    />
                   </td>
                 </tr>
               ))}

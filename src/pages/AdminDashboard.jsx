@@ -28,11 +28,17 @@ import AssignOrders from '../components/admin/AssignOrders';
 import Reports from '../components/admin/Reports';
 import NotificationDropdown from '../components/admin/NotificationDropdown';
 import { useAuth } from '../hooks/useAuth';
+import ToggleSwitch from '../components/common/ToggleSwitch';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user, logout } = useAuth();
+  const { user, logout, preferences, togglePreference } = useAuth();
+  const [dashboardPreferences, setDashboardPreferences] = useState({
+    compactView: false,
+    darkMode: false,
+    autoSave: true
+  });
 
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -57,6 +63,13 @@ const AdminDashboard = () => {
   const handleTabChange = (tabId) => {
     setActiveTab(tabId);
     setSidebarOpen(false); // Close sidebar on mobile after selection
+  };
+
+  const handleDashboardToggle = (setting, newValue) => {
+    setDashboardPreferences(prev => ({
+      ...prev,
+      [setting]: newValue
+    }));
   };
 
   const renderContent = () => {
@@ -198,6 +211,17 @@ const AdminDashboard = () => {
             <div className="flex items-center space-x-2 sm:space-x-4">
               {/* Notifications */}
               <NotificationDropdown />
+              
+              {/* Dashboard Settings */}
+              <div className="hidden lg:flex items-center space-x-2">
+                <ToggleSwitch
+                  enabled={dashboardPreferences.compactView}
+                  onChange={(newValue) => handleDashboardToggle('compactView', newValue)}
+                  size="small"
+                  label="Compact"
+                  id="dashboard-compact-view"
+                />
+              </div>
               
               {/* User Profile - Hidden on mobile, shown on larger screens */}
               <div className="hidden sm:flex items-center space-x-2">

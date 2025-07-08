@@ -146,3 +146,23 @@ export const whatsappApi = {
   sendVendorMessage: (data) => apiService.post('/whatsapp/send-vendor-message', data),
   getTemplates: () => apiService.get('/whatsapp/templates')
 };
+
+export const settingsApi = {
+  getSettings: () => apiService.get('/settings'),
+  updateSettings: (settings) => apiService.put('/settings', settings),
+  resetSettings: () => apiService.post('/settings/reset')
+};
+
+export const analyticsApi = {
+  getAnalytics: (dateRange) => apiService.get(`/analytics?range=${dateRange}`),
+  getReports: (type) => apiService.get(`/analytics/reports/${type}`),
+  exportReport: (type, format) => apiService.get(`/analytics/export/${type}?format=${format}`)
+};
+
+export const notificationsApi = {
+  getNotifications: () => apiService.get('/notifications'),
+  markAsRead: (id) => apiService.put(`/notifications/${id}/read`),
+  markAllAsRead: () => apiService.put('/notifications/read-all'),
+  deleteNotification: (id) => apiService.delete(`/notifications/${id}`),
+  updateSettings: (settings) => apiService.put('/notifications/settings', settings)
+};

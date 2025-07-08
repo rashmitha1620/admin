@@ -54,3 +54,104 @@ export const debounce = (func, wait) => {
     timeout = setTimeout(later, wait);
   };
 };
+
+export const showNotification = (title, message, type = 'info') => {
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm transition-all duration-300 ${
+    type === 'success' ? 'bg-emerald-500 text-white' :
+    type === 'error' ? 'bg-red-500 text-white' :
+    type === 'warning' ? 'bg-yellow-500 text-white' :
+    'bg-blue-500 text-white'
+  }`;
+  
+  notification.innerHTML = `
+    <div class="flex items-center justify-between">
+      <div>
+        <h4 class="font-medium">${title}</h4>
+        <p class="text-sm opacity-90">${message}</p>
+      </div>
+      <button class="ml-4 text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">
+        ×
+      </button>
+    </div>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // Auto remove after 5 seconds
+  setTimeout(() => {
+    if (notification.parentElement) {
+      notification.remove();
+    }
+  }, 5000);
+};
+
+export const validateForm = (formData, rules) => {
+  const errors = {};
+  
+  Object.keys(rules).forEach(field => {
+    const rule = rules[field];
+    const value = formData[field];
+    
+    if (rule.required && (!value || value.trim() === '')) {
+      errors[field] = `${field} is required`;
+    }
+    
+    if (rule.minLength && value && value.length < rule.minLength) {
+      errors[field] = `${field} must be at least ${rule.minLength} characters`;
+    }
+    
+    if (rule.email && value && !/\S+@\S+\.\S+/.test(value)) {
+      errors[field] = `${field} must be a valid email`;
+    }
+    
+    if (rule.phone && value && !/^\+?[\d\s-()]+$/.test(value)) {
+      errors[field] = `${field} must be a valid phone number`;
+    }
+  });
+  
+  return errors;
+};
+
+export const exportToCSV = (data, filename) => {
+  if (!data || data.length === 0) return;
+  
+  const headers = Object.keys(data[0]);
+  const csvContent = [
+    headers.join(','),
+    ...data.map(row => headers.map(header => `"${row[header] || ''}"`).join(','))
+  ].join('\n');
+  
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  link.setAttribute('href', url);
+  link.setAttribute('download', `${filename}.csv`);
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
+export const formatPhoneNumber = (phone) => {
+  const cleaned = phone.replace(/\D/g, '');
+  if (cleaned.length === 10) {
+    return `+91 ${cleaned.slice(0, 5)} ${cleaned.slice(5)}`;
+  }
+  return phone;
+};
+
+export const generateId = () => {
+  return Math.random().toString(36).substr(2, 9);
+};
+
+export const copyToClipboard = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text);
+    showNotification('Copied!', 'Text copied to clipboard', 'success');
+  } catch (err) {
+    console.error('Failed to copy: ', err);
+    showNotification('Error', 'Failed to copy to clipboard', 'error');
+  }
+};

@@ -1,12 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Bell, X, Check, Clock, AlertCircle, Package, Truck, User, Settings } from 'lucide-react';
 import { formatDate } from '../../utils/helpers';
+import ToggleSwitch from '../common/ToggleSwitch';
 
 const NotificationDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const dropdownRef = useRef(null);
+  const [notificationSettings, setNotificationSettings] = useState({
+    soundEnabled: true,
+    emailNotifications: false,
+    pushNotifications: true,
+    orderUpdates: true,
+    systemAlerts: true
+  });
 
   // Mock notifications data
   const mockNotifications = [
@@ -111,6 +119,13 @@ const NotificationDropdown = () => {
       prev.map(notification => ({ ...notification, isRead: true }))
     );
     setUnreadCount(0);
+  };
+
+  const handleNotificationToggle = (setting, newValue) => {
+    setNotificationSettings(prev => ({
+      ...prev,
+      [setting]: newValue
+    }));
   };
 
   const deleteNotification = (notificationId) => {
@@ -253,7 +268,27 @@ const NotificationDropdown = () => {
 
           {/* Footer */}
           {notifications.length > 0 && (
-            <div className="px-4 py-3 border-t bg-gray-50">
+            <div className="px-4 py-3 border-t bg-gray-50 space-y-3">
+              {/* Notification Settings */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-medium text-gray-700">Notification Settings</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  <ToggleSwitch
+                    enabled={notificationSettings.soundEnabled}
+                    onChange={(newValue) => handleNotificationToggle('soundEnabled', newValue)}
+                    label="Sound"
+                    id="notification-sound"
+                    size="small"
+                  />
+                  <ToggleSwitch
+                    enabled={notificationSettings.pushNotifications}
+                    onChange={(newValue) => handleNotificationToggle('pushNotifications', newValue)}
+                    label="Push"
+                    id="notification-push"
+                    size="small"
+                  />
+                </div>
+              </div>
               <button className="w-full text-center text-xs sm:text-sm text-emerald-600 hover:text-emerald-700 font-medium">
                 View all notifications
               </button>
