@@ -657,16 +657,16 @@ const OrderManagement = () => {
                     <span className="font-medium text-green-800">Vendor:</span> {orderToAssign.vendorDetails.name}
                   </div>
                 )}
-                {selectedOrder.vendorDetails && (
+                {orderToAssign?.vendorDetails && (
                   <div className="mt-3 p-3 bg-green-50 rounded-lg">
                     <p className="text-sm font-medium text-green-800">Vendor Assigned:</p>
-                    <p className="text-sm text-green-700">{selectedOrder.vendorDetails.name}</p>
-                    <p className="text-xs text-green-600">{selectedOrder.vendorDetails.address}</p>
+                    <p className="text-sm text-green-700">{orderToAssign.vendorDetails.name}</p>
+                    <p className="text-xs text-green-600">{orderToAssign.vendorDetails.address}</p>
                   </div>
                 )}
               </div>
               <div>
-                <span className="font-medium">Created:</span> {formatDate(selectedOrder.createdAt)}
+                <span className="font-medium">Created:</span> {formatDate(orderToAssign?.createdAt)}
               </div>
 
               <div className="space-y-3 max-h-64 overflow-y-auto">
