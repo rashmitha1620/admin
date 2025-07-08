@@ -141,9 +141,9 @@ const NotificationDropdown = () => {
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2 text-gray-600 hover:text-emerald-600 transition-colors rounded-full hover:bg-gray-100"
       >
-        <Bell className="w-6 h-6" />
+        <Bell className="w-5 h-5 sm:w-6 sm:h-6" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center animate-pulse">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -151,16 +151,16 @@ const NotificationDropdown = () => {
 
       {/* Notification Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-xl border z-50 max-h-96 overflow-hidden">
+        <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-lg shadow-xl border z-50 max-h-96 overflow-hidden">
           {/* Header */}
           <div className="px-4 py-3 border-b bg-gray-50">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900">Notifications</h3>
               <div className="flex items-center space-x-2">
                 {unreadCount > 0 && (
                   <button
                     onClick={markAllAsRead}
-                    className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+                    className="text-xs sm:text-sm text-emerald-600 hover:text-emerald-700 font-medium"
                   >
                     Mark all read
                   </button>
@@ -174,7 +174,7 @@ const NotificationDropdown = () => {
               </div>
             </div>
             {unreadCount > 0 && (
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-xs sm:text-sm text-gray-600 mt-1">
                 You have {unreadCount} unread notification{unreadCount !== 1 ? 's' : ''}
               </p>
             )}
@@ -194,18 +194,18 @@ const NotificationDropdown = () => {
                   >
                     <div className="flex items-start space-x-3">
                       {/* Icon */}
-                      <div className={`flex-shrink-0 w-8 h-8 rounded-full ${notification.bgColor} flex items-center justify-center`}>
-                        <IconComponent className={`w-4 h-4 ${notification.color}`} />
+                      <div className={`flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 rounded-full ${notification.bgColor} flex items-center justify-center`}>
+                        <IconComponent className={`w-3 h-3 sm:w-4 sm:h-4 ${notification.color}`} />
                       </div>
 
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <p className={`text-sm font-medium ${!notification.isRead ? 'text-gray-900' : 'text-gray-700'}`}>
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-xs sm:text-sm font-medium ${!notification.isRead ? 'text-gray-900' : 'text-gray-700'} truncate`}>
                               {notification.title}
                             </p>
-                            <p className="text-sm text-gray-600 mt-1">
+                            <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">
                               {notification.message}
                             </p>
                             <div className="flex items-center space-x-2 mt-2">
@@ -254,7 +254,7 @@ const NotificationDropdown = () => {
           {/* Footer */}
           {notifications.length > 0 && (
             <div className="px-4 py-3 border-t bg-gray-50">
-              <button className="w-full text-center text-sm text-emerald-600 hover:text-emerald-700 font-medium">
+              <button className="w-full text-center text-xs sm:text-sm text-emerald-600 hover:text-emerald-700 font-medium">
                 View all notifications
               </button>
             </div>
