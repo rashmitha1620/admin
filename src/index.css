@@ -173,3 +173,110 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Compact View Styles */
+.is-compact .p-4 { padding: 0.75rem !important; } /* Reduce p-4 to p-3 equivalent */
+.is-compact .p-6 { padding: 1rem !important; }   /* Reduce p-6 to p-4 equivalent */
+.is-compact .space-y-6 > * + * { margin-top: 1rem !important; } /* Reduce space-y-6 to space-y-4 equivalent */
+.is-compact .space-y-4 > * + * { margin-top: 0.75rem !important; } /* Reduce space-y-4 to space-y-3 equivalent */
+.is-compact .text-sm { font-size: 0.75rem !important; } /* Reduce text-sm slightly */
+.is-compact .text-xs { font-size: 0.6875rem !important; } /* Reduce text-xs slightly */
+.is-compact .text-base { font-size: 0.875rem !important; } /* Reduce text-base to text-sm equivalent */
+.is-compact .text-lg { font-size: 1rem !important; } /* Reduce text-lg to text-base equivalent */
+.is-compact .text-xl { font-size: 1.125rem !important; } /* Reduce text-xl to text-lg equivalent */
+.is-compact .text-2xl { font-size: 1.25rem !important; } /* Reduce text-2xl to text-xl equivalent */
+.is-compact .text-3xl { font-size: 1.5rem !important; } /* Reduce text-3xl to text-2xl equivalent */
+
+/* Adjust specific component paddings/margins if needed */
+.is-compact .stat-card { padding: 1rem !important; } /* Example for stat cards */
+.is-compact .stat-card .text-2xl { font-size: 1.5rem !important; }
+.is-compact .stat-card .text-sm { font-size: 0.75rem !important; }
+
+/* Compact view for tables */
+.is-compact table th,
+.is-compact table td { 
+  padding: 0.5rem 1rem !important; 
+}
+
+/* Compact view for cards */
+.is-compact .bg-white.rounded-lg.shadow-sm.border {
+  padding: 1rem !important;
+}
+
+/* Compact view for buttons */
+.is-compact button {
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+}
+
+/* Compact view for form elements */
+.is-compact input,
+.is-compact select,
+.is-compact textarea {
+  padding: 0.375rem 0.75rem !important;
+  font-size: 0.875rem !important;
+}
+
+/* Compact view for grid gaps */
+.is-compact .gap-6 { gap: 1rem !important; }
+.is-compact .gap-4 { gap: 0.75rem !important; }
+.is-compact .gap-3 { gap: 0.5rem !important; }
+
+/* Compact view for margins */
+.is-compact .mb-6 { margin-bottom: 1rem !important; }
+.is-compact .mb-4 { margin-bottom: 0.75rem !important; }
+.is-compact .mt-6 { margin-top: 1rem !important; }
+.is-compact .mt-4 { margin-top: 0.75rem !important; }
+
+/* Compact view for specific dashboard elements */
+.is-compact .admin-content {
+  padding: 1rem !important;
+}
+
+.is-compact .admin-content > * + * {
+  margin-top: 1rem !important;
+}
+
+/* Compact view for notification dropdown */
+.is-compact .notification-enter {
+  animation-duration: 0.2s !important;
+}
+
+/* Compact view for modals */
+.is-compact .fixed.inset-0 .bg-white.rounded-lg {
+  padding: 1rem !important;
+}
+
+/* Compact view for sidebar */
+.is-compact .sidebar-item {
+  padding: 0.5rem 1rem !important;
+}
+
+/* Compact view for headers */
+.is-compact h1,
+.is-compact h2,
+.is-compact h3 {
+  line-height: 1.2 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* Compact view for icons */
+.is-compact .w-8.h-8 {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
+}
+
+.is-compact .w-6.h-6 {
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+}
+
+.is-compact .w-5.h-5 {
+  width: 1rem !important;
+  height: 1rem !important;
+}
+
+/* Compact view for toggle switches */
+.is-compact .toggle-switch {
+  transform: scale(0.9);
+}
