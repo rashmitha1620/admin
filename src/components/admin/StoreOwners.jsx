@@ -169,6 +169,9 @@ const StoreOwners = () => {
           : product
       )
     );
+    
+    // Log for debugging
+    console.log(`Store owner product ${productId} showOnGrooso changed to:`, newValue);
   };
 
   if (loading) {

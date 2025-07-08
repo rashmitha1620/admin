@@ -58,6 +58,9 @@ const CityMartOrders = () => {
       ...prev,
       [setting]: newValue
     }));
+    
+    // Log for debugging
+    console.log(`City mart orders view setting ${setting} changed to:`, newValue);
   };
 
   const filteredOrders = orders.filter(order => {

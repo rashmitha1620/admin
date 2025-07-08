@@ -99,6 +99,9 @@ const Riders = () => {
         [setting]: newValue
       }
     }));
+    
+    // Log for debugging
+    console.log(`Rider ${riderId} setting ${setting} changed to:`, newValue);
   };
   if (loading) {
     return (

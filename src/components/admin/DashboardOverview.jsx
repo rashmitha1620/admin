@@ -14,6 +14,9 @@ const DashboardOverview = () => {
       ...prev,
       [setting]: newValue
     }));
+    
+    // Log for debugging
+    console.log(`Dashboard setting ${setting} changed to:`, newValue);
   };
 
   const stats = [

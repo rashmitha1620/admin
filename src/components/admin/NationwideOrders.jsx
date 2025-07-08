@@ -58,6 +58,9 @@ const NationwideOrders = () => {
       ...prev,
       [setting]: newValue
     }));
+    
+    // Log for debugging
+    console.log(`Nationwide orders view setting ${setting} changed to:`, newValue);
   };
 
   const filteredOrders = orders.filter(order => {

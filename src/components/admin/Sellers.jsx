@@ -97,6 +97,9 @@ const Sellers = () => {
         [setting]: newValue
       }
     }));
+    
+    // Log for debugging
+    console.log(`Seller ${sellerId} setting ${setting} changed to:`, newValue);
   };
   if (loading) {
     return (

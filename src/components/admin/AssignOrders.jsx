@@ -61,6 +61,9 @@ const AssignOrders = () => {
       ...prev,
       [setting]: newValue
     }));
+    
+    // Log for debugging
+    console.log(`Assignment setting ${setting} changed to:`, newValue);
   };
 
   const filteredOrders = unassignedOrders.filter(order =>

@@ -104,6 +104,9 @@ const VendorStockPanel = () => {
           : product
       )
     );
+    
+    // Log for debugging
+    console.log(`Product ${productId} showOnGrooso changed to:`, newValue);
   };
 
   return (

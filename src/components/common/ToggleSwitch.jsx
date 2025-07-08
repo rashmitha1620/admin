@@ -29,7 +29,9 @@ const ToggleSwitch = ({
 
   const currentSize = sizeClasses[size];
 
-  const handleToggle = () => {
+  const handleToggle = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (!disabled && onChange) {
       onChange(!enabled);
     }
@@ -40,7 +42,8 @@ const ToggleSwitch = ({
       {label && (
         <label 
           htmlFor={id} 
-          className={`toggle-switch-label ${compact ? 'text-xs' : 'text-sm'} font-medium text-gray-700 cursor-pointer whitespace-nowrap`}
+          className={`toggle-switch-label ${compact ? 'text-xs' : 'text-sm'} font-medium text-gray-700 cursor-pointer whitespace-nowrap select-none`}
+          onClick={handleToggle}
         >
           {label}
         </label>

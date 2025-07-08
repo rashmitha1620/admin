@@ -73,6 +73,9 @@ const OrderManagement = () => {
         [setting]: newValue
       }
     }));
+    
+    // Log for debugging
+    console.log(`Order ${orderId} setting ${setting} changed to:`, newValue);
   };
 
   const filteredOrders = orders.filter(order => {

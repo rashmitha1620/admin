@@ -126,6 +126,9 @@ const NotificationDropdown = () => {
       ...prev,
       [setting]: newValue
     }));
+    
+    // Log for debugging
+    console.log(`Notification setting ${setting} changed to:`, newValue);
   };
 
   const deleteNotification = (notificationId) => {

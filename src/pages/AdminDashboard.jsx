@@ -70,6 +70,18 @@ const AdminDashboard = () => {
       ...prev,
       [setting]: newValue
     }));
+    
+    // Log for debugging
+    console.log(`Dashboard preference ${setting} changed to:`, newValue);
+    
+    // Apply compact view class to body
+    if (setting === 'compactView') {
+      if (newValue) {
+        document.body.classList.add('is-compact');
+      } else {
+        document.body.classList.remove('is-compact');
+      }
+    }
   };
 
   const renderContent = () => {

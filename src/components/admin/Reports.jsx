@@ -36,6 +36,9 @@ const Reports = () => {
       ...prev,
       [setting]: newValue
     }));
+    
+    // Log for debugging
+    console.log(`Report setting ${setting} changed to:`, newValue);
   };
   return (
     <div className="space-y-6 admin-content">

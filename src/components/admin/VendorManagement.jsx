@@ -86,6 +86,9 @@ const VendorManagement = () => {
         [setting]: newValue
       }
     }));
+    
+    // Log for debugging
+    console.log(`Vendor ${vendorId} setting ${setting} changed to:`, newValue);
   };
 
   const handleSendInvite = () => {

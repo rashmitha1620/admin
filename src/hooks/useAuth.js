@@ -60,10 +60,17 @@ export const useAuth = () => {
     const updatedPreferences = { ...preferences, ...newPreferences };
     setPreferences(updatedPreferences);
     localStorage.setItem('grooso-admin-preferences', JSON.stringify(updatedPreferences));
+    
+    // Log for debugging
+    console.log('Auth preferences updated:', updatedPreferences);
   };
 
   const togglePreference = (key) => {
-    updatePreferences({ [key]: !preferences[key] });
+    const newValue = !preferences[key];
+    updatePreferences({ [key]: newValue });
+    
+    // Log for debugging
+    console.log(`Auth preference ${key} toggled to:`, newValue);
   };
 
   return {

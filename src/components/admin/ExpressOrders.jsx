@@ -58,6 +58,9 @@ const ExpressOrders = () => {
       ...prev,
       [setting]: newValue
     }));
+    
+    // Log for debugging
+    console.log(`Express orders view setting ${setting} changed to:`, newValue);
   };
 
   const filteredOrders = orders.filter(order => {
