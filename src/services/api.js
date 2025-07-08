@@ -98,26 +98,32 @@ export const ordersApi = {
   getOrders: () => apiService.get('/orders'),
   getExpressOrders: () => {
     // Filter orders by type and status (assigned orders that have both vendor and rider)
-    const expressOrders = [...mockExpressOrders, ...mockOrders.filter(order => 
-      order.orderType === 'express' && 
-      (order.status === 'assigned' || order.status === 'in_transit' || order.status === 'delivered')
-    )];
+    const expressOrders = [...mockExpressOrders, ...mockOrders.filter(order => {
+      // Only show orders that have been accepted (confirmed status or higher) and are express type
+      return order.orderType === 'express' && 
+             (order.status === 'confirmed' || order.status === 'assigned' || 
+              order.status === 'in_transit' || order.status === 'delivered');
+    })];
     return Promise.resolve({ data: expressOrders });
   },
   getNationwideOrders: () => {
     // Filter orders by type and status (assigned orders that have both vendor and rider)
-    const nationwideOrders = [...mockNationwideOrders, ...mockOrders.filter(order => 
-      order.orderType === 'nationwide' && 
-      (order.status === 'assigned' || order.status === 'in_transit' || order.status === 'delivered')
-    )];
+    const nationwideOrders = [...mockNationwideOrders, ...mockOrders.filter(order => {
+      // Only show orders that have been accepted (confirmed status or higher) and are nationwide type
+      return order.orderType === 'nationwide' && 
+             (order.status === 'confirmed' || order.status === 'assigned' || 
+              order.status === 'in_transit' || order.status === 'delivered');
+    })];
     return Promise.resolve({ data: nationwideOrders });
   },
   getCityMartOrders: () => {
     // Filter orders by type and status (assigned orders that have both vendor and rider)
-    const citymartOrders = [...mockCityMartOrders, ...mockOrders.filter(order => 
-      order.orderType === 'citymart' && 
-      (order.status === 'assigned' || order.status === 'in_transit' || order.status === 'delivered')
-    )];
+    const citymartOrders = [...mockCityMartOrders, ...mockOrders.filter(order => {
+      // Only show orders that have been accepted (confirmed status or higher) and are citymart type
+      return order.orderType === 'citymart' && 
+             (order.status === 'confirmed' || order.status === 'assigned' || 
+              order.status === 'in_transit' || order.status === 'delivered');
+    })];
     return Promise.resolve({ data: citymartOrders });
   },
   getUnassignedOrders: () => apiService.get('/orders/unassigned'),

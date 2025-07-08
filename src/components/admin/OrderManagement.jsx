@@ -1,281 +1,378 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, Clock, User, Package, MapPin, Phone, Calendar, Filter, Search, Eye, UserCheck } from 'lucide-react';
+import { Search, Filter, Eye, Edit, MessageSquare, CheckCircle, XCircle, UserPlus, Clock, Package, Users, Star, MapPin, Truck, AlertCircle, TrendingUp } from 'lucide-react';
+import { ordersApi, deliveryApi } from '../../services/api';
+import { formatCurrency, formatDate, getStatusColor } from '../../utils/helpers';
+import { ORDER_STATUS } from '../../utils/constants';
+import LoadingSpinner from '../common/LoadingSpinner';
+import ToggleSwitch from '../common/ToggleSwitch';
+import { getVendorRecommendations, searchVendors, assignOrderToVendor } from '../../services/vendorMatching';
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
-  const [filteredOrders, setFilteredOrders] = useState([]);
+  const [deliveryPartners, setDeliveryPartners] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [showVendorModal, setShowVendorModal] = useState(false);
-  const [showRiderModal, setShowRiderModal] = useState(false);
-  const [orderToAssignVendor, setOrderToAssignVendor] = useState(null);
-  const [orderToAssignRider, setOrderToAssignRider] = useState(null);
-  const [availableVendors, setAvailableVendors] = useState([]);
-  const [availableRiders, setAvailableRiders] = useState([]);
-  const [selectedVendor, setSelectedVendor] = useState('');
-  const [selectedRider, setSelectedRider] = useState('');
-  const [assigningVendor, setAssigningVendor] = useState(false);
-  const [assigningRider, setAssigningRider] = useState(false);
-  const [filterStatus, setFilterStatus] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orderSettings, setOrderSettings] = useState({});
+  const [activeTab, setActiveTab] = useState('new');
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [orderToAssign, setOrderToAssign] = useState(null);
+  const [showVendorModal, setShowVendorModal] = useState(false);
+  const [orderToAccept, setOrderToAccept] = useState(null);
+  const [vendorRecommendations, setVendorRecommendations] = useState(null);
+  const [selectedVendor, setSelectedVendor] = useState(null);
+  const [vendorSearchTerm, setVendorSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [assigningVendor, setAssigningVendor] = useState(false);
 
-  // Mock data for orders
+  const tabs = [
+    { id: 'new', label: 'New Orders', icon: Clock, count: 0 },
+    { id: 'accepted', label: 'Accepted Orders', icon: CheckCircle, count: 0 },
+    { id: 'rejected', label: 'Rejected Orders', icon: XCircle, count: 0 }
+  ];
+
   useEffect(() => {
-    const mockOrders = [
-      {
-        id: 'ORD-001',
-        customerName: 'John Doe',
-        customerPhone: '+1234567890',
-        items: [
-          { name: 'Laptop', quantity: 1, price: 999.99 },
-          { name: 'Mouse', quantity: 2, price: 25.99 }
-        ],
-        totalAmount: 1051.97,
-        status: 'pending',
-        orderDate: '2024-01-15T10:30:00Z',
-        deliveryAddress: '123 Main St, City, State 12345',
-        vendorId: null,
-        riderId: null,
-        estimatedDelivery: '2024-01-17T15:00:00Z'
-      },
-      {
-        id: 'ORD-002',
-        customerName: 'Jane Smith',
-        customerPhone: '+1987654321',
-        items: [
-          { name: 'Smartphone', quantity: 1, price: 699.99 }
-        ],
-        totalAmount: 699.99,
-        status: 'assigned_vendor',
-        orderDate: '2024-01-15T14:20:00Z',
-        deliveryAddress: '456 Oak Ave, City, State 12345',
-        vendorId: 'VEN-001',
-        vendorName: 'Tech Solutions Inc.',
-        riderId: null,
-        estimatedDelivery: '2024-01-16T12:00:00Z'
-      },
-      {
-        id: 'ORD-003',
-        customerName: 'Bob Johnson',
-        customerPhone: '+1122334455',
-        items: [
-          { name: 'Headphones', quantity: 1, price: 199.99 },
-          { name: 'Cable', quantity: 3, price: 15.99 }
-        ],
-        totalAmount: 247.96,
-        status: 'in_transit',
-        orderDate: '2024-01-15T09:15:00Z',
-        deliveryAddress: '789 Pine Rd, City, State 12345',
-        vendorId: 'VEN-002',
-        vendorName: 'Electronics Hub',
-        riderId: 'RID-001',
-        riderName: 'Mike Wilson',
-        estimatedDelivery: '2024-01-16T11:00:00Z'
-      }
-    ];
-
-    const mockVendors = [
-      { id: 'VEN-001', name: 'Tech Solutions Inc.', rating: 4.8, available: true },
-      { id: 'VEN-002', name: 'Electronics Hub', rating: 4.6, available: true },
-      { id: 'VEN-003', name: 'Gadget World', rating: 4.7, available: true }
-    ];
-
-    const mockRiders = [
-      { id: 'RID-001', name: 'Mike Wilson', rating: 4.9, available: true },
-      { id: 'RID-002', name: 'Sarah Davis', rating: 4.8, available: true },
-      { id: 'RID-003', name: 'Tom Brown', rating: 4.7, available: true }
-    ];
-
-    setTimeout(() => {
-      setOrders(mockOrders);
-      setFilteredOrders(mockOrders);
-      setAvailableVendors(mockVendors);
-      setAvailableRiders(mockRiders);
-      setLoading(false);
-    }, 1000);
+    fetchOrders();
+    fetchDeliveryPartners();
   }, []);
 
-  // Filter orders based on status and search term
+  // Update tab counts when orders change
   useEffect(() => {
-    let filtered = orders;
+    const newCount = orders.filter(order => order.status === 'pending').length;
+    const acceptedCount = orders.filter(order => ['confirmed', 'assigned'].includes(order.status)).length;
+    const rejectedCount = orders.filter(order => order.status === 'cancelled').length;
 
-    if (filterStatus !== 'all') {
-      filtered = filtered.filter(order => order.status === filterStatus);
-    }
+    tabs[0].count = newCount;
+    tabs[1].count = acceptedCount;
+    tabs[2].count = rejectedCount;
+  }, [orders]);
 
-    if (searchTerm) {
-      filtered = filtered.filter(order =>
-        order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.customerPhone.includes(searchTerm)
-      );
-    }
-
-    setFilteredOrders(filtered);
-  }, [orders, filterStatus, searchTerm]);
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'assigned_vendor': return 'bg-blue-100 text-blue-800';
-      case 'in_transit': return 'bg-purple-100 text-purple-800';
-      case 'delivered': return 'bg-green-100 text-green-800';
-      case 'cancelled': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+  const fetchOrders = async () => {
+    try {
+      const response = await ordersApi.getOrders();
+      setOrders(response.data);
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getStatusText = (status) => {
-    switch (status) {
-      case 'pending': return 'Pending';
-      case 'assigned_vendor': return 'Assigned to Vendor';
-      case 'in_transit': return 'In Transit';
-      case 'delivered': return 'Delivered';
-      case 'cancelled': return 'Cancelled';
-      default: return status;
+  const fetchDeliveryPartners = async () => {
+    try {
+      const response = await deliveryApi.getDeliveryPartners();
+      setDeliveryPartners(response.data);
+    } catch (error) {
+      console.error('Error fetching delivery partners:', error);
     }
   };
 
-  const handleAssignVendor = (order) => {
-    setOrderToAssignVendor(order);
-    setShowVendorModal(true);
+  const updateOrderStatus = async (orderId, newStatus) => {
+    try {
+      await ordersApi.updateOrderStatus(orderId, newStatus);
+      setOrders(orders.map(order => 
+        order.id === orderId ? { ...order, status: newStatus } : order
+      ));
+      
+      // Show success notification
+      if (window.showNotification) {
+        const statusMessages = {
+          confirmed: 'Order accepted successfully!',
+          cancelled: 'Order rejected successfully!',
+          assigned: 'Order assigned successfully!'
+        };
+        window.showNotification('Success', statusMessages[newStatus] || 'Order status updated!', 'success');
+      }
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      if (window.showNotification) {
+        window.showNotification('Error', 'Failed to update order status', 'error');
+      }
+    }
   };
 
-  const handleAssignRider = (order) => {
-    setOrderToAssignRider(order);
-    setShowRiderModal(true);
+  const acceptOrder = (orderId) => {
+    const order = orders.find(o => o.id === orderId);
+    if (order) {
+      setOrderToAccept(order);
+      const recommendations = getVendorRecommendations(order);
+      setVendorRecommendations(recommendations);
+      setShowVendorModal(true);
+    }
+  };
+
+  const rejectOrder = (orderId) => {
+    if (window.confirm('Are you sure you want to reject this order?')) {
+      updateOrderStatus(orderId, 'cancelled');
+    }
+  };
+
+  const assignDeliveryPartner = async (orderId, partnerId) => {
+    try {
+      await deliveryApi.assignOrder(orderId, partnerId);
+      const partner = deliveryPartners.find(p => p.id === partnerId);
+      setOrders(orders.map(order => 
+        order.id === orderId 
+          ? { ...order, deliveryPartner: partner.name, status: 'assigned' }
+          : order
+      ));
+      setShowAssignModal(false);
+      setOrderToAssign(null);
+      
+      if (window.showNotification) {
+        window.showNotification('Success', `Order assigned to ${partner.name}`, 'success');
+      }
+    } catch (error) {
+      console.error('Error assigning delivery partner:', error);
+      if (window.showNotification) {
+        window.showNotification('Error', 'Failed to assign delivery partner', 'error');
+      }
+    }
+  };
+
+  const handleVendorSearch = (searchTerm) => {
+    setVendorSearchTerm(searchTerm);
+    if (searchTerm.trim()) {
+      const results = searchVendors(searchTerm, orderToAccept);
+      setSearchResults(results);
+    } else {
+      setSearchResults([]);
+    }
+  };
+
+  const selectVendor = (vendor) => {
+    setSelectedVendor(vendor);
   };
 
   const confirmVendorAssignment = async () => {
-    if (!selectedVendor || !orderToAssignVendor) return;
+    if (!selectedVendor || !orderToAccept) return;
 
     setAssigningVendor(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      const vendor = availableVendors.find(v => v.id === selectedVendor);
-      const updatedOrders = orders.map(order =>
-        order.id === orderToAssignVendor.id
-          ? {
-              ...order,
-              status: 'assigned_vendor',
-              vendorId: selectedVendor,
-              vendorName: vendor.name
-            }
-          : order
-      );
+    try {
+      await assignOrderToVendor(orderToAccept.id, selectedVendor.id);
       
-      setOrders(updatedOrders);
+      // Update order status and vendor
+      setOrders(orders.map(order => 
+        order.id === orderToAccept.id 
+          ? { ...order, status: 'confirmed', vendor: selectedVendor.name }
+          : order
+      ));
+
+      // Close modals and reset state
       setShowVendorModal(false);
-      setSelectedVendor('');
-      setOrderToAssignVendor(null);
+      setOrderToAccept(null);
+      setSelectedVendor(null);
+      setVendorRecommendations(null);
+      setVendorSearchTerm('');
+      setSearchResults([]);
+
+      if (window.showNotification) {
+        window.showNotification('Success', `Order assigned to ${selectedVendor.name}`, 'success');
+      }
+    } catch (error) {
+      console.error('Error assigning vendor:', error);
+      if (window.showNotification) {
+        window.showNotification('Error', error.message || 'Failed to assign vendor', 'error');
+      }
+    } finally {
       setAssigningVendor(false);
-    }, 1500);
+    }
   };
 
-  const confirmRiderAssignment = async () => {
-    if (!selectedRider || !orderToAssignRider) return;
-
-    setAssigningRider(true);
+  const handleOrderToggle = (orderId, setting, newValue) => {
+    setOrderSettings(prev => ({
+      ...prev,
+      [orderId]: {
+        ...prev[orderId],
+        [setting]: newValue
+      }
+    }));
     
-    // Simulate API call
-    setTimeout(() => {
-      const rider = availableRiders.find(r => r.id === selectedRider);
-      const updatedOrders = orders.map(order =>
-        order.id === orderToAssignRider.id
-          ? {
-              ...order,
-              status: 'in_transit',
-              riderId: selectedRider,
-              riderName: rider.name
-            }
-          : order
+    // Log for debugging
+    console.log(`Order ${orderId} setting ${setting} changed to:`, newValue);
+  };
+
+  const getOrderTypeBadge = (orderType) => {
+    switch (orderType) {
+      case 'express':
+        return <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">🔴 Express</span>;
+      case 'nationwide':
+        return <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">🟡 Nationwide</span>;
+      case 'citymart':
+        return <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">🟢 City Mart</span>;
+      default:
+        return <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">Unknown</span>;
+    }
+  };
+
+  const getFilteredOrders = () => {
+    let filtered = orders;
+
+    // Filter by tab
+    switch (activeTab) {
+      case 'new':
+        filtered = filtered.filter(order => order.status === 'pending');
+        break;
+      case 'accepted':
+        filtered = filtered.filter(order => ['confirmed', 'assigned'].includes(order.status));
+        break;
+      case 'rejected':
+        filtered = filtered.filter(order => order.status === 'cancelled');
+        break;
+      default:
+        break;
+    }
+
+    // Apply search filter
+    if (searchTerm) {
+      filtered = filtered.filter(order =>
+        order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.customer.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
-      
-      setOrders(updatedOrders);
-      setShowRiderModal(false);
-      setSelectedRider('');
-      setOrderToAssignRider(null);
-      setAssigningRider(false);
-    }, 1500);
+    }
+
+    // Apply status filter (for accepted orders tab)
+    if (statusFilter && activeTab === 'accepted') {
+      filtered = filtered.filter(order => order.status === statusFilter);
+    }
+
+    return filtered;
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  const filteredOrders = getFilteredOrders();
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
+  const openAssignModal = (order) => {
+    setOrderToAssign(order);
+    setShowAssignModal(true);
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="flex justify-center items-center h-64">
+        <LoadingSpinner text="Loading orders..." />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 admin-content">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Order Management</h1>
-        <div className="flex items-center space-x-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <input
-              type="text"
-              placeholder="Search orders..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="all">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="assigned_vendor">Assigned to Vendor</option>
-            <option value="in_transit">In Transit</option>
-            <option value="delivered">Delivered</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+        <div>
+          <h2 className="text-2xl font-bold">Order Management</h2>
+          <p className="text-gray-600">Manage new orders, accepted orders, and rejected orders</p>
         </div>
       </div>
 
-      {/* Orders Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">New Orders</p>
+              <p className="text-2xl font-bold text-gray-900">{orders.filter(o => o.status === 'pending').length}</p>
+            </div>
+            <Clock className="w-8 h-8 text-orange-500" />
+          </div>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Accepted Orders</p>
+              <p className="text-2xl font-bold text-gray-900">{orders.filter(o => ['confirmed', 'assigned'].includes(o.status)).length}</p>
+            </div>
+            <CheckCircle className="w-8 h-8 text-emerald-500" />
+          </div>
+        </div>
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Rejected Orders</p>
+              <p className="text-2xl font-bold text-gray-900">{orders.filter(o => o.status === 'cancelled').length}</p>
+            </div>
+            <XCircle className="w-8 h-8 text-red-500" />
+          </div>
+        </div>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="bg-white rounded-lg shadow-sm border">
+        <div className="border-b">
+          <nav className="flex space-x-8 px-6">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
+                    activeTab === tab.id
+                      ? 'border-emerald-500 text-emerald-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{tab.label}</span>
+                  {tab.count > 0 && (
+                    <span className={`px-2 py-1 text-xs rounded-full ${
+                      activeTab === tab.id ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      {tab.count}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Search and Filter */}
+        <div className="p-6 border-b">
+          <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search orders..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              />
+            </div>
+            {activeTab === 'accepted' && (
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              >
+                <option value="">All Status</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="assigned">Assigned</option>
+              </select>
+            )}
+          </div>
+        </div>
+
+        {/* Orders Table */}
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Order ID
+                  Order
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Customer
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Items
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Total
+                  Type
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Total
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Date
@@ -288,76 +385,124 @@ const OrderManagement = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredOrders.map((order) => (
                 <tr key={order.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {order.id}
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">
+                        #{order.orderNumber}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {order.items.length} item(s)
+                      </div>
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">{order.customerName}</div>
-                      <div className="text-sm text-gray-500">{order.customerPhone}</div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {order.customer.name}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {order.customer.phone}
+                      </div>
                     </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-sm text-gray-900">
-                      {order.items.map((item, index) => (
-                        <div key={index}>
-                          {item.name} x{item.quantity}
-                        </div>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {formatCurrency(order.totalAmount)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(order.status)}`}>
-                      {getStatusText(order.status)}
+                    {getOrderTypeBadge(order.orderType)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
+                      {order.status.charAt(0).toUpperCase() + order.status.slice(1).replace('_', ' ')}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatDate(order.orderDate)}
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {formatCurrency(order.total)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                    <button
-                      onClick={() => setSelectedOrder(order)}
-                      className="text-blue-600 hover:text-blue-900 inline-flex items-center"
-                    >
-                      <Eye className="w-4 h-4 mr-1" />
-                      View
-                    </button>
-                    {order.status === 'pending' && (
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {formatDate(order.createdAt)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="flex items-center space-x-2">
                       <button
-                        onClick={() => handleAssignVendor(order)}
-                        className="text-green-600 hover:text-green-900 inline-flex items-center"
+                        onClick={() => setSelectedOrder(order)}
+                        className="text-blue-600 hover:text-blue-900"
+                        title="View Details"
                       >
-                        <UserCheck className="w-4 h-4 mr-1" />
-                        Assign Vendor
+                        <Eye className="w-4 h-4" />
                       </button>
-                    )}
-                    {order.status === 'assigned_vendor' && (
-                      <button
-                        onClick={() => handleAssignRider(order)}
-                        className="text-purple-600 hover:text-purple-900 inline-flex items-center"
-                      >
-                        <UserCheck className="w-4 h-4 mr-1" />
-                        Assign Rider
-                      </button>
-                    )}
+
+                      {/* New Orders Actions */}
+                      {activeTab === 'new' && order.status === 'pending' && (
+                        <>
+                          <button
+                            onClick={() => acceptOrder(order.id)}
+                            className="text-emerald-600 hover:text-emerald-900"
+                            title="Accept & Assign Vendor"
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => rejectOrder(order.id)}
+                            className="text-red-600 hover:text-red-900"
+                            title="Reject Order"
+                          >
+                            <XCircle className="w-4 h-4" />
+                          </button>
+                        </>
+                      )}
+
+                      {/* Accepted Orders Actions */}
+                      {activeTab === 'accepted' && order.status === 'confirmed' && (
+                        <button
+                          onClick={() => openAssignModal(order)}
+                          className="text-purple-600 hover:text-purple-900"
+                          title="Assign Rider"
+                        >
+                          <UserPlus className="w-4 h-4" />
+                        </button>
+                      )}
+
+                      {/* Show delivery partner for assigned orders */}
+                      {order.deliveryPartner && (
+                        <span className="text-xs text-gray-500">
+                          Assigned to: {order.deliveryPartner}
+                        </span>
+                      )}
+
+                      <ToggleSwitch
+                        enabled={orderSettings[order.id]?.priority || false}
+                        onChange={(newValue) => handleOrderToggle(order.id, 'priority', newValue)}
+                        size="small"
+                        label="Priority"
+                        id={`order-priority-${order.id}`}
+                        compact={true}
+                      />
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+
+        {/* Empty State */}
+        {filteredOrders.length === 0 && (
+          <div className="text-center py-12">
+            <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-500">
+              {activeTab === 'new' && 'No new orders found.'}
+              {activeTab === 'accepted' && 'No accepted orders found.'}
+              {activeTab === 'rejected' && 'No rejected orders found.'}
+            </p>
+          </div>
+        )}
       </div>
 
-      {/* Order Details Modal */}
+      {/* Order Detail Modal */}
       {selectedOrder && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-gray-900">Order Details</h2>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-semibold">Order Details</h3>
                 <button
                   onClick={() => setSelectedOrder(null)}
                   className="text-gray-400 hover:text-gray-600"
@@ -366,244 +511,451 @@ const OrderManagement = () => {
                 </button>
               </div>
 
-              <div className="space-y-6">
-                {/* Order Info */}
+              <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Order ID</label>
-                    <p className="mt-1 text-sm text-gray-900">{selectedOrder.id}</p>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Order Number
+                    </label>
+                    <p className="text-sm text-gray-900">#{selectedOrder.orderNumber}</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Status</label>
-                    <span className={`mt-1 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(selectedOrder.status)}`}>
-                      {getStatusText(selectedOrder.status)}
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Order Type
+                    </label>
+                    {getOrderTypeBadge(selectedOrder.orderType)}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Status
+                    </label>
+                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(selectedOrder.status)}`}>
+                      {selectedOrder.status.charAt(0).toUpperCase() + selectedOrder.status.slice(1).replace('_', ' ')}
                     </span>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Order Date</label>
-                    <p className="mt-1 text-sm text-gray-900">{formatDate(selectedOrder.orderDate)}</p>
+                </div>
+
+                {/* Order Actions in Modal */}
+                {selectedOrder.status === 'pending' && (
+                  <div className="flex space-x-3 p-4 bg-gray-50 rounded-lg">
+                    <button
+                      onClick={() => {
+                        acceptOrder(selectedOrder.id);
+                        setSelectedOrder(null);
+                      }}
+                      className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors flex items-center justify-center space-x-2"
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      <span>Accept & Assign Vendor</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        rejectOrder(selectedOrder.id);
+                        setSelectedOrder(null);
+                      }}
+                      className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center space-x-2"
+                    >
+                      <XCircle className="w-4 h-4" />
+                      <span>Reject Order</span>
+                    </button>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Estimated Delivery</label>
-                    <p className="mt-1 text-sm text-gray-900">{formatDate(selectedOrder.estimatedDelivery)}</p>
+                )}
+
+                {selectedOrder.status === 'confirmed' && (
+                  <div className="p-4 bg-blue-50 rounded-lg">
+                    <button
+                      onClick={() => {
+                        openAssignModal(selectedOrder);
+                        setSelectedOrder(null);
+                      }}
+                      className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
+                    >
+                      <UserPlus className="w-4 h-4" />
+                      <span>Assign to Rider</span>
+                    </button>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Customer Information
+                  </label>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-sm"><strong>Name:</strong> {selectedOrder.customer.name}</p>
+                    <p className="text-sm"><strong>Phone:</strong> {selectedOrder.customer.phone}</p>
+                    <p className="text-sm"><strong>Email:</strong> {selectedOrder.customer.email}</p>
                   </div>
                 </div>
 
-                {/* Customer Info */}
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-3">Customer Information</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Name</label>
-                      <p className="mt-1 text-sm text-gray-900">{selectedOrder.customerName}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Phone</label>
-                      <p className="mt-1 text-sm text-gray-900">{selectedOrder.customerPhone}</p>
-                    </div>
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700">Delivery Address</label>
-                    <p className="mt-1 text-sm text-gray-900">{selectedOrder.deliveryAddress}</p>
-                  </div>
-                </div>
-
-                {/* Items */}
-                <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-3">Order Items</h3>
-                  <div className="border rounded-lg overflow-hidden">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
-                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Quantity</th>
-                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
-                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200">
-                        {selectedOrder.items.map((item, index) => (
-                          <tr key={index}>
-                            <td className="px-4 py-2 text-sm text-gray-900">{item.name}</td>
-                            <td className="px-4 py-2 text-sm text-gray-900">{item.quantity}</td>
-                            <td className="px-4 py-2 text-sm text-gray-900">{formatCurrency(item.price)}</td>
-                            <td className="px-4 py-2 text-sm text-gray-900">{formatCurrency(item.price * item.quantity)}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  <div className="mt-4 text-right">
-                    <p className="text-lg font-semibold text-gray-900">
-                      Total: {formatCurrency(selectedOrder.totalAmount)}
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Delivery Address
+                  </label>
+                  <div className="bg-gray-50 p-3 rounded-lg">
+                    <p className="text-sm">
+                      {selectedOrder.deliveryAddress.street}, {selectedOrder.deliveryAddress.area}, 
+                      {selectedOrder.deliveryAddress.city} - {selectedOrder.deliveryAddress.pincode}
                     </p>
                   </div>
                 </div>
 
-                {/* Assignment Info */}
-                {(selectedOrder.vendorName || selectedOrder.riderName) && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Order Items
+                  </label>
+                  <div className="space-y-2">
+                    {selectedOrder.items.map((item, index) => (
+                      <div key={index} className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                        <div>
+                          <p className="text-sm font-medium">{item.name}</p>
+                          <p className="text-xs text-gray-500">Quantity: {item.quantity}</p>
+                        </div>
+                        <p className="text-sm font-medium">{formatCurrency(item.price * item.quantity)}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="border-t pt-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-lg font-semibold">Total Amount:</span>
+                    <span className="text-xl font-bold text-emerald-600">
+                      {formatCurrency(selectedOrder.total)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Assign Rider Modal */}
+      {showAssignModal && orderToAssign && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-semibold">Assign Rider</h3>
+                <button
+                  onClick={() => {
+                    setShowAssignModal(false);
+                    setOrderToAssign(null);
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="mb-4">
+                <p className="text-sm text-gray-600">
+                  Assign order <strong>#{orderToAssign.orderNumber}</strong> to a delivery partner:
+                </p>
+              </div>
+
+              <div className="space-y-3 max-h-64 overflow-y-auto">
+                {deliveryPartners
+                  .filter(partner => partner.currentOrders < partner.maxOrders)
+                  .map(partner => (
+                    <div
+                      key={partner.id}
+                      className="border rounded-lg p-3 hover:bg-gray-50 cursor-pointer"
+                      onClick={() => assignDeliveryPartner(orderToAssign.id, partner.id)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">{partner.name}</p>
+                          <p className="text-sm text-gray-500">{partner.location}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-medium">⭐ {partner.rating}</p>
+                          <p className="text-xs text-gray-500">
+                            {partner.currentOrders}/{partner.maxOrders} orders
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+
+              {deliveryPartners.filter(partner => partner.currentOrders < partner.maxOrders).length === 0 && (
+                <div className="text-center py-8">
+                  <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                  <p className="text-gray-500">No available delivery partners</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Vendor Selection Modal */}
+      {showVendorModal && orderToAccept && vendorRecommendations && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="text-xl font-semibold">Select Vendor for Order #{orderToAccept.orderNumber}</h3>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Choose the best vendor based on product category, location, and availability
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowVendorModal(false);
+                    setOrderToAccept(null);
+                    setSelectedVendor(null);
+                    setVendorRecommendations(null);
+                    setVendorSearchTerm('');
+                    setSearchResults([]);
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* Order Summary */}
+              <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-3">Assignment Information</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      {selectedOrder.vendorName && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">Assigned Vendor</label>
-                          <p className="mt-1 text-sm text-gray-900">{selectedOrder.vendorName}</p>
+                    <p className="text-sm font-medium text-gray-700">Order Details</p>
+                    <p className="text-sm text-gray-600">
+                      {orderToAccept.items.length} items • {formatCurrency(orderToAccept.total)}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Categories: {vendorRecommendations.orderAnalysis.categories.join(', ')}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Delivery Location</p>
+                    <p className="text-sm text-gray-600">
+                      {orderToAccept.deliveryAddress.city}, {orderToAccept.deliveryAddress.state}
+                    </p>
+                    <p className="text-xs text-gray-500">PIN: {orderToAccept.deliveryAddress.pincode}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Type & Priority</p>
+                    {getOrderTypeBadge(orderToAccept.orderType)}
+                    <span className={`ml-2 inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                      orderToAccept.priority === 'urgent' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {orderToAccept.priority || 'Normal'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Search Vendors */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Search Vendors (Optional)
+                </label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    placeholder="Search by vendor name, category, or specialization..."
+                    value={vendorSearchTerm}
+                    onChange={(e) => handleVendorSearch(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {/* Vendor Recommendations */}
+              <div className="space-y-6">
+                {/* Top Matches */}
+                <div>
+                  <h4 className="text-lg font-semibold mb-4 flex items-center">
+                    <TrendingUp className="w-5 h-5 text-emerald-600 mr-2" />
+                    Top Recommended Vendors
+                  </h4>
+                  <div className="grid grid-cols-1 gap-4">
+                    {vendorRecommendations.topMatches.map((vendor, index) => (
+                      <div
+                        key={vendor.id}
+                        className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                          selectedVendor?.id === vendor.id
+                            ? 'border-emerald-500 bg-emerald-50'
+                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        }`}
+                        onClick={() => selectVendor(vendor)}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <h5 className="font-semibold text-gray-900">{vendor.name}</h5>
+                              {index === 0 && (
+                                <span className="bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded-full font-medium">
+                                  Best Match
+                                </span>
+                              )}
+                              <div className="flex items-center space-x-1">
+                                <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                                <span className="text-sm text-gray-600">{vendor.rating}</span>
+                              </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                              <div>
+                                <p className="text-sm text-gray-600 flex items-center">
+                                  <MapPin className="w-4 h-4 mr-1" />
+                                  {vendor.city}, {vendor.state} ({vendor.matchData.distance} km away)
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  Categories: {vendor.categories.join(', ')}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-sm text-gray-600">
+                                  Capacity: {vendor.matchData.availableCapacity}/{vendor.maxOrdersPerDay} available
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  Completion Rate: {vendor.completionRate}%
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* Match Score Breakdown */}
+                            <div className="bg-white rounded-lg p-3 border">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-sm font-medium text-gray-700">Match Score</span>
+                                <span className="text-lg font-bold text-emerald-600">
+                                  {vendor.matchData.score}/100
+                                </span>
+                              </div>
+                              <div className="grid grid-cols-3 gap-2 text-xs">
+                                <div>
+                                  <span className="text-gray-600">Category:</span>
+                                  <span className="font-medium ml-1">{vendor.matchData.breakdown.categoryMatch}</span>
+                                </div>
+                                <div>
+                                  <span className="text-gray-600">Location:</span>
+                                  <span className="font-medium ml-1">{vendor.matchData.breakdown.location}</span>
+                                </div>
+                                <div>
+                                  <span className="text-gray-600">Available:</span>
+                                  <span className="font-medium ml-1">
+                                    {vendor.matchData.breakdown.availability > 0 ? '✓' : '✗'}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {selectedVendor?.id === vendor.id && (
+                            <div className="ml-4">
+                              <CheckCircle className="w-6 h-6 text-emerald-600" />
+                            </div>
+                          )}
                         </div>
-                      )}
-                      {selectedOrder.riderName && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700">Assigned Rider</label>
-                          <p className="mt-1 text-sm text-gray-900">{selectedOrder.riderName}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Search Results */}
+                {searchResults.length > 0 && (
+                  <div>
+                    <h4 className="text-lg font-semibold mb-4 flex items-center">
+                      <Search className="w-5 h-5 text-blue-600 mr-2" />
+                      Search Results
+                    </h4>
+                    <div className="grid grid-cols-1 gap-4">
+                      {searchResults.slice(0, 5).map((vendor) => (
+                        <div
+                          key={vendor.id}
+                          className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                            selectedVendor?.id === vendor.id
+                              ? 'border-emerald-500 bg-emerald-50'
+                              : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                          }`}
+                          onClick={() => selectVendor(vendor)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h5 className="font-semibold text-gray-900">{vendor.name}</h5>
+                              <p className="text-sm text-gray-600">
+                                {vendor.city}, {vendor.state} • {vendor.categories.join(', ')}
+                              </p>
+                              {vendor.matchData && (
+                                <p className="text-sm text-emerald-600">
+                                  Match Score: {vendor.matchData.score}/100
+                                </p>
+                              )}
+                            </div>
+                            {selectedVendor?.id === vendor.id && (
+                              <CheckCircle className="w-6 h-6 text-emerald-600" />
+                            )}
+                          </div>
                         </div>
-                      )}
+                      ))}
                     </div>
                   </div>
                 )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
-      {/* Vendor Assignment Modal */}
-      {showVendorModal && orderToAssignVendor && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-gray-900">Assign Vendor</h2>
+                {/* No Available Vendors Warning */}
+                {vendorRecommendations.topMatches.length === 0 && (
+                  <div className="text-center py-8">
+                    <AlertCircle className="w-12 h-12 text-orange-500 mx-auto mb-3" />
+                    <p className="text-gray-600 mb-2">No suitable vendors found for this order</p>
+                    <p className="text-sm text-gray-500">
+                      Try searching manually or contact vendors directly
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-between items-center mt-8 pt-6 border-t">
                 <button
-                  onClick={() => setShowVendorModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  onClick={() => {
+                    setShowVendorModal(false);
+                    setOrderToAccept(null);
+                    setSelectedVendor(null);
+                    setVendorRecommendations(null);
+                    setVendorSearchTerm('');
+                    setSearchResults([]);
+                  }}
+                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  ×
+                  Cancel
                 </button>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Order: {orderToAssignVendor.id}
-                  </label>
-                  <p className="text-sm text-gray-600">
-                    Customer: {orderToAssignVendor.customerName}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Total: {formatCurrency(orderToAssignVendor.totalAmount)}
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Select Vendor
-                  </label>
-                  <select
-                    value={selectedVendor}
-                    onChange={(e) => setSelectedVendor(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Choose a vendor...</option>
-                    {availableVendors.filter(vendor => vendor.available).map((vendor) => (
-                      <option key={vendor.id} value={vendor.id}>
-                        {vendor.name} (Rating: {vendor.rating})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="flex justify-end space-x-3 pt-4">
+                
+                <div className="flex space-x-3">
                   <button
-                    onClick={() => setShowVendorModal(false)}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                    onClick={() => {
+                      // Accept order without vendor assignment
+                      updateOrderStatus(orderToAccept.id, 'confirmed');
+                      setShowVendorModal(false);
+                      setOrderToAccept(null);
+                      setSelectedVendor(null);
+                      setVendorRecommendations(null);
+                      setVendorSearchTerm('');
+                      setSearchResults([]);
+                    }}
+                    className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
                   >
-                    Cancel
+                    Accept Without Vendor
                   </button>
+                  
                   <button
                     onClick={confirmVendorAssignment}
                     disabled={!selectedVendor || assigningVendor}
-                    className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                    className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
                   >
                     {assigningVendor ? (
-                      <span>Assigning...</span>
-                    ) : (
                       <>
-                        <CheckCircle className="w-4 h-4" />
-                        <span>Assign Selected Vendor</span>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Assigning...</span>
                       </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Rider Assignment Modal */}
-      {showRiderModal && orderToAssignRider && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-gray-900">Assign Rider</h2>
-                <button
-                  onClick={() => setShowRiderModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  ×
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Order: {orderToAssignRider.id}
-                  </label>
-                  <p className="text-sm text-gray-600">
-                    Customer: {orderToAssignRider.customerName}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Vendor: {orderToAssignRider.vendorName}
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Select Rider
-                  </label>
-                  <select
-                    value={selectedRider}
-                    onChange={(e) => setSelectedRider(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Choose a rider...</option>
-                    {availableRiders.filter(rider => rider.available).map((rider) => (
-                      <option key={rider.id} value={rider.id}>
-                        {rider.name} (Rating: {rider.rating})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="flex justify-end space-x-3 pt-4">
-                  <button
-                    onClick={() => setShowRiderModal(false)}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={confirmRiderAssignment}
-                    disabled={!selectedRider || assigningRider}
-                    className="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-                  >
-                    {assigningRider ? (
-                      <span>Assigning...</span>
                     ) : (
                       <>
                         <CheckCircle className="w-4 h-4" />
-                        <span>Assign Selected Rider</span>
+                        <span>Accept & Assign to {selectedVendor?.name || 'Vendor'}</span>
                       </>
                     )}
                   </button>
