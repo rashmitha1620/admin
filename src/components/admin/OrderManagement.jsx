@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Eye, Edit, MessageSquare, CheckCircle, XCircle, UserPlus, Clock, Package, Users, Star, MapPin, Truck, AlertCircle, TrendingUp } from 'lucide-react';
-import { ordersApi, deliveryApi } from '../../services/api';
+import { ordersApi, ridersApi } from '../../services/api';
 import { formatCurrency, formatDate, getStatusColor } from '../../utils/helpers';
 import { ORDER_STATUS } from '../../utils/constants';
 import LoadingSpinner from '../common/LoadingSpinner';
@@ -34,7 +34,7 @@ const OrderManagement = () => {
 
   useEffect(() => {
     fetchOrders();
-    fetchDeliveryPartners();
+    fetchRiders();
   }, []);
 
   // Update tab counts when orders change
@@ -59,12 +59,12 @@ const OrderManagement = () => {
     }
   };
 
-  const fetchDeliveryPartners = async () => {
+  const fetchRiders = async () => {
     try {
-      const response = await deliveryApi.getDeliveryPartners();
+      const response = await ridersApi.getRiders();
       setDeliveryPartners(response.data);
     } catch (error) {
-      console.error('Error fetching delivery partners:', error);
+      console.error('Error fetching riders:', error);
     }
   };
 
