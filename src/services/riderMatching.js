@@ -201,6 +201,19 @@ export const assignOrderToRider = async (orderId, riderId) => {
   // Update rider's current orders (in real app, this would be handled by backend)
   rider.currentOrders += 1;
 
+  // Update the order status to assigned (which will move it to respective order type tab)
+  const orderIndex = mockOrders.findIndex(o => o.id === orderId);
+  if (orderIndex !== -1) {
+    mockOrders[orderIndex].status = 'assigned';
+    mockOrders[orderIndex].deliveryPartner = rider.name;
+    mockOrders[orderIndex].riderDetails = {
+      id: riderId,
+      name: rider.name,
+      phone: rider.phone,
+      vehicleType: rider.vehicleType
+    };
+  }
+
   return {
     success: true,
     assignedRider: rider,

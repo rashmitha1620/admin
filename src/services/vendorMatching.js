@@ -191,6 +191,20 @@ export const assignOrderToVendor = async (orderId, vendorId) => {
   // Update vendor's current orders (in real app, this would be handled by backend)
   vendor.currentOrdersToday += 1;
 
+  // Update the order status to vendor_assigned
+  const orderIndex = mockOrders.findIndex(o => o.id === orderId);
+  if (orderIndex !== -1) {
+    mockOrders[orderIndex].status = 'vendor_assigned';
+    mockOrders[orderIndex].vendor = vendor.name;
+    mockOrders[orderIndex].vendorDetails = {
+      id: vendorId,
+      name: vendor.name,
+      address: vendor.address,
+      phone: vendor.phone,
+      pincode: vendor.pincode
+    };
+  }
+
   return {
     success: true,
     assignedVendor: vendor,

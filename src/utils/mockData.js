@@ -2,6 +2,7 @@ export const mockOrders = [
   {
     id: 'GRO-2025-001',
     orderNumber: 'GRO-2025-001',
+    orderType: 'express', // Add order type
     status: 'pending',
     total: 3598,
     items: [
@@ -31,6 +32,7 @@ export const mockOrders = [
   {
     id: 'GRO-2025-002',
     orderNumber: 'GRO-2025-002',
+    orderType: 'citymart', // Add order type
     status: 'pending',
     total: 1698,
     items: [
@@ -60,6 +62,7 @@ export const mockOrders = [
   {
     id: 'GRO-2025-003',
     orderNumber: 'GRO-2025-003',
+    orderType: 'nationwide', // Add order type
     status: 'pending',
     total: 2499,
     items: [
@@ -89,6 +92,7 @@ export const mockOrders = [
   {
     id: 'GRO-2025-004',
     orderNumber: 'GRO-2025-004',
+    orderType: 'express', // Add order type
     status: 'vendor_assigned',
     total: 4299,
     items: [
@@ -123,6 +127,7 @@ export const mockOrders = [
   {
     id: 'GRO-2025-005',
     orderNumber: 'GRO-2025-005',
+    orderType: 'citymart', // Add order type
     status: 'vendor_assigned',
     total: 1899,
     items: [
@@ -158,54 +163,267 @@ export const mockOrders = [
 
 export const mockExpressOrders = [
   {
-    id: 'EXP-001',
-    orderNumber: 'EXP-001',
-    status: 'ready',
-    total: 899,
-    items: [{ name: 'Coffee', quantity: 2, price: 450 }],
-    customer: { name: 'John Doe', phone: '+919876543210' },
-    store: 'Coffee House',
-    createdAt: '2025-01-22T09:15:00Z'
+    id: 'GRO-2025-006',
+    orderNumber: 'GRO-2025-006',
+    orderType: 'express',
+    status: 'assigned',
+    total: 1299,
+    items: [
+      { productId: '10', name: 'Fresh Coffee', quantity: 2, price: 450, category: 'Food & Beverages' },
+      { productId: '11', name: 'Croissant', quantity: 1, price: 399, category: 'Food & Beverages' }
+    ],
+    customer: {
+      name: 'Arjun Mehta',
+      phone: '+919876543215',
+      email: 'arjun@example.com'
+    },
+    deliveryAddress: {
+      street: '890 FC Road',
+      area: 'Shivajinagar',
+      city: 'Pune',
+      state: 'Maharashtra',
+      pincode: '411005'
+    },
+    vendor: 'Coffee House Express',
+    vendorDetails: {
+      id: 'v7',
+      name: 'Coffee House Express',
+      address: 'FC Road, Pune',
+      phone: '+919123456795',
+      pincode: '411004'
+    },
+    deliveryPartner: 'Speedy Delivery',
+    riderDetails: {
+      id: 'r6',
+      name: 'Kiran Patil',
+      phone: '+919876543245',
+      vehicleType: 'Motorcycle'
+    },
+    store: 'Coffee House Express',
+    createdAt: '2025-01-22T09:15:00Z',
+    estimatedDelivery: '2025-01-22T10:00:00Z',
+    priority: 'urgent'
   },
   {
-    id: 'EXP-002',
-    orderNumber: 'EXP-002',
-    status: 'preparing',
-    total: 1299,
-    items: [{ name: 'Sandwich', quantity: 1, price: 1299 }],
-    customer: { name: 'Jane Smith', phone: '+919876543211' },
+    id: 'GRO-2025-007',
+    orderNumber: 'GRO-2025-007',
+    orderType: 'express',
+    status: 'ready',
+    total: 899,
+    items: [
+      { productId: '12', name: 'Burger Combo', quantity: 1, price: 899, category: 'Food & Beverages' }
+    ],
+    customer: {
+      name: 'Sneha Joshi',
+      phone: '+919876543216',
+      email: 'sneha@example.com'
+    },
+    deliveryAddress: {
+      street: '234 MG Road',
+      area: 'Camp',
+      city: 'Pune',
+      state: 'Maharashtra',
+      pincode: '411001'
+    },
+    vendor: 'Quick Bites',
+    vendorDetails: {
+      id: 'v8',
+      name: 'Quick Bites',
+      address: 'MG Road, Pune',
+      phone: '+919123456796',
+      pincode: '411001'
+    },
+    deliveryPartner: 'Flash Delivery',
+    riderDetails: {
+      id: 'r7',
+      name: 'Rahul Sharma',
+      phone: '+919876543246',
+      vehicleType: 'Bicycle'
+    },
     store: 'Quick Bites',
-    createdAt: '2025-01-22T09:30:00Z'
+    createdAt: '2025-01-22T09:30:00Z',
+    estimatedDelivery: '2025-01-22T10:15:00Z',
+    priority: 'normal'
   }
 ];
 
 export const mockNationwideOrders = [
   {
-    id: 'NAT-001',
-    orderNumber: 'NAT-001',
+    id: 'GRO-2025-008',
+    orderNumber: 'GRO-2025-008',
+    orderType: 'nationwide',
     status: 'shipped',
-    total: 4999,
-    items: [{ name: 'Electronics', quantity: 1, price: 4999 }],
-    customer: { name: 'Amit Patel', phone: '+919876543212' },
+    total: 8999,
+    items: [
+      { productId: '13', name: 'Gaming Laptop', quantity: 1, price: 8999, category: 'Electronics' }
+    ],
+    customer: {
+      name: 'Vikram Singh',
+      phone: '+919876543217',
+      email: 'vikram@example.com'
+    },
+    deliveryAddress: {
+      street: '567 Connaught Place',
+      area: 'Central Delhi',
+      city: 'Delhi',
+      state: 'Delhi',
+      pincode: '110001'
+    },
+    vendor: 'TechWorld Electronics',
+    vendorDetails: {
+      id: 'v1',
+      name: 'TechWorld Electronics',
+      address: 'Electronics Market, Nehru Place, Delhi',
+      phone: '+919123456789',
+      pincode: '110019'
+    },
+    deliveryPartner: 'National Express',
+    riderDetails: {
+      id: 'r8',
+      name: 'Manoj Kumar',
+      phone: '+919876543247',
+      vehicleType: 'Truck'
+    },
     fromCity: 'Mumbai',
     toCity: 'Delhi',
     trackingNumber: 'TRK123456789',
-    createdAt: '2025-01-20T10:00:00Z'
+    createdAt: '2025-01-20T10:00:00Z',
+    estimatedDelivery: '2025-01-23T18:00:00Z',
+    priority: 'normal'
+  },
+  {
+    id: 'GRO-2025-009',
+    orderNumber: 'GRO-2025-009',
+    orderType: 'nationwide',
+    status: 'in_transit',
+    total: 3499,
+    items: [
+      { productId: '14', name: 'Smartphone', quantity: 1, price: 3499, category: 'Electronics' }
+    ],
+    customer: {
+      name: 'Kavya Reddy',
+      phone: '+919876543218',
+      email: 'kavya@example.com'
+    },
+    deliveryAddress: {
+      street: '789 Banjara Hills',
+      area: 'Jubilee Hills',
+      city: 'Hyderabad',
+      state: 'Telangana',
+      pincode: '500034'
+    },
+    vendor: 'Mumbai Electronics Hub',
+    vendorDetails: {
+      id: 'v4',
+      name: 'Mumbai Electronics Hub',
+      address: 'Lamington Road, Mumbai',
+      phone: '+919123456792',
+      pincode: '400007'
+    },
+    deliveryPartner: 'Cross Country Logistics',
+    riderDetails: {
+      id: 'r9',
+      name: 'Sanjay Yadav',
+      phone: '+919876543248',
+      vehicleType: 'Van'
+    },
+    fromCity: 'Mumbai',
+    toCity: 'Hyderabad',
+    trackingNumber: 'TRK987654321',
+    createdAt: '2025-01-21T14:00:00Z',
+    estimatedDelivery: '2025-01-24T16:00:00Z',
+    priority: 'normal'
   }
 ];
 
 export const mockCityMartOrders = [
   {
-    id: 'CM-001',
-    orderNumber: 'CM-001',
+    id: 'GRO-2025-010',
+    orderNumber: 'GRO-2025-010',
+    orderType: 'citymart',
     status: 'ready_pickup',
-    total: 2499,
-    items: [{ name: 'Groceries', quantity: 5, price: 500 }],
-    customer: { name: 'Ravi Kumar', phone: '+919876543213' },
+    total: 1899,
+    items: [
+      { productId: '15', name: 'Fresh Vegetables', quantity: 3, price: 299, category: 'Food & Beverages' },
+      { productId: '16', name: 'Dairy Products', quantity: 2, price: 650, category: 'Food & Beverages' }
+    ],
+    customer: {
+      name: 'Anita Sharma',
+      phone: '+919876543219',
+      email: 'anita@example.com'
+    },
+    deliveryAddress: {
+      street: '123 Residency Road',
+      area: 'Shantinagar',
+      city: 'Bangalore',
+      state: 'Karnataka',
+      pincode: '560027'
+    },
+    vendor: 'Fresh Mart',
+    vendorDetails: {
+      id: 'v9',
+      name: 'Fresh Mart',
+      address: 'Commercial Street, Bangalore',
+      phone: '+919123456797',
+      pincode: '560001'
+    },
+    deliveryPartner: 'Local Delivery',
+    riderDetails: {
+      id: 'r10',
+      name: 'Suresh Babu',
+      phone: '+919876543249',
+      vehicleType: 'Scooter'
+    },
     store: 'Fresh Mart',
-    storeAddress: 'MG Road, Bangalore',
+    storeAddress: 'Commercial Street, Bangalore',
     orderType: 'pickup',
-    createdAt: '2025-01-22T08:00:00Z'
+    createdAt: '2025-01-22T08:00:00Z',
+    estimatedDelivery: '2025-01-22T12:00:00Z',
+    priority: 'normal'
+  },
+  {
+    id: 'GRO-2025-011',
+    orderNumber: 'GRO-2025-011',
+    orderType: 'citymart',
+    status: 'picked_up',
+    total: 2299,
+    items: [
+      { productId: '17', name: 'Household Items', quantity: 4, price: 399, category: 'Home & Garden' },
+      { productId: '18', name: 'Personal Care', quantity: 1, price: 699, category: 'Health & Beauty' }
+    ],
+    customer: {
+      name: 'Rajesh Gupta',
+      phone: '+919876543220',
+      email: 'rajesh@example.com'
+    },
+    deliveryAddress: {
+      street: '456 Koramangala',
+      area: '5th Block',
+      city: 'Bangalore',
+      state: 'Karnataka',
+      pincode: '560095'
+    },
+    vendor: 'City Essentials',
+    vendorDetails: {
+      id: 'v10',
+      name: 'City Essentials',
+      address: 'Koramangala, Bangalore',
+      phone: '+919123456798',
+      pincode: '560095'
+    },
+    deliveryPartner: 'Quick Pick',
+    riderDetails: {
+      id: 'r11',
+      name: 'Ganesh Kumar',
+      phone: '+919876543250',
+      vehicleType: 'Motorcycle'
+    },
+    store: 'City Essentials',
+    storeAddress: 'Koramangala, Bangalore',
+    orderType: 'delivery',
+    createdAt: '2025-01-22T10:30:00Z',
+    estimatedDelivery: '2025-01-22T14:00:00Z',
+    priority: 'normal'
   }
 ];
 
