@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Plus, Eye, Edit, Store, MapPin, Phone, X, Calendar, DollarSign, Package, Upload, Download } from 'lucide-react';
+import { Search, Filter, Plus, Eye, Edit, Store, MapPin, Phone, X, Calendar, DollarSign, Package, Upload, Download, User } from 'lucide-react';
 import { storeOwnersApi } from '../../services/api';
 import { formatDate, getStatusColor } from '../../utils/helpers';
 import LoadingSpinner from '../common/LoadingSpinner';
@@ -196,7 +196,7 @@ const StoreOwners = () => {
         </button>
         <button 
           onClick={() => setShowInviteModal(true)}
-          className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2 text-sm sm:text-base"
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
         >
           <User className="w-4 h-4" />
           <span>Send Invite</span>
@@ -504,8 +504,10 @@ const StoreOwners = () => {
 
               {/* Action Buttons */}
               <div className="flex flex-wrap items-center gap-3 mb-6">
-                <button className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors flex items-center space-x-2">
+                <button 
                   onClick={() => setShowAddProductModal(true)}
+                  className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors flex items-center space-x-2"
+                >
                   <Plus className="w-4 h-4" />
                   <span>Add New Product</span>
                 </button>
