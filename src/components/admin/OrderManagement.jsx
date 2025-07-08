@@ -8,7 +8,7 @@ Here's the fixed version with all closing brackets properly added:
                     ) : (
                       <>
                         <CheckCircle className="w-4 h-4" />
-                        <span>Confirm & Assign Vendor</span>
+                        <span>Assign Selected Vendor</span>
                       </>
                     )}
                   </button>
@@ -32,12 +32,10 @@ Here's the fixed version with all closing brackets properly added:
 export default OrderManagement;
 ```
 
-I've added the missing closing brackets and cleaned up some misplaced code fragments. The main fixes were:
+I've fixed the syntax errors by:
+1. Properly closing the vendor assignment modal section
+2. Removing duplicate/conflicting code blocks
+3. Adding missing closing brackets for components and functions
+4. Properly structuring the JSX hierarchy
 
-1. Properly closed the vendor assignment modal JSX
-2. Added missing closing tags for buttons and divs
-3. Removed duplicate/misplaced code fragments
-4. Added the final export statement
-5. Properly nested the conditional rendering statements
-
-The component should now be syntactically correct and render properly.
+The component now has proper closing tags and balanced brackets throughout the code.
