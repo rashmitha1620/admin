@@ -11,6 +11,21 @@ const Riders = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [riderSettings, setRiderSettings] = useState({});
+  const [showAddRiderModal, setShowAddRiderModal] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [newRider, setNewRider] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    vehicleType: '',
+    licenseNumber: '',
+    address: ''
+  });
+  const [inviteData, setInviteData] = useState({
+    email: '',
+    name: '',
+    phone: ''
+  });
 
   useEffect(() => {
     fetchRiders();
@@ -33,6 +48,48 @@ const Riders = () => {
     const matchesStatus = !statusFilter || rider.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  const handleAddRider = () => {
+    if (newRider.name && newRider.phone && newRider.email) {
+      const rider = {
+        id: `r${Date.now()}`,
+        ...newRider,
+        status: 'offline',
+        currentOrders: 0,
+        maxOrders: 5,
+        totalDeliveries: 0,
+        rating: 4.0,
+        currentLocation: 'Not available',
+        lastActive: new Date().toISOString()
+      };
+      setRiders(prev => [...prev, rider]);
+      setNewRider({
+        name: '',
+        phone: '',
+        email: '',
+        vehicleType: '',
+        licenseNumber: '',
+        address: ''
+      });
+      setShowAddRiderModal(false);
+      if (window.showNotification) {
+        window.showNotification('Success', 'Rider added successfully!', 'success');
+      }
+    }
+  };
+
+  const handleSendInvite = () => {
+    if (inviteData.email && inviteData.name) {
+      const inviteLink = `https://grooso.com/rider-invite/${btoa(inviteData.email)}`;
+      navigator.clipboard.writeText(inviteLink).then(() => {
+        if (window.showNotification) {
+          window.showNotification('Invite Sent', `Rider invitation sent to ${inviteData.email}`, 'success');
+        }
+      });
+      setInviteData({ email: '', name: '', phone: '' });
+      setShowInviteModal(false);
+    }
+  };
 
   const handleRiderToggle = (riderId, setting, newValue) => {
     setRiderSettings(prev => ({
@@ -59,10 +116,22 @@ const Riders = () => {
           <h2 className="text-2xl font-bold">Riders</h2>
           <p className="text-gray-600">Manage delivery riders and their assignments</p>
         </div>
-        <button className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors flex items-center space-x-2">
-          <Plus className="w-4 h-4" />
-          <span>Add Rider</span>
-        </button>
+        <div className="flex space-x-3">
+          <button 
+            onClick={() => setShowAddRiderModal(true)}
+            className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors flex items-center space-x-2"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Rider</span>
+          </button>
+          <button 
+            onClick={() => setShowInviteModal(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+          >
+            <User className="w-4 h-4" />
+            <span>Send Invite</span>
+          </button>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -231,6 +300,180 @@ const Riders = () => {
         </div>
       )}
     </div>
+      {/* Add Rider Modal */}
+      {showAddRiderModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-4 sm:p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-semibold">Add New Rider</h3>
+                <button
+                  onClick={() => setShowAddRiderModal(false)}
+                  className="text-gray-400 hover:text-gray-600 p-1"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleAddRider(); }}>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                  <input
+                    type="text"
+                    value={newRider.name}
+                    onChange={(e) => setNewRider(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter full name"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                  <input
+                    type="tel"
+                    value={newRider.phone}
+                    onChange={(e) => setNewRider(prev => ({ ...prev, phone: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter phone number"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                  <input
+                    type="email"
+                    value={newRider.email}
+                    onChange={(e) => setNewRider(prev => ({ ...prev, email: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter email address"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Vehicle Type</label>
+                  <select
+                    value={newRider.vehicleType}
+                    onChange={(e) => setNewRider(prev => ({ ...prev, vehicleType: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="">Select vehicle type</option>
+                    <option value="Bicycle">Bicycle</option>
+                    <option value="Motorcycle">Motorcycle</option>
+                    <option value="Scooter">Scooter</option>
+                    <option value="Car">Car</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">License Number</label>
+                  <input
+                    type="text"
+                    value={newRider.licenseNumber}
+                    onChange={(e) => setNewRider(prev => ({ ...prev, licenseNumber: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter license number"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                  <textarea
+                    rows="3"
+                    value={newRider.address}
+                    onChange={(e) => setNewRider(prev => ({ ...prev, address: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter complete address"
+                  ></textarea>
+                </div>
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddRiderModal(false)}
+                    className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors"
+                  >
+                    Add Rider
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Send Invite Modal */}
+      {showInviteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-semibold">Send Rider Invite</h3>
+                <button
+                  onClick={() => setShowInviteModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ×
+                </button>
+              </div>
+
+              <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleSendInvite(); }}>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                  <input
+                    type="email"
+                    value={inviteData.email}
+                    onChange={(e) => setInviteData(prev => ({ ...prev, email: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter email address"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Rider Name</label>
+                  <input
+                    type="text"
+                    value={inviteData.name}
+                    onChange={(e) => setInviteData(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter rider name"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                  <input
+                    type="tel"
+                    value={inviteData.phone}
+                    onChange={(e) => setInviteData(prev => ({ ...prev, phone: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter phone number"
+                  />
+                </div>
+                <div className="flex space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowInviteModal(false)}
+                    className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Send Invite
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
   );
 };
 

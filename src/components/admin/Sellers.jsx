@@ -11,6 +11,21 @@ const Sellers = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [sellerSettings, setSellerSettings] = useState({});
+  const [showAddSellerModal, setShowAddSellerModal] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [newSeller, setNewSeller] = useState({
+    name: '',
+    businessName: '',
+    email: '',
+    phone: '',
+    category: '',
+    location: ''
+  });
+  const [inviteData, setInviteData] = useState({
+    email: '',
+    businessName: '',
+    contactPerson: ''
+  });
 
   useEffect(() => {
     fetchSellers();
@@ -33,6 +48,46 @@ const Sellers = () => {
     const matchesStatus = !statusFilter || seller.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  const handleAddSeller = () => {
+    if (newSeller.name && newSeller.businessName && newSeller.email) {
+      const seller = {
+        id: `s${Date.now()}`,
+        ...newSeller,
+        productCount: 0,
+        rating: 4.0,
+        reviewCount: 0,
+        monthlyRevenue: 0,
+        status: 'pending'
+      };
+      setSellers(prev => [...prev, seller]);
+      setNewSeller({
+        name: '',
+        businessName: '',
+        email: '',
+        phone: '',
+        category: '',
+        location: ''
+      });
+      setShowAddSellerModal(false);
+      if (window.showNotification) {
+        window.showNotification('Success', 'Seller added successfully!', 'success');
+      }
+    }
+  };
+
+  const handleSendInvite = () => {
+    if (inviteData.email && inviteData.businessName) {
+      const inviteLink = `https://grooso.com/seller-invite/${btoa(inviteData.email)}`;
+      navigator.clipboard.writeText(inviteLink).then(() => {
+        if (window.showNotification) {
+          window.showNotification('Invite Sent', `Seller invitation sent to ${inviteData.email}`, 'success');
+        }
+      });
+      setInviteData({ email: '', businessName: '', contactPerson: '' });
+      setShowInviteModal(false);
+    }
+  };
 
   const handleSellerToggle = (sellerId, setting, newValue) => {
     setSellerSettings(prev => ({
@@ -59,10 +114,22 @@ const Sellers = () => {
           <h2 className="text-2xl font-bold">Sellers</h2>
           <p className="text-gray-600">Manage individual sellers and their products</p>
         </div>
-        <button className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors flex items-center space-x-2">
-          <Plus className="w-4 h-4" />
-          <span>Add Seller</span>
-        </button>
+        <div className="flex space-x-3">
+          <button 
+            onClick={() => setShowAddSellerModal(true)}
+            className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors flex items-center space-x-2"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Seller</span>
+          </button>
+          <button 
+            onClick={() => setShowInviteModal(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+          >
+            <User className="w-4 h-4" />
+            <span>Send Invite</span>
+          </button>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -233,6 +300,181 @@ const Sellers = () => {
         </div>
       )}
     </div>
+      {/* Add Seller Modal */}
+      {showAddSellerModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-4 sm:p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-semibold">Add New Seller</h3>
+                <button
+                  onClick={() => setShowAddSellerModal(false)}
+                  className="text-gray-400 hover:text-gray-600 p-1"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleAddSeller(); }}>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Seller Name</label>
+                  <input
+                    type="text"
+                    value={newSeller.name}
+                    onChange={(e) => setNewSeller(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter seller name"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
+                  <input
+                    type="text"
+                    value={newSeller.businessName}
+                    onChange={(e) => setNewSeller(prev => ({ ...prev, businessName: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter business name"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                  <input
+                    type="email"
+                    value={newSeller.email}
+                    onChange={(e) => setNewSeller(prev => ({ ...prev, email: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter email address"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                  <input
+                    type="tel"
+                    value={newSeller.phone}
+                    onChange={(e) => setNewSeller(prev => ({ ...prev, phone: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter phone number"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                  <select
+                    value={newSeller.category}
+                    onChange={(e) => setNewSeller(prev => ({ ...prev, category: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="">Select category</option>
+                    <option value="Handicrafts">Handicrafts</option>
+                    <option value="Textiles">Textiles</option>
+                    <option value="Electronics">Electronics</option>
+                    <option value="Food & Beverages">Food & Beverages</option>
+                    <option value="Fashion">Fashion</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                  <input
+                    type="text"
+                    value={newSeller.location}
+                    onChange={(e) => setNewSeller(prev => ({ ...prev, location: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter location"
+                  />
+                </div>
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddSellerModal(false)}
+                    className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors"
+                  >
+                    Add Seller
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Send Invite Modal */}
+      {showInviteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-semibold">Send Seller Invite</h3>
+                <button
+                  onClick={() => setShowInviteModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ×
+                </button>
+              </div>
+
+              <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleSendInvite(); }}>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                  <input
+                    type="email"
+                    value={inviteData.email}
+                    onChange={(e) => setInviteData(prev => ({ ...prev, email: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter email address"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
+                  <input
+                    type="text"
+                    value={inviteData.businessName}
+                    onChange={(e) => setInviteData(prev => ({ ...prev, businessName: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter business name"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Contact Person</label>
+                  <input
+                    type="text"
+                    value={inviteData.contactPerson}
+                    onChange={(e) => setInviteData(prev => ({ ...prev, contactPerson: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter contact person name"
+                  />
+                </div>
+                <div className="flex space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowInviteModal(false)}
+                    className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Send Invite
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
   );
 };
 

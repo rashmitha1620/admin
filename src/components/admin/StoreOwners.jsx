@@ -14,6 +14,22 @@ const StoreOwners = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingOwner, setEditingOwner] = useState(null);
+  const [showAddProductModal, setShowAddProductModal] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [newProduct, setNewProduct] = useState({
+    name: '',
+    sku: '',
+    price: '',
+    stock: '',
+    category: '',
+    image: null
+  });
+  const [inviteData, setInviteData] = useState({
+    email: '',
+    storeName: '',
+    ownerName: '',
+    phone: ''
+  });
   const [products, setProducts] = useState([
     {
       id: 1,
@@ -79,6 +95,67 @@ const StoreOwners = () => {
     return matchesSearch && matchesStatus;
   });
 
+  const handleAddProduct = () => {
+    if (newProduct.name && newProduct.sku && newProduct.price) {
+      const product = {
+        id: Date.now(),
+        ...newProduct,
+        showOnGrooso: true,
+        tags: newProduct.stock < 10 ? 'Low Stock' : 'In Stock'
+      };
+      setProducts(prev => [...prev, product]);
+      setNewProduct({
+        name: '',
+        sku: '',
+        price: '',
+        stock: '',
+        category: '',
+        image: null
+      });
+      setShowAddProductModal(false);
+      // Show success notification
+      if (window.showNotification) {
+        window.showNotification('Success', 'Product added successfully!', 'success');
+      }
+    }
+  };
+
+  const handleSendInvite = () => {
+    if (inviteData.email && inviteData.storeName) {
+      // Generate invite link
+      const inviteLink = `https://grooso.com/invite/${btoa(inviteData.email)}`;
+      
+      // Copy to clipboard
+      navigator.clipboard.writeText(inviteLink).then(() => {
+        if (window.showNotification) {
+          window.showNotification('Invite Sent', `Invitation sent to ${inviteData.email}`, 'success');
+        }
+      });
+      
+      setInviteData({
+        email: '',
+        storeName: '',
+        ownerName: '',
+        phone: ''
+      });
+      setShowInviteModal(false);
+    }
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setNewProduct(prev => ({
+          ...prev,
+          image: e.target.result
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleEditClick = (owner) => {
     setEditingOwner(owner);
     setShowEditModal(true);
@@ -116,6 +193,13 @@ const StoreOwners = () => {
         >
           <Plus className="w-4 h-4" />
           <span>Add Store Owner</span>
+        </button>
+        <button 
+          onClick={() => setShowInviteModal(true)}
+          className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2 text-sm sm:text-base"
+        >
+          <User className="w-4 h-4" />
+          <span>Send Invite</span>
         </button>
       </div>
 
@@ -421,27 +505,76 @@ const StoreOwners = () => {
               {/* Action Buttons */}
               <div className="flex flex-wrap items-center gap-3 mb-6">
                 <button className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors flex items-center space-x-2">
+                  onClick={() => setShowAddProductModal(true)}
                   <Plus className="w-4 h-4" />
                   <span>Add New Product</span>
                 </button>
-                <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
-                  Import OSV
-                </button>
-                <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
-                  Export Stock
+                <button 
+                  onClick={() => {
+                    const csvData = products.map(p => ({
+                      name: p.name,
+                      sku: p.sku,
+                      price: p.price,
+                      stock: p.stock,
+                      tags: p.tags,
+                      showOnGrooso: p.showOnGrooso
+                    }));
+                    // Export functionality
+                    const csv = [
+                      Object.keys(csvData[0]).join(','),
+                      ...csvData.map(row => Object.values(row).join(','))
+                    ].join('\n');
+                    const blob = new Blob([csv], { type: 'text/csv' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'products.csv';
+                    a.click();
+                  }}
+                  className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center space-x-2"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Export Products</span>
                 </button>
               </div>
 
               {/* File Upload Area */}
+              {/* Bulk Actions */}
               <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                  <Upload className="w-8 h-8 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 mb-2">
-                    Drag and drop a CSV file here, or <button className="text-emerald-600 hover:text-emerald-700 underline">browse</button>
-                  </p>
-                  <button className="text-sm text-gray-500 hover:text-gray-700 flex items-center justify-center space-x-1 mx-auto">
-                    <Download className="w-4 h-4" />
-                    <span>Download sample CSV</span>
+                <h3 className="text-lg font-semibold mb-4">Bulk Actions</h3>
+                <div className="flex flex-wrap gap-3">
+                  <button 
+                    onClick={() => {
+                      setProducts(prev => prev.map(p => ({ ...p, showOnGrooso: true })));
+                      if (window.showNotification) {
+                        window.showNotification('Success', 'All products enabled on Grooso', 'success');
+                      }
+                    }}
+                    className="bg-emerald-100 text-emerald-700 px-4 py-2 rounded-lg hover:bg-emerald-200 transition-colors"
+                  >
+                    Enable All on Grooso
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setProducts(prev => prev.map(p => ({ ...p, showOnGrooso: false })));
+                      if (window.showNotification) {
+                        window.showNotification('Success', 'All products disabled on Grooso', 'success');
+                      }
+                    }}
+                    className="bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition-colors"
+                  >
+                    Disable All on Grooso
+                  </button>
+                  <button 
+                    onClick={() => {
+                      const lowStockProducts = products.filter(p => p.stock < 10);
+                      if (window.showNotification) {
+                        window.showNotification('Info', `${lowStockProducts.length} products have low stock`, 'warning');
+                      }
+                    }}
+                    className="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-lg hover:bg-yellow-200 transition-colors"
+                  >
+                    Check Low Stock
                   </button>
                 </div>
               </div>
@@ -652,6 +785,197 @@ const StoreOwners = () => {
                     className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors"
                   >
                     Add Store Owner
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Product Modal */}
+      {showAddProductModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-4 sm:p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-semibold">Add New Product</h3>
+                <button
+                  onClick={() => setShowAddProductModal(false)}
+                  className="text-gray-400 hover:text-gray-600 p-1"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleAddProduct(); }}>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  />
+                  {newProduct.image && (
+                    <img src={newProduct.image} alt="Preview" className="mt-2 w-20 h-20 object-cover rounded-lg" />
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
+                  <input
+                    type="text"
+                    value={newProduct.name}
+                    onChange={(e) => setNewProduct(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter product name"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">SKU</label>
+                  <input
+                    type="text"
+                    value={newProduct.sku}
+                    onChange={(e) => setNewProduct(prev => ({ ...prev, sku: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter SKU"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Price</label>
+                  <input
+                    type="text"
+                    value={newProduct.price}
+                    onChange={(e) => setNewProduct(prev => ({ ...prev, price: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="$0.00"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Stock Quantity</label>
+                  <input
+                    type="number"
+                    value={newProduct.stock}
+                    onChange={(e) => setNewProduct(prev => ({ ...prev, stock: parseInt(e.target.value) || 0 }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="0"
+                    min="0"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                  <select
+                    value={newProduct.category}
+                    onChange={(e) => setNewProduct(prev => ({ ...prev, category: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  >
+                    <option value="">Select category</option>
+                    <option value="food">Food & Beverages</option>
+                    <option value="household">Household Items</option>
+                    <option value="personal">Personal Care</option>
+                    <option value="electronics">Electronics</option>
+                  </select>
+                </div>
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddProductModal(false)}
+                    className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors"
+                  >
+                    Add Product
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Send Invite Modal */}
+      {showInviteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-4 sm:p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-semibold">Send Store Owner Invite</h3>
+                <button
+                  onClick={() => setShowInviteModal(false)}
+                  className="text-gray-400 hover:text-gray-600 p-1"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleSendInvite(); }}>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                  <input
+                    type="email"
+                    value={inviteData.email}
+                    onChange={(e) => setInviteData(prev => ({ ...prev, email: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter email address"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Store Name</label>
+                  <input
+                    type="text"
+                    value={inviteData.storeName}
+                    onChange={(e) => setInviteData(prev => ({ ...prev, storeName: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter store name"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Owner Name</label>
+                  <input
+                    type="text"
+                    value={inviteData.ownerName}
+                    onChange={(e) => setInviteData(prev => ({ ...prev, ownerName: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter owner name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                  <input
+                    type="tel"
+                    value={inviteData.phone}
+                    onChange={(e) => setInviteData(prev => ({ ...prev, phone: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter phone number"
+                  />
+                </div>
+                <div className="bg-blue-50 p-3 rounded-lg">
+                  <p className="text-sm text-blue-700">
+                    An invitation link will be generated and copied to your clipboard. You can then share it with the store owner.
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowInviteModal(false)}
+                    className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Send Invite
                   </button>
                 </div>
               </form>

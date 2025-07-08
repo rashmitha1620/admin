@@ -7,6 +7,13 @@ const VendorManagement = () => {
   const [filterBy, setFilterBy] = useState('');
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [vendorSettings, setVendorSettings] = useState({});
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteData, setInviteData] = useState({
+    email: '',
+    businessName: '',
+    contactPerson: '',
+    phone: ''
+  });
 
   const vendorStats = [
     { label: 'Total Vendors', value: '391', trend: 'up' },
@@ -81,6 +88,19 @@ const VendorManagement = () => {
     }));
   };
   return (
+  const handleSendInvite = () => {
+    if (inviteData.email && inviteData.businessName) {
+      const inviteLink = `https://grooso.com/vendor-invite/${btoa(inviteData.email)}`;
+      navigator.clipboard.writeText(inviteLink).then(() => {
+        if (window.showNotification) {
+          window.showNotification('Invite Sent', `Vendor invitation sent to ${inviteData.email}`, 'success');
+        }
+      });
+      setInviteData({ email: '', businessName: '', contactPerson: '', phone: '' });
+      setShowInviteModal(false);
+    }
+  };
+
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -134,8 +154,11 @@ const VendorManagement = () => {
         <button className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors">
           Invite
         </button>
-        <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
-          Invite Dashboard
+        <button 
+          onClick={() => setShowInviteModal(true)}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Send Invite Link
         </button>
       </div>
 
@@ -293,6 +316,85 @@ const VendorManagement = () => {
               <button className="flex-1 bg-emerald-100 text-emerald-700 py-2 px-4 rounded-lg hover:bg-emerald-200 transition-colors">
                 Approve
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Send Invite Modal */}
+      {showInviteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-semibold">Send Vendor Invite</h3>
+                <button
+                  onClick={() => setShowInviteModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ×
+                </button>
+              </div>
+
+              <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); handleSendInvite(); }}>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                  <input
+                    type="email"
+                    value={inviteData.email}
+                    onChange={(e) => setInviteData(prev => ({ ...prev, email: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter email address"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
+                  <input
+                    type="text"
+                    value={inviteData.businessName}
+                    onChange={(e) => setInviteData(prev => ({ ...prev, businessName: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter business name"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Contact Person</label>
+                  <input
+                    type="text"
+                    value={inviteData.contactPerson}
+                    onChange={(e) => setInviteData(prev => ({ ...prev, contactPerson: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter contact person name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                  <input
+                    type="tel"
+                    value={inviteData.phone}
+                    onChange={(e) => setInviteData(prev => ({ ...prev, phone: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter phone number"
+                  />
+                </div>
+                <div className="flex space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowInviteModal(false)}
+                    className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Send Invite
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

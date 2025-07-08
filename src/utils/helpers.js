@@ -155,3 +155,70 @@ export const copyToClipboard = async (text) => {
     showNotification('Error', 'Failed to copy to clipboard', 'error');
   }
 };
+
+// Make showNotification globally available
+window.showNotification = showNotification;
+
+export const generateInviteLink = (type, email, additionalData = {}) => {
+  const baseUrl = 'https://grooso.com';
+  const encodedData = btoa(JSON.stringify({ email, ...additionalData }));
+  return `${baseUrl}/${type}-invite/${encodedData}`;
+};
+
+export const validateEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+export const validatePhone = (phone) => {
+  const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+  return phoneRegex.test(phone.replace(/\s/g, ''));
+};
+
+export const formatFileSize = (bytes) => {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
+
+export const downloadFile = (data, filename, type = 'text/plain') => {
+  const blob = new Blob([data], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+export const searchFilter = (items, searchTerm, searchFields) => {
+  if (!searchTerm) return items;
+  
+  return items.filter(item => 
+    searchFields.some(field => 
+      item[field]?.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
+};
+
+export const sortData = (data, sortBy, sortOrder = 'asc') => {
+  return [...data].sort((a, b) => {
+    let aVal = a[sortBy];
+    let bVal = b[sortBy];
+    
+    if (typeof aVal === 'string') {
+      aVal = aVal.toLowerCase();
+      bVal = bVal.toLowerCase();
+    }
+    
+    if (sortOrder === 'asc') {
+      return aVal > bVal ? 1 : -1;
+    } else {
+      return aVal < bVal ? 1 : -1;
+    }
+  });
+};
