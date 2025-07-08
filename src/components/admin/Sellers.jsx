@@ -107,6 +107,7 @@ const Sellers = () => {
   }
 
   return (
+    <>
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
@@ -300,8 +301,9 @@ const Sellers = () => {
         </div>
       )}
     </div>
-      {/* Add Seller Modal */}
-      {showAddSellerModal && (
+
+    {/* Add Seller Modal */}
+    {showAddSellerModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="p-4 sm:p-6">
@@ -404,10 +406,10 @@ const Sellers = () => {
             </div>
           </div>
         </div>
-      )}
+    )}
 
-      {/* Send Invite Modal */}
-      {showInviteModal && (
+    {/* Send Invite Modal */}
+    {showInviteModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-md w-full">
             <div className="p-6">
@@ -473,7 +475,8 @@ const Sellers = () => {
             </div>
           </div>
         </div>
-      )}
+    )}
+    </>
 
   );
 };
