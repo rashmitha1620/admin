@@ -39,7 +39,7 @@ class ApiService {
       case '/riders':
         return { data: mockRiders };
       case '/riders/available':
-        return { data: mockRiders.filter(rider => rider.status === 'online' && rider.currentOrders < rider.maxOrders) };
+        return { data: mockRiders.filter(rider => (rider.status === 'online' || rider.status === 'active') && rider.currentOrders < rider.maxOrders) };
       default:
         throw new Error('Endpoint not found');
     }
@@ -140,7 +140,7 @@ export const ordersApi = {
       throw new Error('Rider not found');
     }
 
-    if (rider.status !== 'online' || rider.currentOrders >= rider.maxOrders) {
+    if (rider.status !== 'online' && rider.status !== 'active' || rider.currentOrders >= rider.maxOrders) {
       throw new Error('Rider is not available or at capacity');
     }
 

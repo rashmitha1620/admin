@@ -31,7 +31,7 @@ const calculateRiderScore = (rider, order) => {
   };
 
   // Availability check
-  if (rider.status === 'online' && rider.currentOrders < rider.maxOrders) {
+  if ((rider.status === 'online' || rider.status === 'active') && rider.currentOrders < rider.maxOrders) {
     score += weights.availability;
   }
 
@@ -69,7 +69,7 @@ const calculateRiderScore = (rider, order) => {
   return {
     score: Math.round(score * 10) / 10,
     breakdown: {
-      availability: rider.status === 'online' && rider.currentOrders < rider.maxOrders ? weights.availability : 0,
+      availability: (rider.status === 'online' || rider.status === 'active') && rider.currentOrders < rider.maxOrders ? weights.availability : 0,
       location: Math.round(locationScore * 10) / 10,
       rating: Math.round(ratingScore * 10) / 10,
       experience: Math.round(experienceScore * 10) / 10,
@@ -87,7 +87,7 @@ const calculateRiderScore = (rider, order) => {
  */
 export const findMatchingRiders = (order, limit = 3) => {
   const availableRiders = mockRiders.filter(rider => 
-    rider.status === 'online' && rider.currentOrders < rider.maxOrders
+    (rider.status === 'online' || rider.status === 'active') && rider.currentOrders < rider.maxOrders
   );
   
   const riderScores = availableRiders.map(rider => ({
@@ -143,7 +143,7 @@ export const getRiderRecommendations = (order) => {
  */
 export const searchRiders = (searchTerm, order = null) => {
   const availableRiders = mockRiders.filter(rider => 
-    rider.status === 'online' && rider.currentOrders < rider.maxOrders
+    (rider.status === 'online' || rider.status === 'active') && rider.currentOrders < rider.maxOrders
   );
   
   const filteredRiders = availableRiders.filter(rider => 
@@ -174,10 +174,10 @@ export const getRiderDetails = (riderId) => {
   return {
     ...rider,
     currentStatus: {
-      isAvailable: rider.status === 'online' && rider.currentOrders < rider.maxOrders,
+      isAvailable: (rider.status === 'online' || rider.status === 'active') && rider.currentOrders < rider.maxOrders,
       capacityUtilization: Math.round((rider.currentOrders / rider.maxOrders) * 100),
       remainingCapacity: rider.maxOrders - rider.currentOrders,
-      estimatedResponseTime: rider.status === 'online' ? '5-10 minutes' : 'Currently offline'
+      estimatedResponseTime: (rider.status === 'online' || rider.status === 'active') ? '5-10 minutes' : 'Currently offline'
     }
   };
 };
@@ -194,7 +194,7 @@ export const assignOrderToRider = async (orderId, riderId) => {
     throw new Error('Rider not found');
   }
 
-  if (rider.status !== 'online' || rider.currentOrders >= rider.maxOrders) {
+  if (rider.status !== 'online' && rider.status !== 'active' || rider.currentOrders >= rider.maxOrders) {
     throw new Error('Rider is not available or at capacity');
   }
 
