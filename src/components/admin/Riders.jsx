@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Plus, Eye, Edit, Truck, MapPin, Clock } from 'lucide-react';
+import { Search, Filter, Plus, Eye, Edit, Truck, MapPin, Clock, User, X } from 'lucide-react';
 import { ridersApi } from '../../services/api';
 import { formatDate, getStatusColor } from '../../utils/helpers';
 import LoadingSpinner from '../common/LoadingSpinner';
@@ -109,6 +109,7 @@ const Riders = () => {
   }
 
   return (
+    <>
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
@@ -300,6 +301,7 @@ const Riders = () => {
         </div>
       )}
     </div>
+
       {/* Add Rider Modal */}
       {showAddRiderModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -473,7 +475,7 @@ const Riders = () => {
           </div>
         </div>
       )}
-
+    </>
   );
 };
 

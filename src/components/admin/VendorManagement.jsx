@@ -87,7 +87,7 @@ const VendorManagement = () => {
       }
     }));
   };
-  return (
+
   const handleSendInvite = () => {
     if (inviteData.email && inviteData.businessName) {
       const inviteLink = `https://grooso.com/vendor-invite/${btoa(inviteData.email)}`;
@@ -101,6 +101,7 @@ const VendorManagement = () => {
     }
   };
 
+  return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
