@@ -1,9 +1,16 @@
 import React, { useState } from 'react';
 import { BarChart3, TrendingUp, Download, Calendar, Filter } from 'lucide-react';
+import ToggleSwitch from '../common/ToggleSwitch';
 
 const Reports = () => {
   const [dateRange, setDateRange] = useState('7days');
   const [reportType, setReportType] = useState('overview');
+  const [reportSettings, setReportSettings] = useState({
+    autoRefresh: true,
+    emailReports: false,
+    includeCharts: true,
+    showTrends: true
+  });
 
   const reportData = {
     overview: {
@@ -24,6 +31,12 @@ const Reports = () => {
     }
   };
 
+  const handleReportToggle = (setting, newValue) => {
+    setReportSettings(prev => ({
+      ...prev,
+      [setting]: newValue
+    }));
+  };
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -50,6 +63,36 @@ const Reports = () => {
         </div>
       </div>
 
+      {/* Report Settings */}
+      <div className="bg-white rounded-lg shadow-sm border p-6">
+        <h3 className="text-lg font-semibold mb-4">Report Settings</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <ToggleSwitch
+            enabled={reportSettings.autoRefresh}
+            onChange={(newValue) => handleReportToggle('autoRefresh', newValue)}
+            label="Auto Refresh"
+            id="auto-refresh-toggle"
+          />
+          <ToggleSwitch
+            enabled={reportSettings.emailReports}
+            onChange={(newValue) => handleReportToggle('emailReports', newValue)}
+            label="Email Reports"
+            id="email-reports-toggle"
+          />
+          <ToggleSwitch
+            enabled={reportSettings.includeCharts}
+            onChange={(newValue) => handleReportToggle('includeCharts', newValue)}
+            label="Include Charts"
+            id="include-charts-toggle"
+          />
+          <ToggleSwitch
+            enabled={reportSettings.showTrends}
+            onChange={(newValue) => handleReportToggle('showTrends', newValue)}
+            label="Show Trends"
+            id="show-trends-toggle"
+          />
+        </div>
+      </div>
       {/* Report Type Tabs */}
       <div className="bg-white rounded-lg shadow-sm border">
         <div className="border-b">

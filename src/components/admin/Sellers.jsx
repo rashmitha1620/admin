@@ -3,12 +3,14 @@ import { Search, Filter, Plus, Eye, Edit, User, Star, TrendingUp } from 'lucide-
 import { sellersApi } from '../../services/api';
 import { formatDate, formatCurrency, getStatusColor } from '../../utils/helpers';
 import LoadingSpinner from '../common/LoadingSpinner';
+import ToggleSwitch from '../common/ToggleSwitch';
 
 const Sellers = () => {
   const [sellers, setSellers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [sellerSettings, setSellerSettings] = useState({});
 
   useEffect(() => {
     fetchSellers();
@@ -32,6 +34,15 @@ const Sellers = () => {
     return matchesSearch && matchesStatus;
   });
 
+  const handleSellerToggle = (sellerId, setting, newValue) => {
+    setSellerSettings(prev => ({
+      ...prev,
+      [sellerId]: {
+        ...prev[sellerId],
+        [setting]: newValue
+      }
+    }));
+  };
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -200,6 +211,13 @@ const Sellers = () => {
                     <button className="text-blue-600 hover:text-blue-900">
                       <Edit className="w-4 h-4" />
                     </button>
+                    <ToggleSwitch
+                      enabled={sellerSettings[seller.id]?.featured || false}
+                      onChange={(newValue) => handleSellerToggle(seller.id, 'featured', newValue)}
+                      size="small"
+                      label="Featured"
+                      id={`seller-featured-${seller.id}`}
+                    />
                   </td>
                 </tr>
               ))}

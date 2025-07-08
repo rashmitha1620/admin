@@ -3,12 +3,14 @@ import { Search, Filter, Plus, Eye, Edit, Truck, MapPin, Clock } from 'lucide-re
 import { ridersApi } from '../../services/api';
 import { formatDate, getStatusColor } from '../../utils/helpers';
 import LoadingSpinner from '../common/LoadingSpinner';
+import ToggleSwitch from '../common/ToggleSwitch';
 
 const Riders = () => {
   const [riders, setRiders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [riderSettings, setRiderSettings] = useState({});
 
   useEffect(() => {
     fetchRiders();
@@ -32,6 +34,15 @@ const Riders = () => {
     return matchesSearch && matchesStatus;
   });
 
+  const handleRiderToggle = (riderId, setting, newValue) => {
+    setRiderSettings(prev => ({
+      ...prev,
+      [riderId]: {
+        ...prev[riderId],
+        [setting]: newValue
+      }
+    }));
+  };
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -183,6 +194,23 @@ const Riders = () => {
                 <Edit className="w-4 h-4" />
                 <span>Edit</span>
               </button>
+            </div>
+
+            <div className="mt-3 flex items-center justify-between">
+              <ToggleSwitch
+                enabled={riderSettings[rider.id]?.available || rider.status === 'online'}
+                onChange={(newValue) => handleRiderToggle(rider.id, 'available', newValue)}
+                size="small"
+                label="Available"
+                id={`rider-available-${rider.id}`}
+              />
+              <ToggleSwitch
+                enabled={riderSettings[rider.id]?.notifications || true}
+                onChange={(newValue) => handleRiderToggle(rider.id, 'notifications', newValue)}
+                size="small"
+                label="Notifications"
+                id={`rider-notifications-${rider.id}`}
+              />
             </div>
 
             {rider.currentOrders > 0 && (

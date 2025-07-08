@@ -4,6 +4,7 @@ import { ordersApi, deliveryApi } from '../../services/api';
 import { formatCurrency, formatDate, getStatusColor } from '../../utils/helpers';
 import { ORDER_STATUS } from '../../utils/constants';
 import LoadingSpinner from '../common/LoadingSpinner';
+import ToggleSwitch from '../common/ToggleSwitch';
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
@@ -12,6 +13,7 @@ const OrderManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orderSettings, setOrderSettings] = useState({});
 
   useEffect(() => {
     fetchOrders();
@@ -61,6 +63,16 @@ const OrderManagement = () => {
     } catch (error) {
       console.error('Error assigning delivery partner:', error);
     }
+  };
+
+  const handleOrderToggle = (orderId, setting, newValue) => {
+    setOrderSettings(prev => ({
+      ...prev,
+      [orderId]: {
+        ...prev[orderId],
+        [setting]: newValue
+      }
+    }));
   };
 
   const filteredOrders = orders.filter(order => {
@@ -188,6 +200,13 @@ const OrderManagement = () => {
                     <button className="text-purple-600 hover:text-purple-900">
                       <MessageSquare className="w-4 h-4" />
                     </button>
+                    <ToggleSwitch
+                      enabled={orderSettings[order.id]?.priority || false}
+                      onChange={(newValue) => handleOrderToggle(order.id, 'priority', newValue)}
+                      size="small"
+                      label="Priority"
+                      id={`order-priority-${order.id}`}
+                    />
                   </td>
                 </tr>
               ))}

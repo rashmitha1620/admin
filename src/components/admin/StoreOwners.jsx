@@ -3,6 +3,7 @@ import { Search, Filter, Plus, Eye, Edit, Store, MapPin, Phone, X, Calendar, Dol
 import { storeOwnersApi } from '../../services/api';
 import { formatDate, getStatusColor } from '../../utils/helpers';
 import LoadingSpinner from '../common/LoadingSpinner';
+import ToggleSwitch from '../common/ToggleSwitch';
 
 const StoreOwners = () => {
   const [storeOwners, setStoreOwners] = useState([]);
@@ -13,6 +14,48 @@ const StoreOwners = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingOwner, setEditingOwner] = useState(null);
+  const [products, setProducts] = useState([
+    {
+      id: 1,
+      image: 'https://images.pexels.com/photos/5946080/pexels-photo-5946080.jpeg?auto=compress&cs=tinysrgb&w=100',
+      name: 'Cereal',
+      sku: '12345',
+      price: '$4.99',
+      stock: 20,
+      tags: 'Low Stock',
+      showOnGrooso: true
+    },
+    {
+      id: 2,
+      image: 'https://images.pexels.com/photos/894695/pexels-photo-894695.jpeg?auto=compress&cs=tinysrgb&w=100',
+      name: 'Coffee',
+      sku: '67690',
+      price: '$8.99',
+      stock: 50,
+      tags: 'Bestseller',
+      showOnGrooso: true
+    },
+    {
+      id: 3,
+      image: 'https://images.pexels.com/photos/4239091/pexels-photo-4239091.jpeg?auto=compress&cs=tinysrgb&w=100',
+      name: 'Laundry Detergent',
+      sku: '54321',
+      price: '$12.99',
+      stock: 15,
+      tags: 'Bestseller',
+      showOnGrooso: true
+    },
+    {
+      id: 4,
+      image: 'https://images.pexels.com/photos/33783/olive-oil-salad-dressing-cooking-olive.jpg?auto=compress&cs=tinysrgb&w=100',
+      name: 'Olive Oil',
+      sku: '98765',
+      price: '$10.99',
+      stock: 0,
+      tags: 'O',
+      showOnGrooso: false
+    }
+  ]);
 
   useEffect(() => {
     fetchStoreOwners();
@@ -39,6 +82,16 @@ const StoreOwners = () => {
   const handleEditClick = (owner) => {
     setEditingOwner(owner);
     setShowEditModal(true);
+  };
+
+  const handleToggleProduct = (productId, newValue) => {
+    setProducts(prev => 
+      prev.map(product => 
+        product.id === productId 
+          ? { ...product, showOnGrooso: newValue }
+          : product
+      )
+    );
   };
 
   if (loading) {
@@ -449,130 +502,48 @@ const StoreOwners = () => {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      <tr className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <img
-                            src="https://images.pexels.com/photos/5946080/pexels-photo-5946080.jpeg?auto=compress&cs=tinysrgb&w=100"
-                            alt="Cereal"
-                            className="w-12 h-12 object-cover rounded-lg"
-                          />
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm font-medium text-gray-900">Cereal</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">12345</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">$4.99</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">20</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
-                            Low Stock
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="w-12 h-6 bg-emerald-600 rounded-full flex items-center cursor-pointer">
-                            <div className="w-5 h-5 bg-white rounded-full ml-1 transform translate-x-6 transition-transform"></div>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <img
-                            src="https://images.pexels.com/photos/894695/pexels-photo-894695.jpeg?auto=compress&cs=tinysrgb&w=100"
-                            alt="Coffee"
-                            className="w-12 h-12 object-cover rounded-lg"
-                          />
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm font-medium text-gray-900">Coffee</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">67690</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">$8.99</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">50</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-emerald-100 text-emerald-800">
-                            Bestseller
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="w-12 h-6 bg-emerald-600 rounded-full flex items-center cursor-pointer">
-                            <div className="w-5 h-5 bg-white rounded-full ml-1 transform translate-x-6 transition-transform"></div>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <img
-                            src="https://images.pexels.com/photos/4239091/pexels-photo-4239091.jpeg?auto=compress&cs=tinysrgb&w=100"
-                            alt="Laundry Detergent"
-                            className="w-12 h-12 object-cover rounded-lg"
-                          />
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm font-medium text-gray-900">Laundry Detergent</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">54321</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">$12.99</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">15</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-emerald-100 text-emerald-800">
-                            Bestseller
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="w-12 h-6 bg-emerald-600 rounded-full flex items-center cursor-pointer">
-                            <div className="w-5 h-5 bg-white rounded-full ml-1 transform translate-x-6 transition-transform"></div>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <img
-                            src="https://images.pexels.com/photos/33783/olive-oil-salad-dressing-cooking-olive.jpg?auto=compress&cs=tinysrgb&w=100"
-                            alt="Olive Oil"
-                            className="w-12 h-12 object-cover rounded-lg"
-                          />
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm font-medium text-gray-900">Olive Oil</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">98765</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">$10.99</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-red-600">0</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
-                            O
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="w-12 h-6 bg-gray-300 rounded-full flex items-center cursor-pointer">
-                            <div className="w-5 h-5 bg-white rounded-full ml-1 transition-transform"></div>
-                          </div>
-                        </td>
-                      </tr>
+                      {products.map((product) => (
+                        <tr key={product.id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              className="w-12 h-12 object-cover rounded-lg"
+                            />
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-sm font-medium text-gray-900">{product.name}</span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-sm text-gray-900">{product.sku}</span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-sm text-gray-900">{product.price}</span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`text-sm ${product.stock === 0 ? 'text-red-600' : 'text-gray-900'}`}>
+                              {product.stock}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                              product.tags === 'Low Stock' ? 'bg-red-100 text-red-800' :
+                              product.tags === 'Bestseller' ? 'bg-emerald-100 text-emerald-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {product.tags}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <ToggleSwitch
+                              enabled={product.showOnGrooso}
+                              onChange={(newValue) => handleToggleProduct(product.id, newValue)}
+                              size="medium"
+                              id={`product-toggle-${product.id}`}
+                            />
+                          </td>
+                        </tr>
+                      ))}
                     </tbody>
                   </table>
                 </div>

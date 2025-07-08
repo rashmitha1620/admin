@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { Search, Filter, Eye, Edit, Send as Suspend, CheckCircle } from 'lucide-react';
+import ToggleSwitch from '../common/ToggleSwitch';
 
 const VendorManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterBy, setFilterBy] = useState('');
   const [selectedVendor, setSelectedVendor] = useState(null);
+  const [vendorSettings, setVendorSettings] = useState({});
 
   const vendorStats = [
     { label: 'Total Vendors', value: '391', trend: 'up' },
@@ -69,6 +71,15 @@ const VendorManagement = () => {
     }
   ];
 
+  const handleVendorToggle = (vendorId, setting, newValue) => {
+    setVendorSettings(prev => ({
+      ...prev,
+      [vendorId]: {
+        ...prev[vendorId],
+        [setting]: newValue
+      }
+    }));
+  };
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -226,9 +237,12 @@ const VendorManagement = () => {
                   <button className="text-gray-600 hover:text-blue-600">
                     <Edit className="w-4 h-4" />
                   </button>
-                  <button className="text-gray-600 hover:text-emerald-600">
-                    <CheckCircle className="w-4 h-4" />
-                  </button>
+                  <ToggleSwitch
+                    enabled={vendorSettings[vendor.id]?.approved || vendor.status === 'Active'}
+                    onChange={(newValue) => handleVendorToggle(vendor.id, 'approved', newValue)}
+                    size="small"
+                    id={`vendor-approved-${vendor.id}`}
+                  />
                   <button className="text-gray-600 hover:text-red-600">
                     <Suspend className="w-4 h-4" />
                   </button>

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Plus, Upload, Download, Search, Filter, ToggleLeft, ToggleRight } from 'lucide-react';
+import ToggleSwitch from '../common/ToggleSwitch';
 
 const VendorStockPanel = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [category, setCategory] = useState('');
   const [stockFilter, setStockFilter] = useState('');
-
-  const products = [
+  const [products, setProducts] = useState([
     {
       id: 1,
       image: 'https://images.pexels.com/photos/5946080/pexels-photo-5946080.jpeg?auto=compress&cs=tinysrgb&w=100',
@@ -47,7 +47,17 @@ const VendorStockPanel = () => {
       tags: 'O',
       showOnGrooso: false
     }
-  ];
+  ]);
+
+  const handleToggleProduct = (productId, newValue) => {
+    setProducts(prev => 
+      prev.map(product => 
+        product.id === productId 
+          ? { ...product, showOnGrooso: newValue }
+          : product
+      )
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -214,17 +224,12 @@ const VendorStockPanel = () => {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <button className="relative">
-                    {product.showOnGrooso ? (
-                      <div className="w-12 h-6 bg-emerald-600 rounded-full flex items-center">
-                        <div className="w-5 h-5 bg-white rounded-full ml-1 transform translate-x-6 transition-transform"></div>
-                      </div>
-                    ) : (
-                      <div className="w-12 h-6 bg-gray-300 rounded-full flex items-center">
-                        <div className="w-5 h-5 bg-white rounded-full ml-1 transition-transform"></div>
-                      </div>
-                    )}
-                  </button>
+                  <ToggleSwitch
+                    enabled={product.showOnGrooso}
+                    onChange={(newValue) => handleToggleProduct(product.id, newValue)}
+                    size="medium"
+                    id={`product-toggle-${product.id}`}
+                  />
                 </td>
               </tr>
             ))}
