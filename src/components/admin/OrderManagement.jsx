@@ -450,7 +450,7 @@ const OrderManagement = () => {
                       )}
 
                       {/* Accepted Orders Actions */}
-                      {activeTab === 'accepted' && (order.status === 'confirmed' || order.status === 'vendor_assigned') && (
+                      {activeTab === 'accepted' && (order.status === 'confirmed' || order.status === 'vendor_assigned') && !order.deliveryPartner && (
                         <button
                           onClick={() => openAssignModal(order)}
                           className="text-purple-600 hover:text-purple-900"
@@ -461,9 +461,9 @@ const OrderManagement = () => {
                       )}
 
                       {/* Show delivery partner for assigned orders */}
-                      {order.deliveryPartner && (
+                      {(order.deliveryPartner || order.riderDetails) && (
                         <span className="text-xs text-gray-500">
-                          Assigned to: {order.deliveryPartner}
+                          Assigned to: {order.deliveryPartner || order.riderDetails?.name}
                         </span>
                       )}
 
@@ -561,7 +561,7 @@ const OrderManagement = () => {
                   </div>
                 )}
 
-                {(selectedOrder.status === 'confirmed' || selectedOrder.status === 'vendor_assigned') && (
+                {(selectedOrder.status === 'confirmed' || selectedOrder.status === 'vendor_assigned') && !selectedOrder.deliveryPartner && !selectedOrder.riderDetails && (
                   <div className="p-4 bg-blue-50 rounded-lg">
                     <button
                       onClick={() => {
@@ -650,39 +650,60 @@ const OrderManagement = () => {
 
               <div className="mb-4">
                 <p className="text-sm text-gray-600">
-                  Assign order <strong>#{orderToAssign.orderNumber}</strong> to a delivery partner:
+                  Assign order <strong>#{orderToAssign.orderNumber}</strong> to a rider:
                 </p>
+                {orderToAssign.vendorDetails && (
+                  <div className="mt-2 p-2 bg-green-50 rounded text-sm">
+                    <span className="font-medium text-green-800">Vendor:</span> {orderToAssign.vendorDetails.name}
+                  </div>
+                )}
+                {selectedOrder.vendorDetails && (
+                  <div className="mt-3 p-3 bg-green-50 rounded-lg">
+                    <p className="text-sm font-medium text-green-800">Vendor Assigned:</p>
+                    <p className="text-sm text-green-700">{selectedOrder.vendorDetails.name}</p>
+                    <p className="text-xs text-green-600">{selectedOrder.vendorDetails.address}</p>
+                  </div>
+                )}
+              </div>
+              <div>
+                <span className="font-medium">Created:</span> {formatDate(selectedOrder.createdAt)}
               </div>
 
               <div className="space-y-3 max-h-64 overflow-y-auto">
                 {deliveryPartners
-                  .filter(partner => partner.currentOrders < partner.maxOrders)
+                  .filter(partner => partner.currentOrders < partner.maxOrders && partner.status === 'active')
                   .map(partner => (
                     <div
                       key={partner.id}
-                      className="border rounded-lg p-3 hover:bg-gray-50 cursor-pointer"
+                      className="border rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-colors"
                       onClick={() => assignDeliveryPartner(orderToAssign.id, partner.id)}
                     >
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="font-medium">{partner.name}</p>
-                          <p className="text-sm text-gray-500">{partner.location}</p>
+                          <p className="text-sm text-gray-500">{partner.location || partner.currentLocation}</p>
+                          <p className="text-xs text-gray-400">{partner.vehicleType || partner.vehicle}</p>
                         </div>
                         <div className="text-right">
                           <p className="text-sm font-medium">⭐ {partner.rating}</p>
                           <p className="text-xs text-gray-500">
                             {partner.currentOrders}/{partner.maxOrders} orders
                           </p>
+                          <span className={`text-xs px-2 py-1 rounded-full ${
+                            partner.status === 'online' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {partner.status || 'active'}
+                          </span>
                         </div>
                       </div>
                     </div>
                   ))}
               </div>
 
-              {deliveryPartners.filter(partner => partner.currentOrders < partner.maxOrders).length === 0 && (
+              {deliveryPartners.filter(partner => partner.currentOrders < partner.maxOrders && partner.status === 'active').length === 0 && (
                 <div className="text-center py-8">
                   <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-500">No available delivery partners</p>
+                  <p className="text-gray-500">No available riders</p>
                 </div>
               )}
             </div>

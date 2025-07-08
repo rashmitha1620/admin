@@ -562,13 +562,39 @@ export const mockDeliveryPartners = [
     name: 'Rohit Singh',
     phone: '+919876543220',
     email: 'rohit.delivery@grooso.com',
-    status: 'active',
+    status: 'online',
     rating: 4.6,
     totalDeliveries: 340,
     currentOrders: 3,
     maxOrders: 8,
-    vehicle: 'Motorcycle',
-    location: 'Andheri, Mumbai'
+    vehicleType: 'Motorcycle',
+    currentLocation: 'Salt Lake, Kolkata'
+  },
+  {
+    id: 'd2',
+    name: 'Priya Sharma',
+    phone: '+919876543221',
+    email: 'priya.delivery@grooso.com',
+    status: 'online',
+    rating: 4.8,
+    totalDeliveries: 520,
+    currentOrders: 1,
+    maxOrders: 6,
+    vehicleType: 'Scooter',
+    currentLocation: 'Navrangpura, Ahmedabad'
+  },
+  {
+    id: 'd3',
+    name: 'Amit Kumar',
+    phone: '+919876543222',
+    email: 'amit.delivery@grooso.com',
+    status: 'online',
+    rating: 4.5,
+    totalDeliveries: 890,
+    currentOrders: 2,
+    maxOrders: 5,
+    vehicleType: 'Motorcycle',
+    currentLocation: 'Connaught Place, Delhi'
   }
 ];
 
