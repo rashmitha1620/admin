@@ -1,7 +1,7 @@
 // Vendor Matching Service
 // This service handles intelligent vendor matching based on various criteria
 
-import { mockVendors } from '../utils/mockData';
+import { mockVendors, mockOrders } from '../utils/mockData';
 
 /**
  * Calculate distance between two pincodes (simplified calculation)
