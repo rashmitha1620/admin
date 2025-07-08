@@ -40,7 +40,7 @@ const OrderManagement = () => {
   // Update tab counts when orders change
   useEffect(() => {
     const newCount = orders.filter(order => order.status === 'pending').length;
-    const acceptedCount = orders.filter(order => ['confirmed', 'assigned'].includes(order.status)).length;
+    const acceptedCount = orders.filter(order => ['confirmed', 'vendor_assigned', 'assigned'].includes(order.status)).length;
     const rejectedCount = orders.filter(order => order.status === 'cancelled').length;
 
     tabs[0].count = newCount;
@@ -110,23 +110,22 @@ const OrderManagement = () => {
 
   const assignDeliveryPartner = async (orderId, partnerId) => {
     try {
-      await deliveryApi.assignOrder(orderId, partnerId);
-      const partner = deliveryPartners.find(p => p.id === partnerId);
-      setOrders(orders.map(order => 
-        order.id === orderId 
-          ? { ...order, deliveryPartner: partner.name, status: 'assigned' }
-          : order
-      ));
+      // Use the rider assignment service
+      const result = await ordersApi.assignRider(orderId, partnerId);
+      
+      // Update the orders list to reflect the assignment
+      await fetchOrders(); // Refresh the orders to get updated data
+      
       setShowAssignModal(false);
       setOrderToAssign(null);
       
       if (window.showNotification) {
-        window.showNotification('Success', `Order assigned to ${partner.name}`, 'success');
+        window.showNotification('Success', `Order assigned to rider successfully`, 'success');
       }
     } catch (error) {
       console.error('Error assigning delivery partner:', error);
       if (window.showNotification) {
-        window.showNotification('Error', 'Failed to assign delivery partner', 'error');
+        window.showNotification('Error', error.message || 'Failed to assign rider', 'error');
       }
     }
   };
@@ -215,7 +214,7 @@ const OrderManagement = () => {
         filtered = filtered.filter(order => order.status === 'pending');
         break;
       case 'accepted':
-        filtered = filtered.filter(order => ['confirmed', 'assigned'].includes(order.status));
+        filtered = filtered.filter(order => ['confirmed', 'vendor_assigned', 'assigned'].includes(order.status));
         break;
       case 'rejected':
         filtered = filtered.filter(order => order.status === 'cancelled');
@@ -280,7 +279,7 @@ const OrderManagement = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Accepted Orders</p>
-              <p className="text-2xl font-bold text-gray-900">{orders.filter(o => ['confirmed', 'assigned'].includes(o.status)).length}</p>
+              <p className="text-2xl font-bold text-gray-900">{orders.filter(o => ['confirmed', 'vendor_assigned', 'assigned'].includes(o.status)).length}</p>
             </div>
             <CheckCircle className="w-8 h-8 text-emerald-500" />
           </div>
@@ -348,6 +347,7 @@ const OrderManagement = () => {
               >
                 <option value="">All Status</option>
                 <option value="confirmed">Confirmed</option>
+                <option value="vendor_assigned">Vendor Assigned</option>
                 <option value="assigned">Assigned</option>
               </select>
             )}
@@ -450,7 +450,7 @@ const OrderManagement = () => {
                       )}
 
                       {/* Accepted Orders Actions */}
-                      {activeTab === 'accepted' && order.status === 'confirmed' && (
+                      {activeTab === 'accepted' && (order.status === 'confirmed' || order.status === 'vendor_assigned') && (
                         <button
                           onClick={() => openAssignModal(order)}
                           className="text-purple-600 hover:text-purple-900"
@@ -561,7 +561,7 @@ const OrderManagement = () => {
                   </div>
                 )}
 
-                {selectedOrder.status === 'confirmed' && (
+                {(selectedOrder.status === 'confirmed' || selectedOrder.status === 'vendor_assigned') && (
                   <div className="p-4 bg-blue-50 rounded-lg">
                     <button
                       onClick={() => {

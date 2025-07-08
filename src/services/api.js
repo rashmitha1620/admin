@@ -130,7 +130,13 @@ export const ordersApi = {
   getOrder: (id) => apiService.get(`/orders/${id}`),
   createOrder: (data) => apiService.post('/orders', data),
   updateOrderStatus: (id, status) => apiService.put(`/orders/${id}/status`, { status }),
-  assignOrder: (orderId, riderId) => apiService.post(`/orders/${orderId}/assign`, { riderId })
+  assignOrder: (orderId, riderId) => apiService.post(`/orders/${orderId}/assign`, { riderId }),
+  assignRider: (orderId, riderId) => {
+    // Import the rider assignment function
+    return import('../services/riderMatching.js').then(module => 
+      module.assignOrderToRider(orderId, riderId)
+    );
+  }
 };
 
 export const vendorsApi = {
