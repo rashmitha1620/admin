@@ -298,7 +298,7 @@ const AdminDashboard = () => {
                   size="small"
                   label="Compact"
                   id="dashboard-compact-view"
-                  compact={dashboardPreferences.compactView}
+                  compact={true}
                 />
               </div>
               
