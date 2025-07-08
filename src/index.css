@@ -280,3 +280,105 @@
 .is-compact .toggle-switch {
   transform: scale(0.9);
 }
+
+/* Enhanced toggle switch responsiveness for compact view */
+.is-compact .toggle-switch,
+.is-compact button[aria-pressed] {
+  transform: scale(0.85) !important;
+}
+
+/* Specific toggle switch container adjustments */
+.is-compact .flex.items-center.space-x-2 {
+  gap: 0.375rem !important; /* Reduce gap between toggle and label */
+}
+
+/* Toggle switch label adjustments in compact view */
+.is-compact .toggle-switch + span,
+.is-compact label[for*="toggle"] {
+  font-size: 0.75rem !important;
+  line-height: 1.2 !important;
+}
+
+/* Compact view for ToggleSwitch component specifically */
+.is-compact .relative.inline-flex {
+  transform: scale(0.85) !important;
+}
+
+/* Adjust toggle switch containers in compact view */
+.is-compact .grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-4.gap-4,
+.is-compact .grid.grid-cols-1.sm\\:grid-cols-3.gap-4,
+.is-compact .grid.grid-cols-1.md\\:grid-cols-2.gap-4 {
+  gap: 0.5rem !important;
+}
+
+/* Compact view for toggle switch rows */
+.is-compact .space-x-2 {
+  gap: 0.375rem !important;
+}
+
+/* Better spacing for toggle switches in settings panels */
+.is-compact .bg-white.rounded-lg.shadow-sm.border .grid {
+  gap: 0.5rem !important;
+}
+
+/* Compact view for toggle switch labels */
+.is-compact .text-sm.font-medium.text-gray-700 {
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+}
+
+/* Responsive toggle switches for mobile in compact view */
+@media (max-width: 640px) {
+  .is-compact .toggle-switch,
+  .is-compact .relative.inline-flex {
+    transform: scale(0.8) !important;
+  }
+  
+  .is-compact .flex.items-center.space-x-2 {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.25rem !important;
+  }
+  
+  .is-compact .grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-4.gap-4,
+  .is-compact .grid.grid-cols-1.sm\\:grid-cols-3.gap-4 {
+    grid-template-columns: repeat(1, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+}
+
+/* Tablet responsive adjustments */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .is-compact .toggle-switch,
+  .is-compact .relative.inline-flex {
+    transform: scale(0.82) !important;
+  }
+  
+  .is-compact .grid.grid-cols-1.sm\\:grid-cols-3.gap-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* Desktop fine-tuning */
+@media (min-width: 1025px) {
+  .is-compact .toggle-switch,
+  .is-compact .relative.inline-flex {
+    transform: scale(0.85) !important;
+  }
+}
+
+/* Fix toggle switch alignment in tables */
+.is-compact table .toggle-switch {
+  margin: 0 auto !important;
+}
+
+/* Compact view for action button groups with toggles */
+.is-compact .text-sm.font-medium.space-x-2 {
+  gap: 0.375rem !important;
+}
+
+/* Better visual hierarchy for toggle switches in compact mode */
+.is-compact .toggle-switch:focus {
+  outline: 1px solid #10b981 !important;
+  outline-offset: 1px !important;
+}
