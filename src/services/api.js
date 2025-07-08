@@ -131,11 +131,44 @@ export const ordersApi = {
   createOrder: (data) => apiService.post('/orders', data),
   updateOrderStatus: (id, status) => apiService.put(`/orders/${id}/status`, { status }),
   assignOrder: (orderId, riderId) => apiService.post(`/orders/${orderId}/assign`, { riderId }),
-  assignRider: (orderId, riderId) => {
-    // Import the rider assignment function
-    return import('../services/riderMatching.js').then(module => 
-      module.assignOrderToRider(orderId, riderId)
-    );
+  assignRider: async (orderId, riderId) => {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    const rider = mockRiders.find(r => r.id === riderId);
+    if (!rider) {
+      throw new Error('Rider not found');
+    }
+
+    if (rider.status !== 'online' || rider.currentOrders >= rider.maxOrders) {
+      throw new Error('Rider is not available or at capacity');
+    }
+
+    // Update rider's current orders
+    rider.currentOrders += 1;
+
+    // Update the order status to assigned
+    const orderIndex = mockOrders.findIndex(o => o.id === orderId);
+    if (orderIndex !== -1) {
+      mockOrders[orderIndex].status = 'assigned';
+      mockOrders[orderIndex].deliveryPartner = rider.name;
+      mockOrders[orderIndex].riderDetails = {
+        id: riderId,
+        name: rider.name,
+        phone: rider.phone,
+        vehicleType: rider.vehicleType
+      };
+    }
+
+    return {
+      success: true,
+      data: {
+        assignedRider: rider,
+        estimatedPickupTime: '15-20 minutes',
+        estimatedDeliveryTime: '45-60 minutes',
+        trackingId: `TRK-${Date.now()}`
+      }
+    };
   }
 };
 

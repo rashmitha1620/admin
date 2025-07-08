@@ -671,12 +671,16 @@ const OrderManagement = () => {
 
               <div className="space-y-3 max-h-64 overflow-y-auto">
                 {deliveryPartners
-                  .filter(partner => partner.currentOrders < partner.maxOrders && partner.status === 'active')
+                  .filter(partner => partner.currentOrders < partner.maxOrders && (partner.status === 'active' || partner.status === 'online'))
                   .map(partner => (
                     <div
                       key={partner.id}
                       className="border rounded-lg p-3 hover:bg-gray-50 cursor-pointer transition-colors"
-                      onClick={() => assignDeliveryPartner(orderToAssign.id, partner.id)}
+                      onClick={() => {
+                        if (!loading) {
+                          assignDeliveryPartner(orderToAssign.id, partner.id);
+                        }
+                      }}
                     >
                       <div className="flex items-center justify-between">
                         <div>
@@ -690,17 +694,22 @@ const OrderManagement = () => {
                             {partner.currentOrders}/{partner.maxOrders} orders
                           </p>
                           <span className={`text-xs px-2 py-1 rounded-full ${
-                            partner.status === 'online' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                            (partner.status === 'online' || partner.status === 'active') ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                           }`}>
-                            {partner.status || 'active'}
+                            {partner.status === 'online' || partner.status === 'active' ? 'Available' : 'Busy'}
                           </span>
                         </div>
                       </div>
+                      {loading && (
+                        <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center rounded-lg">
+                          <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                      )}
                     </div>
                   ))}
               </div>
 
-              {deliveryPartners.filter(partner => partner.currentOrders < partner.maxOrders && partner.status === 'active').length === 0 && (
+              {deliveryPartners.filter(partner => partner.currentOrders < partner.maxOrders && (partner.status === 'active' || partner.status === 'online')).length === 0 && (
                 <div className="text-center py-8">
                   <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
                   <p className="text-gray-500">No available riders</p>
