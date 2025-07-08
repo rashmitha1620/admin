@@ -20,8 +20,10 @@ export const mockOrders = [
       state: 'Maharashtra',
       pincode: '400058'
     },
-    vendor: 'TechWorld Electronics',
-    deliveryPartner: 'Speed Delivery',
+    vendor: null,
+    vendorDetails: null,
+    deliveryPartner: null,
+    riderDetails: null,
     createdAt: '2025-01-20T10:30:00Z',
     estimatedDelivery: '2025-01-22T18:00:00Z',
     priority: 'normal'
@@ -47,8 +49,10 @@ export const mockOrders = [
       state: 'Karnataka',
       pincode: '560038'
     },
-    vendor: 'Home Essentials',
-    deliveryPartner: 'Quick Transport',
+    vendor: null,
+    vendorDetails: null,
+    deliveryPartner: null,
+    riderDetails: null,
     createdAt: '2025-01-21T14:15:00Z',
     estimatedDelivery: '2025-01-23T16:00:00Z',
     priority: 'urgent'
@@ -75,7 +79,9 @@ export const mockOrders = [
       pincode: '380015'
     },
     vendor: null,
+    vendorDetails: null,
     deliveryPartner: null,
+    riderDetails: null,
     createdAt: '2025-01-22T08:30:00Z',
     estimatedDelivery: '2025-01-24T16:00:00Z',
     priority: 'normal'
@@ -83,7 +89,7 @@ export const mockOrders = [
   {
     id: 'GRO-2025-004',
     orderNumber: 'GRO-2025-004',
-    status: 'confirmed',
+    status: 'vendor_assigned',
     total: 4299,
     items: [
       { productId: '8', name: 'Smart Watch', quantity: 1, price: 4299, category: 'Electronics' }
@@ -100,10 +106,52 @@ export const mockOrders = [
       state: 'West Bengal',
       pincode: '700064'
     },
-    vendor: 'TechWorld Electronics',
+    vendor: 'Kolkata Tech Solutions',
+    vendorDetails: {
+      id: 'v6',
+      name: 'Kolkata Tech Solutions',
+      address: 'Sector V, Salt Lake, Kolkata',
+      phone: '+919123456794',
+      pincode: '700091'
+    },
     deliveryPartner: null,
+    riderDetails: null,
     createdAt: '2025-01-22T11:15:00Z',
     estimatedDelivery: '2025-01-24T18:00:00Z',
+    priority: 'normal'
+  },
+  {
+    id: 'GRO-2025-005',
+    orderNumber: 'GRO-2025-005',
+    status: 'vendor_assigned',
+    total: 1899,
+    items: [
+      { productId: '9', name: 'Organic Spices Pack', quantity: 1, price: 1899, category: 'Food & Beverages' }
+    ],
+    customer: {
+      name: 'Meera Shah',
+      phone: '+919876543214',
+      email: 'meera@example.com'
+    },
+    deliveryAddress: {
+      street: '567 CG Road',
+      area: 'Navrangpura',
+      city: 'Ahmedabad',
+      state: 'Gujarat',
+      pincode: '380009'
+    },
+    vendor: 'Gujarat Fresh Produce',
+    vendorDetails: {
+      id: 'v5',
+      name: 'Gujarat Fresh Produce',
+      address: 'APMC Market, Ahmedabad',
+      phone: '+919123456793',
+      pincode: '380026'
+    },
+    deliveryPartner: null,
+    riderDetails: null,
+    createdAt: '2025-01-22T12:30:00Z',
+    estimatedDelivery: '2025-01-24T16:00:00Z',
     priority: 'normal'
   }
 ];
@@ -408,32 +456,45 @@ export const mockRiders = [
     id: 'r1',
     name: 'Vikash Singh',
     phone: '+919876543240',
+    email: 'vikash@grooso.com',
     status: 'online',
     vehicleType: 'Motorcycle',
     currentOrders: 2,
     maxOrders: 5,
     totalDeliveries: 1250,
     rating: 4.8,
-    currentLocation: 'Andheri West, Mumbai',
-    lastActive: '2025-01-22T10:30:00Z'
+    currentLocation: 'Salt Lake, Kolkata',
+    city: 'Kolkata',
+    state: 'West Bengal',
+    pincode: '700064',
+    deliveryRadius: 15,
+    lastActive: '2025-01-22T10:30:00Z',
+    experience: '2 years'
   },
   {
     id: 'r2',
     name: 'Ravi Patel',
     phone: '+919876543241',
+    email: 'ravi@grooso.com',
     status: 'online',
     vehicleType: 'Bicycle',
     currentOrders: 1,
     maxOrders: 3,
     totalDeliveries: 890,
     rating: 4.6,
-    currentLocation: 'Koramangala, Bangalore',
-    lastActive: '2025-01-22T10:45:00Z'
+    currentLocation: 'Navrangpura, Ahmedabad',
+    city: 'Ahmedabad',
+    state: 'Gujarat',
+    pincode: '380009',
+    deliveryRadius: 10,
+    lastActive: '2025-01-22T10:45:00Z',
+    experience: '1.5 years'
   },
   {
     id: 'r3',
     name: 'Suresh Kumar',
     phone: '+919876543242',
+    email: 'suresh@grooso.com',
     status: 'offline',
     vehicleType: 'Scooter',
     currentOrders: 0,
@@ -441,6 +502,49 @@ export const mockRiders = [
     totalDeliveries: 567,
     rating: 4.4,
     currentLocation: 'Connaught Place, Delhi',
-    lastActive: '2025-01-22T08:00:00Z'
+    city: 'Delhi',
+    state: 'Delhi',
+    pincode: '110001',
+    deliveryRadius: 12,
+    lastActive: '2025-01-22T08:00:00Z',
+    experience: '3 years'
+  },
+  {
+    id: 'r4',
+    name: 'Arjun Mehta',
+    phone: '+919876543243',
+    email: 'arjun@grooso.com',
+    status: 'online',
+    vehicleType: 'Motorcycle',
+    currentOrders: 1,
+    maxOrders: 6,
+    totalDeliveries: 1890,
+    rating: 4.9,
+    currentLocation: 'Satellite, Ahmedabad',
+    city: 'Ahmedabad',
+    state: 'Gujarat',
+    pincode: '380015',
+    deliveryRadius: 20,
+    lastActive: '2025-01-22T11:00:00Z',
+    experience: '4 years'
+  },
+  {
+    id: 'r5',
+    name: 'Deepak Roy',
+    phone: '+919876543244',
+    email: 'deepak@grooso.com',
+    status: 'online',
+    vehicleType: 'Scooter',
+    currentOrders: 0,
+    maxOrders: 4,
+    totalDeliveries: 756,
+    rating: 4.7,
+    currentLocation: 'Park Street, Kolkata',
+    city: 'Kolkata',
+    state: 'West Bengal',
+    pincode: '700016',
+    deliveryRadius: 18,
+    lastActive: '2025-01-22T11:15:00Z',
+    experience: '2.5 years'
   }
 ];

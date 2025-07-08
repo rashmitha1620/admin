@@ -6,6 +6,7 @@ import { ORDER_STATUS } from '../../utils/constants';
 import LoadingSpinner from '../common/LoadingSpinner';
 import ToggleSwitch from '../common/ToggleSwitch';
 import { getVendorRecommendations, searchVendors, assignOrderToVendor } from '../../services/vendorMatching';
+import { getRiderRecommendations, searchRiders, assignOrderToRider } from '../../services/riderMatching';
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
@@ -16,8 +17,6 @@ const OrderManagement = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [orderSettings, setOrderSettings] = useState({});
   const [activeTab, setActiveTab] = useState('new');
-  const [showAssignModal, setShowAssignModal] = useState(false);
-  const [orderToAssign, setOrderToAssign] = useState(null);
   const [showVendorModal, setShowVendorModal] = useState(false);
   const [orderToAccept, setOrderToAccept] = useState(null);
   const [vendorRecommendations, setVendorRecommendations] = useState(null);
@@ -25,10 +24,20 @@ const OrderManagement = () => {
   const [vendorSearchTerm, setVendorSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [assigningVendor, setAssigningVendor] = useState(false);
+  
+  // Rider assignment states
+  const [showRiderModal, setShowRiderModal] = useState(false);
+  const [orderToAssignRider, setOrderToAssignRider] = useState(null);
+  const [riderRecommendations, setRiderRecommendations] = useState(null);
+  const [selectedRider, setSelectedRider] = useState(null);
+  const [riderSearchTerm, setRiderSearchTerm] = useState('');
+  const [riderSearchResults, setRiderSearchResults] = useState([]);
+  const [assigningRider, setAssigningRider] = useState(false);
 
   const tabs = [
     { id: 'new', label: 'New Orders', icon: Clock, count: 0 },
-    { id: 'accepted', label: 'Accepted Orders', icon: CheckCircle, count: 0 },
+    { id: 'vendor-assigned', label: 'Rider Assignment', icon: Truck, count: 0 },
+    { id: 'assigned', label: 'Assigned Orders', icon: CheckCircle, count: 0 },
     { id: 'rejected', label: 'Rejected Orders', icon: XCircle, count: 0 }
   ];
 
@@ -40,12 +49,14 @@ const OrderManagement = () => {
   // Update tab counts when orders change
   useEffect(() => {
     const newCount = orders.filter(order => order.status === 'pending').length;
-    const acceptedCount = orders.filter(order => ['confirmed', 'assigned'].includes(order.status)).length;
+    const vendorAssignedCount = orders.filter(order => order.status === 'vendor_assigned').length;
+    const assignedCount = orders.filter(order => order.status === 'assigned').length;
     const rejectedCount = orders.filter(order => order.status === 'cancelled').length;
 
     tabs[0].count = newCount;
-    tabs[1].count = acceptedCount;
-    tabs[2].count = rejectedCount;
+    tabs[1].count = vendorAssignedCount;
+    tabs[2].count = assignedCount;
+    tabs[3].count = rejectedCount;
   }, [orders]);
 
   const fetchOrders = async () => {
@@ -155,7 +166,18 @@ const OrderManagement = () => {
       // Update order status and vendor
       setOrders(orders.map(order => 
         order.id === orderToAccept.id 
-          ? { ...order, status: 'confirmed', vendor: selectedVendor.name }
+          ? { 
+              ...order, 
+              status: 'vendor_assigned', 
+              vendor: selectedVendor.name,
+              vendorDetails: {
+                id: selectedVendor.id,
+                name: selectedVendor.name,
+                address: `${selectedVendor.address}, ${selectedVendor.city}`,
+                phone: selectedVendor.phone,
+                pincode: selectedVendor.pincode
+              }
+            }
           : order
       ));
 
@@ -168,7 +190,7 @@ const OrderManagement = () => {
       setSearchResults([]);
 
       if (window.showNotification) {
-        window.showNotification('Success', `Order assigned to ${selectedVendor.name}`, 'success');
+        window.showNotification('Success', `Order assigned to ${selectedVendor.name}. Ready for rider assignment.`, 'success');
       }
     } catch (error) {
       console.error('Error assigning vendor:', error);
@@ -177,6 +199,74 @@ const OrderManagement = () => {
       }
     } finally {
       setAssigningVendor(false);
+    }
+  };
+
+  // Rider assignment functions
+  const openRiderAssignmentModal = (order) => {
+    setOrderToAssignRider(order);
+    const recommendations = getRiderRecommendations(order);
+    setRiderRecommendations(recommendations);
+    setShowRiderModal(true);
+  };
+
+  const handleRiderSearch = (searchTerm) => {
+    setRiderSearchTerm(searchTerm);
+    if (searchTerm.trim()) {
+      const results = searchRiders(searchTerm, orderToAssignRider);
+      setRiderSearchResults(results);
+    } else {
+      setRiderSearchResults([]);
+    }
+  };
+
+  const selectRider = (rider) => {
+    setSelectedRider(rider);
+  };
+
+  const confirmRiderAssignment = async () => {
+    if (!selectedRider || !orderToAssignRider) return;
+
+    setAssigningRider(true);
+    try {
+      await assignOrderToRider(orderToAssignRider.id, selectedRider.id);
+      
+      // Update order status and rider
+      setOrders(orders.map(order => 
+        order.id === orderToAssignRider.id 
+          ? { 
+              ...order, 
+              status: 'assigned', 
+              deliveryPartner: selectedRider.name,
+              riderDetails: {
+                id: selectedRider.id,
+                name: selectedRider.name,
+                phone: selectedRider.phone,
+                vehicleType: selectedRider.vehicleType,
+                rating: selectedRider.rating
+              }
+            }
+          : order
+      ));
+
+      // Close modals and reset state
+      setShowRiderModal(false);
+      setOrderToAssignRider(null);
+      setSelectedRider(null);
+      setRiderRecommendations(null);
+      setRiderSearchTerm('');
+      setRiderSearchResults([]);
+
+      if (window.showNotification) {
+        window.showNotification('Success', `Order assigned to rider ${selectedRider.name}`, 'success');
+      }
+    } catch (error) {
+      console.error('Error assigning rider:', error);
+      if (window.showNotification) {
+        window.showNotification('Error', error.message || 'Failed to assign rider', 'error');
+      }
+    } finally {
+      setAssigningRider(false);
     }
   };
 
@@ -201,8 +291,11 @@ const OrderManagement = () => {
       case 'new':
         filtered = filtered.filter(order => order.status === 'pending');
         break;
-      case 'accepted':
-        filtered = filtered.filter(order => ['confirmed', 'assigned'].includes(order.status));
+      case 'vendor-assigned':
+        filtered = filtered.filter(order => order.status === 'vendor_assigned');
+        break;
+      case 'assigned':
+        filtered = filtered.filter(order => order.status === 'assigned');
         break;
       case 'rejected':
         filtered = filtered.filter(order => order.status === 'cancelled');
@@ -219,8 +312,8 @@ const OrderManagement = () => {
       );
     }
 
-    // Apply status filter (for accepted orders tab)
-    if (statusFilter && activeTab === 'accepted') {
+    // Apply status filter (for assigned orders tab)
+    if (statusFilter && activeTab === 'assigned') {
       filtered = filtered.filter(order => order.status === statusFilter);
     }
 
@@ -228,11 +321,6 @@ const OrderManagement = () => {
   };
 
   const filteredOrders = getFilteredOrders();
-
-  const openAssignModal = (order) => {
-    setOrderToAssign(order);
-    setShowAssignModal(true);
-  };
 
   if (loading) {
     return (
@@ -266,19 +354,19 @@ const OrderManagement = () => {
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Accepted Orders</p>
-              <p className="text-2xl font-bold text-gray-900">{orders.filter(o => ['confirmed', 'assigned'].includes(o.status)).length}</p>
+              <p className="text-sm font-medium text-gray-600">Awaiting Rider Assignment</p>
+              <p className="text-2xl font-bold text-gray-900">{orders.filter(o => o.status === 'vendor_assigned').length}</p>
             </div>
-            <CheckCircle className="w-8 h-8 text-emerald-500" />
+            <Truck className="w-8 h-8 text-blue-500" />
           </div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Rejected Orders</p>
-              <p className="text-2xl font-bold text-gray-900">{orders.filter(o => o.status === 'cancelled').length}</p>
+              <p className="text-sm font-medium text-gray-600">Fully Assigned</p>
+              <p className="text-2xl font-bold text-gray-900">{orders.filter(o => o.status === 'assigned').length}</p>
             </div>
-            <XCircle className="w-8 h-8 text-red-500" />
+            <CheckCircle className="w-8 h-8 text-emerald-500" />
           </div>
         </div>
       </div>
@@ -536,17 +624,17 @@ const OrderManagement = () => {
                   </div>
                 )}
 
-                {selectedOrder.status === 'confirmed' && (
+               {selectedOrder.status === 'vendor_assigned' && (
                   <div className="p-4 bg-blue-50 rounded-lg">
                     <button
                       onClick={() => {
-                        openAssignModal(selectedOrder);
+                       openRiderAssignmentModal(selectedOrder);
                         setSelectedOrder(null);
                       }}
                       className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
                     >
-                      <UserPlus className="w-4 h-4" />
-                      <span>Assign to Rider</span>
+                     <Truck className="w-4 h-4" />
+                     <span>Assign Rider</span>
                     </button>
                   </div>
                 )}
@@ -818,14 +906,13 @@ const OrderManagement = () => {
                                 </div>
                               </div>
                             </div>
-                          </div>
+         {activeTab === 'assigned' && (
                           
                           {selectedVendor?.id === vendor.id && (
                             <div className="ml-4">
                               <CheckCircle className="w-6 h-6 text-emerald-600" />
                             </div>
                           )}
-                        </div>
                       </div>
                     ))}
                   </div>
@@ -843,6 +930,16 @@ const OrderManagement = () => {
                         <div
                           key={vendor.id}
                           className={`border rounded-lg p-4 cursor-pointer transition-all ${
+             {activeTab === 'vendor-assigned' && (
+               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                 Vendor
+               </th>
+             )}
+             {activeTab === 'assigned' && (
+               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                 Assigned To
+               </th>
+             )}
                             selectedVendor?.id === vendor.id
                               ? 'border-emerald-500 bg-emerald-50'
                               : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
@@ -881,9 +978,34 @@ const OrderManagement = () => {
                     </p>
                   </div>
                 )}
+               {activeTab === 'vendor-assigned' && (
+                 <td className="px-6 py-4 whitespace-nowrap">
+                   <div>
+                     <div className="text-sm font-medium text-gray-900">
+                       {order.vendor}
+                     </div>
+                     <div className="text-sm text-gray-500">
+                       {order.vendorDetails?.address}
+                     </div>
+                   </div>
+                 </td>
+               )}
+               {activeTab === 'assigned' && (
+                 <td className="px-6 py-4 whitespace-nowrap">
+                   <div>
+                     <div className="text-sm font-medium text-gray-900">
+                       Vendor: {order.vendor}
+                     </div>
+                     <div className="text-sm text-gray-500">
+                       Rider: {order.deliveryPartner}
+                     </div>
+                   </div>
+                 </td>
+               )}
               </div>
 
-              {/* Action Buttons */}
+                   {order.status === 'vendor_assigned' ? 'Awaiting Rider' : 
+                    order.status.charAt(0).toUpperCase() + order.status.slice(1).replace('_', ' ')}
               <div className="flex justify-between items-center mt-8 pt-6 border-t">
                 <button
                   onClick={() => {
@@ -922,14 +1044,14 @@ const OrderManagement = () => {
                     className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
                   >
                     {assigningVendor ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                   {/* Rider Assignment Actions */}
+                   {activeTab === 'vendor-assigned' && order.status === 'vendor_assigned' && (
                         <span>Assigning...</span>
-                      </>
+                       onClick={() => openRiderAssignmentModal(order)}
                     ) : (
                       <>
                         <CheckCircle className="w-4 h-4" />
-                        <span>Accept & Assign to {selectedVendor?.name || 'Vendor'}</span>
+                       <Truck className="w-4 h-4" />
                       </>
                     )}
                   </button>
@@ -943,4 +1065,5 @@ const OrderManagement = () => {
   );
 };
 
-export default OrderManagement;
+           {activeTab === 'vendor-assigned' && 'No orders awaiting rider assignment.'}
+           {activeTab === 'assigned' && 'No fully assigned orders found.'}
