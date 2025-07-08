@@ -77,6 +77,7 @@ const DashboardOverview = () => {
             label="Auto Refresh"
             id="dashboard-auto-refresh"
             size="small"
+            compact={true}
           />
           <ToggleSwitch
             enabled={dashboardSettings.notifications}
@@ -84,6 +85,7 @@ const DashboardOverview = () => {
             label="Notifications"
             id="dashboard-notifications"
             size="small"
+            compact={true}
           />
           <ToggleSwitch
             enabled={dashboardSettings.realTimeUpdates}
@@ -91,6 +93,7 @@ const DashboardOverview = () => {
             label="Real-time Updates"
             id="dashboard-realtime"
             size="small"
+            compact={true}
           />
         </div>
       </div>
