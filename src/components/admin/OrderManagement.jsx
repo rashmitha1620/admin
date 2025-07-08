@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Eye, Edit, MessageSquare, CheckCircle, XCircle, UserPlus, Clock, Package, Users } from 'lucide-react';
+import { Search, Filter, Eye, Edit, MessageSquare, CheckCircle, XCircle, UserPlus, Clock, Package, Users, Star, MapPin, Truck, AlertCircle, TrendingUp } from 'lucide-react';
 import { ordersApi, deliveryApi } from '../../services/api';
 import { formatCurrency, formatDate, getStatusColor } from '../../utils/helpers';
 import { ORDER_STATUS } from '../../utils/constants';
 import LoadingSpinner from '../common/LoadingSpinner';
 import ToggleSwitch from '../common/ToggleSwitch';
+import { getVendorRecommendations, searchVendors, assignOrderToVendor } from '../../services/vendorMatching';
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
@@ -17,6 +18,13 @@ const OrderManagement = () => {
   const [activeTab, setActiveTab] = useState('new');
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [orderToAssign, setOrderToAssign] = useState(null);
+  const [showVendorModal, setShowVendorModal] = useState(false);
+  const [orderToAccept, setOrderToAccept] = useState(null);
+  const [vendorRecommendations, setVendorRecommendations] = useState(null);
+  const [selectedVendor, setSelectedVendor] = useState(null);
+  const [vendorSearchTerm, setVendorSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [assigningVendor, setAssigningVendor] = useState(false);
 
   const tabs = [
     { id: 'new', label: 'New Orders', icon: Clock, count: 0 },
@@ -85,7 +93,13 @@ const OrderManagement = () => {
   };
 
   const acceptOrder = (orderId) => {
-    updateOrderStatus(orderId, 'confirmed');
+    const order = orders.find(o => o.id === orderId);
+    if (order) {
+      setOrderToAccept(order);
+      const recommendations = getVendorRecommendations(order);
+      setVendorRecommendations(recommendations);
+      setShowVendorModal(true);
+    }
   };
 
   const rejectOrder = (orderId) => {
@@ -114,6 +128,55 @@ const OrderManagement = () => {
       if (window.showNotification) {
         window.showNotification('Error', 'Failed to assign delivery partner', 'error');
       }
+    }
+  };
+
+  const handleVendorSearch = (searchTerm) => {
+    setVendorSearchTerm(searchTerm);
+    if (searchTerm.trim()) {
+      const results = searchVendors(searchTerm, orderToAccept);
+      setSearchResults(results);
+    } else {
+      setSearchResults([]);
+    }
+  };
+
+  const selectVendor = (vendor) => {
+    setSelectedVendor(vendor);
+  };
+
+  const confirmVendorAssignment = async () => {
+    if (!selectedVendor || !orderToAccept) return;
+
+    setAssigningVendor(true);
+    try {
+      await assignOrderToVendor(orderToAccept.id, selectedVendor.id);
+      
+      // Update order status and vendor
+      setOrders(orders.map(order => 
+        order.id === orderToAccept.id 
+          ? { ...order, status: 'confirmed', vendor: selectedVendor.name }
+          : order
+      ));
+
+      // Close modals and reset state
+      setShowVendorModal(false);
+      setOrderToAccept(null);
+      setSelectedVendor(null);
+      setVendorRecommendations(null);
+      setVendorSearchTerm('');
+      setSearchResults([]);
+
+      if (window.showNotification) {
+        window.showNotification('Success', `Order assigned to ${selectedVendor.name}`, 'success');
+      }
+    } catch (error) {
+      console.error('Error assigning vendor:', error);
+      if (window.showNotification) {
+        window.showNotification('Error', error.message || 'Failed to assign vendor', 'error');
+      }
+    } finally {
+      setAssigningVendor(false);
     }
   };
 
@@ -353,7 +416,7 @@ const OrderManagement = () => {
                           <button
                             onClick={() => acceptOrder(order.id)}
                             className="text-emerald-600 hover:text-emerald-900"
-                            title="Accept Order"
+                            title="Accept & Assign Vendor"
                           >
                             <CheckCircle className="w-4 h-4" />
                           </button>
@@ -458,7 +521,7 @@ const OrderManagement = () => {
                       className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors flex items-center justify-center space-x-2"
                     >
                       <CheckCircle className="w-4 h-4" />
-                      <span>Accept Order</span>
+                      <span>Accept & Assign Vendor</span>
                     </button>
                     <button
                       onClick={() => {
@@ -597,6 +660,281 @@ const OrderManagement = () => {
                   <p className="text-gray-500">No available delivery partners</p>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Vendor Selection Modal */}
+      {showVendorModal && orderToAccept && vendorRecommendations && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="text-xl font-semibold">Select Vendor for Order #{orderToAccept.orderNumber}</h3>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Choose the best vendor based on product category, location, and availability
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowVendorModal(false);
+                    setOrderToAccept(null);
+                    setSelectedVendor(null);
+                    setVendorRecommendations(null);
+                    setVendorSearchTerm('');
+                    setSearchResults([]);
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* Order Summary */}
+              <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Order Details</p>
+                    <p className="text-sm text-gray-600">
+                      {orderToAccept.items.length} items • {formatCurrency(orderToAccept.total)}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Categories: {vendorRecommendations.orderAnalysis.categories.join(', ')}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Delivery Location</p>
+                    <p className="text-sm text-gray-600">
+                      {orderToAccept.deliveryAddress.city}, {orderToAccept.deliveryAddress.state}
+                    </p>
+                    <p className="text-xs text-gray-500">PIN: {orderToAccept.deliveryAddress.pincode}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Priority</p>
+                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                      orderToAccept.priority === 'urgent' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {orderToAccept.priority || 'Normal'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Search Vendors */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Search Vendors (Optional)
+                </label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    placeholder="Search by vendor name, category, or specialization..."
+                    value={vendorSearchTerm}
+                    onChange={(e) => handleVendorSearch(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {/* Vendor Recommendations */}
+              <div className="space-y-6">
+                {/* Top Matches */}
+                <div>
+                  <h4 className="text-lg font-semibold mb-4 flex items-center">
+                    <TrendingUp className="w-5 h-5 text-emerald-600 mr-2" />
+                    Top Recommended Vendors
+                  </h4>
+                  <div className="grid grid-cols-1 gap-4">
+                    {vendorRecommendations.topMatches.map((vendor, index) => (
+                      <div
+                        key={vendor.id}
+                        className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                          selectedVendor?.id === vendor.id
+                            ? 'border-emerald-500 bg-emerald-50'
+                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        }`}
+                        onClick={() => selectVendor(vendor)}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-2 mb-2">
+                              <h5 className="font-semibold text-gray-900">{vendor.name}</h5>
+                              {index === 0 && (
+                                <span className="bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded-full font-medium">
+                                  Best Match
+                                </span>
+                              )}
+                              <div className="flex items-center space-x-1">
+                                <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                                <span className="text-sm text-gray-600">{vendor.rating}</span>
+                              </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                              <div>
+                                <p className="text-sm text-gray-600 flex items-center">
+                                  <MapPin className="w-4 h-4 mr-1" />
+                                  {vendor.city}, {vendor.state} ({vendor.matchData.distance} km away)
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  Categories: {vendor.categories.join(', ')}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-sm text-gray-600">
+                                  Capacity: {vendor.matchData.availableCapacity}/{vendor.maxOrdersPerDay} available
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  Completion Rate: {vendor.completionRate}%
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* Match Score Breakdown */}
+                            <div className="bg-white rounded-lg p-3 border">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-sm font-medium text-gray-700">Match Score</span>
+                                <span className="text-lg font-bold text-emerald-600">
+                                  {vendor.matchData.score}/100
+                                </span>
+                              </div>
+                              <div className="grid grid-cols-3 gap-2 text-xs">
+                                <div>
+                                  <span className="text-gray-600">Category:</span>
+                                  <span className="font-medium ml-1">{vendor.matchData.breakdown.categoryMatch}</span>
+                                </div>
+                                <div>
+                                  <span className="text-gray-600">Location:</span>
+                                  <span className="font-medium ml-1">{vendor.matchData.breakdown.location}</span>
+                                </div>
+                                <div>
+                                  <span className="text-gray-600">Available:</span>
+                                  <span className="font-medium ml-1">
+                                    {vendor.matchData.breakdown.availability > 0 ? '✓' : '✗'}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {selectedVendor?.id === vendor.id && (
+                            <div className="ml-4">
+                              <CheckCircle className="w-6 h-6 text-emerald-600" />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Search Results */}
+                {searchResults.length > 0 && (
+                  <div>
+                    <h4 className="text-lg font-semibold mb-4 flex items-center">
+                      <Search className="w-5 h-5 text-blue-600 mr-2" />
+                      Search Results
+                    </h4>
+                    <div className="grid grid-cols-1 gap-4">
+                      {searchResults.slice(0, 5).map((vendor) => (
+                        <div
+                          key={vendor.id}
+                          className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                            selectedVendor?.id === vendor.id
+                              ? 'border-emerald-500 bg-emerald-50'
+                              : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                          }`}
+                          onClick={() => selectVendor(vendor)}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h5 className="font-semibold text-gray-900">{vendor.name}</h5>
+                              <p className="text-sm text-gray-600">
+                                {vendor.city}, {vendor.state} • {vendor.categories.join(', ')}
+                              </p>
+                              {vendor.matchData && (
+                                <p className="text-sm text-emerald-600">
+                                  Match Score: {vendor.matchData.score}/100
+                                </p>
+                              )}
+                            </div>
+                            {selectedVendor?.id === vendor.id && (
+                              <CheckCircle className="w-6 h-6 text-emerald-600" />
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* No Available Vendors Warning */}
+                {vendorRecommendations.topMatches.length === 0 && (
+                  <div className="text-center py-8">
+                    <AlertCircle className="w-12 h-12 text-orange-500 mx-auto mb-3" />
+                    <p className="text-gray-600 mb-2">No suitable vendors found for this order</p>
+                    <p className="text-sm text-gray-500">
+                      Try searching manually or contact vendors directly
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-between items-center mt-8 pt-6 border-t">
+                <button
+                  onClick={() => {
+                    setShowVendorModal(false);
+                    setOrderToAccept(null);
+                    setSelectedVendor(null);
+                    setVendorRecommendations(null);
+                    setVendorSearchTerm('');
+                    setSearchResults([]);
+                  }}
+                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                
+                <div className="flex space-x-3">
+                  <button
+                    onClick={() => {
+                      // Accept order without vendor assignment
+                      updateOrderStatus(orderToAccept.id, 'confirmed');
+                      setShowVendorModal(false);
+                      setOrderToAccept(null);
+                      setSelectedVendor(null);
+                      setVendorRecommendations(null);
+                      setVendorSearchTerm('');
+                      setSearchResults([]);
+                    }}
+                    className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                  >
+                    Accept Without Vendor
+                  </button>
+                  
+                  <button
+                    onClick={confirmVendorAssignment}
+                    disabled={!selectedVendor || assigningVendor}
+                    className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+                  >
+                    {assigningVendor ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Assigning...</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle className="w-4 h-4" />
+                        <span>Accept & Assign to {selectedVendor?.name || 'Vendor'}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
