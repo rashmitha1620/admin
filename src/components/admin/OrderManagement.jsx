@@ -59,42 +59,18 @@ const OrderManagement = () => {
         customerName: 'Bob Johnson',
         customerPhone: '+1122334455',
         items: [
-      // Get the order to check its type
-      const order = orders.find(o => o.id === orderId);
-      
           { name: 'Headphones', quantity: 1, price: 199.99 },
           { name: 'Cable', quantity: 3, price: 15.99 }
-      
-      // Update order with rider assignment and move to appropriate status
-      const updatedOrders = orders.map(orderItem => 
-        orderItem.id === orderId 
-          ? { 
-              ...orderItem, 
-              deliveryPartner: rider.name, 
-              riderDetails: {
-                id: riderId,
-                name: rider.name,
-                phone: rider.phone || '+919876543210',
-                vehicleType: rider.vehicleType || 'Motorcycle'
-              },
-              status: 'assigned' // This will move it to the respective order type tab
-            }
-          : orderItem
+        ],
+        totalAmount: 247.96,
+        status: 'in_transit',
+        orderDate: '2024-01-15T09:15:00Z',
         deliveryAddress: '789 Pine Rd, City, State 12345',
-      
-      setOrders(updatedOrders);
         vendorId: 'VEN-002',
         vendorName: 'Electronics Hub',
         riderId: 'RID-001',
         riderName: 'Mike Wilson',
-        const orderTypeName = order?.orderType === 'express' ? 'Express Orders' :
-                             order?.orderType === 'nationwide' ? 'Nationwide Orders' :
-                             order?.orderType === 'citymart' ? 'City Mart Orders' : 'Orders';
-        window.showNotification(
-          'Success', 
-          `Order assigned to ${rider.name} and moved to ${orderTypeName} tab`, 
-          'success'
-        );
+        estimatedDelivery: '2024-01-16T11:00:00Z'
       }
     ];
 
