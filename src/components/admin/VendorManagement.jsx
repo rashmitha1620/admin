@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Filter, Send as Suspend, CheckCircle, X } from 'lucide-react';
+import { Search, Filter, Send as Suspend, CheckCircle } from 'lucide-react';
 import ToggleSwitch from '../common/ToggleSwitch';
 import EntityCard from '../common/EntityCard';
 import EntityModal from '../common/EntityModal';
@@ -350,6 +350,100 @@ const VendorManagement = () => {
                     className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
                   >
                     Send Invite
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Vendor Modal */}
+      {editingVendor && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-4 sm:p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-semibold">Edit Vendor</h3>
+                <button
+                  onClick={() => setEditingVendor(null)}
+                  className="text-gray-400 hover:text-gray-600 p-1"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form className="space-y-4" onSubmit={(e) => { 
+                e.preventDefault(); 
+                setEditingVendor(null);
+                if (window.showNotification) {
+                  window.showNotification('Success', 'Vendor updated successfully!', 'success');
+                }
+              }}>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Store Name</label>
+                  <input
+                    type="text"
+                    defaultValue={editingVendor.storeName}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter store name"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Vendor Name</label>
+                  <input
+                    type="text"
+                    defaultValue={editingVendor.vendor}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter vendor name"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                  <input
+                    type="text"
+                    defaultValue={editingVendor.city}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter city"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                  <select
+                    defaultValue={editingVendor.type}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  >
+                    <option value="Express">Express</option>
+                    <option value="City Mart">City Mart</option>
+                    <option value="E-Commerce">E-Commerce</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <select
+                    defaultValue={editingVendor.status?.toLowerCase()}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  >
+                    <option value="active">Active</option>
+                    <option value="pending">Pending</option>
+                    <option value="suspended">Suspended</option>
+                  </select>
+                </div>
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setEditingVendor(null)}
+                    className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors"
+                  >
+                    Update Vendor
                   </button>
                 </div>
               </form>
