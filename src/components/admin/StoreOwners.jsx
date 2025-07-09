@@ -462,7 +462,7 @@ const StoreOwners = () => {
               {/* Header */}
               <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center space-x-3">
-                  <h3 className="text-xl font-semibold">Vendor Stock Panel</h3>
+                  <h3 className="text-xl font-semibold">Store Inventory Panel</h3>
                   <div className="flex items-center space-x-2">
                     <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
                       <img 

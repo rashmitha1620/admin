@@ -119,11 +119,25 @@ const StockPanelModal = ({
   const getEntityName = () => {
     if (type === 'store') return entity.storeName || entity.name;
     if (type === 'vendor') return entity.businessName || entity.storeName || entity.name;
+    if (type === 'seller') return entity.businessName || entity.name;
     return entity.name;
   };
 
   const getEntityLocation = () => {
     return entity.location || entity.address || entity.city || 'Unknown Location';
+  };
+
+  const getPanelTitle = () => {
+    switch (type) {
+      case 'vendor':
+        return 'Vendor Stock Panel';
+      case 'seller':
+        return 'Seller Inventory Panel';
+      case 'store':
+        return 'Store Inventory Panel';
+      default:
+        return 'Stock Panel';
+    }
   };
 
   const inStockCount = products.filter(p => p.stock > 0).length;
@@ -138,11 +152,7 @@ const StockPanelModal = ({
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center space-x-3">
-                <h3 className="text-xl font-semibold">
-                  {type === 'vendor' ? 'Vendor Stock Panel' : 
-                   type === 'seller' ? 'Seller Inventory Panel' : 
-                   type === 'store' ? 'Store Inventory Panel' : 'Stock Panel'}
-                </h3>
+                <h3 className="text-xl font-semibold">{getPanelTitle()}</h3>
                 <div className="flex items-center space-x-2">
                   <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
                     <img 
@@ -234,15 +244,53 @@ const StockPanelModal = ({
             </div>
 
             {/* File Upload Area */}
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-6">
+              <Upload className="w-8 h-8 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600 mb-2">
+                Drag and drop a CSV file here, or <button className="text-emerald-600 hover:text-emerald-700">browse</button>
+              </p>
+              <button className="text-sm text-gray-500 hover:text-gray-700 flex items-center justify-center space-x-1 mx-auto">
+                <Download className="w-4 h-4" />
+                <span>Download sample CSV</span>
+              </button>
+            </div>
+
+            {/* Bulk Actions */}
             <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                <Upload className="w-8 h-8 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 mb-2">
-                  Drag and drop a CSV file here, or <button className="text-emerald-600 hover:text-emerald-700">browse</button>
-                </p>
-                <button className="text-sm text-gray-500 hover:text-gray-700 flex items-center justify-center space-x-1 mx-auto">
-                  <Download className="w-4 h-4" />
-                  <span>Download sample CSV</span>
+              <h3 className="text-lg font-semibold mb-4">Bulk Actions</h3>
+              <div className="flex flex-wrap gap-3">
+                <button 
+                  onClick={() => {
+                    setProducts(prev => prev.map(p => ({ ...p, showOnGrooso: true })));
+                    if (window.showNotification) {
+                      window.showNotification('Success', 'All products enabled on Grooso', 'success');
+                    }
+                  }}
+                  className="bg-emerald-100 text-emerald-700 px-4 py-2 rounded-lg hover:bg-emerald-200 transition-colors"
+                >
+                  Enable All on Grooso
+                </button>
+                <button 
+                  onClick={() => {
+                    setProducts(prev => prev.map(p => ({ ...p, showOnGrooso: false })));
+                    if (window.showNotification) {
+                      window.showNotification('Success', 'All products disabled on Grooso', 'success');
+                    }
+                  }}
+                  className="bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition-colors"
+                >
+                  Disable All on Grooso
+                </button>
+                <button 
+                  onClick={() => {
+                    const lowStockProducts = products.filter(p => p.stock < 10);
+                    if (window.showNotification) {
+                      window.showNotification('Info', `${lowStockProducts.length} products have low stock`, 'warning');
+                    }
+                  }}
+                  className="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-lg hover:bg-yellow-200 transition-colors"
+                >
+                  Check Low Stock
                 </button>
               </div>
             </div>

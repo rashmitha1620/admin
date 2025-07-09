@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Plus, User, Star, TrendingUp, X } from 'lucide-react';
 import { sellersApi } from '../../services/api';
-import { formatDate, formatCurrency } from '../../utils/helpers';
+import { formatDate, formatCurrency, getStatusColor } from '../../utils/helpers';
 import LoadingSpinner from '../common/LoadingSpinner';
 import ToggleSwitch from '../common/ToggleSwitch';
 import EntityCard from '../common/EntityCard';
