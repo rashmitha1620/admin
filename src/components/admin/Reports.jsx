@@ -66,36 +66,6 @@ const Reports = () => {
         </div>
       </div>
 
-      {/* Report Settings */}
-      <div className="bg-white rounded-lg shadow-sm border p-6">
-        <h3 className="text-lg font-semibold mb-4">Report Settings</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <ToggleSwitch
-            enabled={reportSettings.autoRefresh}
-            onChange={(newValue) => handleReportToggle('autoRefresh', newValue)}
-            label="Auto Refresh"
-            id="auto-refresh-toggle"
-          />
-          <ToggleSwitch
-            enabled={reportSettings.emailReports}
-            onChange={(newValue) => handleReportToggle('emailReports', newValue)}
-            label="Email Reports"
-            id="email-reports-toggle"
-          />
-          <ToggleSwitch
-            enabled={reportSettings.includeCharts}
-            onChange={(newValue) => handleReportToggle('includeCharts', newValue)}
-            label="Include Charts"
-            id="include-charts-toggle"
-          />
-          <ToggleSwitch
-            enabled={reportSettings.showTrends}
-            onChange={(newValue) => handleReportToggle('showTrends', newValue)}
-            label="Show Trends"
-            id="show-trends-toggle"
-          />
-        </div>
-      </div>
       {/* Report Type Tabs */}
       <div className="bg-white rounded-lg shadow-sm border">
         <div className="border-b">

@@ -153,34 +153,6 @@ const CityMartOrders = () => {
         </div>
       </div>
 
-      {/* Store Settings */}
-      <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
-        <h3 className="text-lg font-semibold mb-4">Store Settings</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <ToggleSwitch
-            enabled={viewSettings.showPickupOnly}
-            onChange={(newValue) => handleViewToggle('showPickupOnly', newValue)}
-            label="Show Pickup Only"
-            id="citymart-pickup-only"
-            size="small"
-          />
-          <ToggleSwitch
-            enabled={viewSettings.autoAssign}
-            onChange={(newValue) => handleViewToggle('autoAssign', newValue)}
-            label="Auto Assign"
-            id="citymart-auto-assign"
-            size="small"
-          />
-          <ToggleSwitch
-            enabled={viewSettings.storeNotifications}
-            onChange={(newValue) => handleViewToggle('storeNotifications', newValue)}
-            label="Store Notifications"
-            id="citymart-store-notifications"
-            size="small"
-          />
-        </div>
-      </div>
-
       {/* Orders Table */}
       <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
         <div className="overflow-x-auto">

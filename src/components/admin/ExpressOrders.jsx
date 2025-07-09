@@ -154,34 +154,6 @@ const ExpressOrders = () => {
         </div>
       </div>
 
-      {/* View Settings */}
-      <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
-        <h3 className="text-lg font-semibold mb-4">View Settings</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <ToggleSwitch
-            enabled={viewSettings.showUrgentOnly}
-            onChange={(newValue) => handleViewToggle('showUrgentOnly', newValue)}
-            label="Show Urgent Only"
-            id="express-urgent-only"
-            size="small"
-          />
-          <ToggleSwitch
-            enabled={viewSettings.autoRefresh}
-            onChange={(newValue) => handleViewToggle('autoRefresh', newValue)}
-            label="Auto Refresh"
-            id="express-auto-refresh"
-            size="small"
-          />
-          <ToggleSwitch
-            enabled={viewSettings.soundNotifications}
-            onChange={(newValue) => handleViewToggle('soundNotifications', newValue)}
-            label="Sound Notifications"
-            id="express-sound-notifications"
-            size="small"
-          />
-        </div>
-      </div>
-
       {/* Orders Table */}
       <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
         <div className="overflow-x-auto">

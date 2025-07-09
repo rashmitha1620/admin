@@ -139,40 +139,6 @@ const AssignOrders = () => {
         </div>
       </div>
 
-      {/* Assignment Settings */}
-      <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
-        <h3 className="text-lg font-semibold mb-4">Assignment Settings</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <ToggleSwitch
-            enabled={assignmentSettings.autoAssign}
-            onChange={(newValue) => handleAssignmentToggle('autoAssign', newValue)}
-            label="Auto Assign"
-            id="assignment-auto-assign"
-            size="small"
-          />
-          <ToggleSwitch
-            enabled={assignmentSettings.prioritizeUrgent}
-            onChange={(newValue) => handleAssignmentToggle('prioritizeUrgent', newValue)}
-            label="Prioritize Urgent"
-            id="assignment-prioritize-urgent"
-            size="small"
-          />
-          <ToggleSwitch
-            enabled={assignmentSettings.notifyRiders}
-            onChange={(newValue) => handleAssignmentToggle('notifyRiders', newValue)}
-            label="Notify Riders"
-            id="assignment-notify-riders"
-            size="small"
-          />
-          <ToggleSwitch
-            enabled={assignmentSettings.optimizeRoutes}
-            onChange={(newValue) => handleAssignmentToggle('optimizeRoutes', newValue)}
-            label="Optimize Routes"
-            id="assignment-optimize-routes"
-            size="small"
-          />
-        </div>
-      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Unassigned Orders */}
