@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Search, Filter, Eye, Edit, Send as Suspend, CheckCircle } from 'lucide-react';
+import { Search, Filter, Send as Suspend, CheckCircle } from 'lucide-react';
 import ToggleSwitch from '../common/ToggleSwitch';
+import EntityCard from '../common/EntityCard';
+import EntityModal from '../common/EntityModal';
 
 const VendorManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -195,164 +197,87 @@ const VendorManagement = () => {
       </div>
 
       {/* Vendors Table */}
-      <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-        <table className="min-w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Store Name
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Vendor
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                City
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Type
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {vendors.map((vendor) => (
-              <tr key={vendor.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                      <span className="text-lg">{vendor.storeIcon}</span>
-                    </div>
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">{vendor.storeName}</div>
-                      <div className="text-sm text-gray-500">{vendor.storeName}</div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div>
-                    <div className="text-sm font-medium text-gray-900">{vendor.vendor}</div>
-                    <div className="text-sm text-gray-500">{vendor.testMailey}</div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="text-sm text-gray-900">{vendor.city}</span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                    vendor.type === 'Express' ? 'bg-emerald-100 text-emerald-800' : 
-                    vendor.type === 'Expresse' ? 'bg-blue-100 text-blue-800' :
-                    'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {vendor.type}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`text-sm ${
-                    vendor.status === 'Active' ? 'text-emerald-600' : 'text-gray-600'
-                  }`}>
-                    {vendor.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                  <button
-                    onClick={() => {
-                      setSelectedVendor(vendor);
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        {vendors.map((vendor) => (
+          <EntityCard
+            key={vendor.id}
+            id={vendor.id}
+            type="vendor"
+            name={vendor.vendor}
+            storeName={vendor.storeName}
+            businessName={vendor.storeName}
+            contactPerson={vendor.vendor}
+            location={vendor.city}
+            category={vendor.type}
+            status={vendor.status.toLowerCase()}
+            onView={(id) => {
+              setSelectedVendor(vendor);
+              if (window.showNotification) {
+                window.showNotification('View Vendor', `Viewing ${vendor.storeName}`, 'info');
+              }
+            }}
+            onEdit={(id) => {
+              setEditingVendor(vendor);
+              if (window.showNotification) {
+                window.showNotification('Edit Mode', `Editing ${vendor.storeName}`, 'info');
+              }
+            }}
+            customActions={
+              <div className="flex items-center justify-between w-full space-x-2">
+                <ToggleSwitch
+                  enabled={vendorSettings[vendor.id]?.approved || vendor.status === 'Active'}
+                  onChange={(newValue) => handleVendorToggle(vendor.id, 'approved', newValue)}
+                  size="small"
+                  label="Approved"
+                  id={`vendor-approved-${vendor.id}`}
+                />
+                <button
+                  onClick={() => {
+                    if (window.confirm(`Are you sure you want to suspend ${vendor.storeName}?`)) {
                       if (window.showNotification) {
-                        window.showNotification('View Vendor', `Viewing ${vendor.storeName}`, 'info');
+                        window.showNotification('Vendor Suspended', `${vendor.storeName} has been suspended`, 'warning');
                       }
-                    }}
-                    title="View vendor details"
-                    className="text-gray-600 hover:text-emerald-600"
-                  >
-                    <Eye className="w-4 h-4" />
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setEditingVendor(vendor);
-                      if (window.showNotification) {
-                        window.showNotification('Edit Mode', `Editing ${vendor.storeName}`, 'info');
-                      }
-                    }}
-                    title="Edit vendor"
-                    className="text-gray-600 hover:text-blue-600"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </button>
-                  <ToggleSwitch
-                    enabled={vendorSettings[vendor.id]?.approved || vendor.status === 'Active'}
-                    onChange={(newValue) => handleVendorToggle(vendor.id, 'approved', newValue)}
-                    size="small"
-                    id={`vendor-approved-${vendor.id}`}
-                  />
-                  <button
-                    onClick={() => {
-                      if (window.confirm(`Are you sure you want to suspend ${vendor.storeName}?`)) {
-                        if (window.showNotification) {
-                          window.showNotification('Vendor Suspended', `${vendor.storeName} has been suspended`, 'warning');
-                        }
-                      }
-                    }}
-                    title="Suspend vendor"
-                    className="text-gray-600 hover:text-red-600"
-                  >
-                    <Suspend className="w-4 h-4" />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                    }
+                  }}
+                  title="Suspend vendor"
+                  className="text-red-600 hover:text-red-800 p-1"
+                >
+                  <Suspend className="w-4 h-4" />
+                </button>
+              </div>
+            }
+            icon={vendor.storeIcon ? () => <span className="text-lg">{vendor.storeIcon}</span> : undefined}
+          />
+        ))}
       </div>
 
       {/* Vendor Detail Sidebar */}
-      {selectedVendor && (
-        <div className="fixed right-0 top-0 h-full w-80 bg-white shadow-xl z-50 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold">HealthyMart</h3>
-            <button
-              onClick={() => setSelectedVendor(null)}
-              className="text-gray-400 hover:text-gray-600"
-            >
-              ×
+      <EntityModal
+        isOpen={!!selectedVendor}
+        onClose={() => setSelectedVendor(null)}
+        entity={selectedVendor}
+        type="vendor"
+        title="Vendor Details"
+        actions={
+          <>
+            <button className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors">
+              View Dashboard
             </button>
-          </div>
-          
-          <div className="space-y-4">
-            <img
-              src="https://images.pexels.com/photos/1435904/pexels-photo-1435904.jpeg?auto=compress&cs=tinysrgb&w=300"
-              alt="HealthyMart"
-              className="w-full h-32 object-cover rounded-lg"
-            />
-            
-            <div>
-              <h4 className="font-medium">HealthyMart</h4>
-              <p className="text-sm text-gray-600">326 Products</p>
-              <p className="text-sm text-gray-600">2 hrgo ago</p>
-              <p className="text-sm text-gray-600">Last Sync 2 hours ago</p>
-            </div>
-
-            <div className="flex space-x-2">
-              <button className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors">
-                View Dashboard
-              </button>
-            </div>
-
-            <div className="flex space-x-2">
-              <button className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors">
-                Edit
-              </button>
-              <button className="flex-1 bg-emerald-100 text-emerald-700 py-2 px-4 rounded-lg hover:bg-emerald-200 transition-colors">
-                Approve
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            <button 
+              onClick={() => {
+                setEditingVendor(selectedVendor);
+                setSelectedVendor(null);
+              }}
+              className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Edit
+            </button>
+            <button className="flex-1 bg-emerald-100 text-emerald-700 py-2 px-4 rounded-lg hover:bg-emerald-200 transition-colors">
+              Approve
+            </button>
+          </>
+        }
+      />
 
       {/* Send Invite Modal */}
       {showInviteModal && (

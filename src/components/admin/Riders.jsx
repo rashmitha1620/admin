@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Plus, Eye, Edit, Truck, MapPin, Clock, User, X } from 'lucide-react';
+import { Search, Filter, Plus, Truck, User, X } from 'lucide-react';
 import { ridersApi } from '../../services/api';
-import { formatDate, getStatusColor } from '../../utils/helpers';
+import { formatDate } from '../../utils/helpers';
 import LoadingSpinner from '../common/LoadingSpinner';
 import ToggleSwitch from '../common/ToggleSwitch';
+import EntityCard from '../common/EntityCard';
+import EntityModal from '../common/EntityModal';
 
 const Riders = () => {
   const [riders, setRiders] = useState([]);
@@ -207,115 +209,53 @@ const Riders = () => {
       </div>
 
       {/* Riders Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {filteredRiders.map((rider) => (
-          <div key={rider.id} className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center">
-                  <Truck className="w-6 h-6 text-emerald-600" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{rider.name}</h3>
-                  <p className="text-sm text-gray-600">{rider.phone}</p>
-                </div>
+          <EntityCard
+            key={rider.id}
+            id={rider.id}
+            type="rider"
+            name={rider.name}
+            phone={rider.phone}
+            location={rider.currentLocation}
+            vehicleType={rider.vehicleType}
+            status={rider.status}
+            rating={rider.rating}
+            currentOrders={rider.currentOrders}
+            maxOrders={rider.maxOrders}
+            totalDeliveries={rider.totalDeliveries}
+            onView={(id) => {
+              setSelectedRider(rider);
+              if (window.showNotification) {
+                window.showNotification('View Rider', `Viewing details for ${rider.name}`, 'info');
+              }
+            }}
+            onEdit={(id) => {
+              setShowEditModal(true);
+              setEditingRider(rider);
+              if (window.showNotification) {
+                window.showNotification('Edit Mode', `Editing ${rider.name}`, 'info');
+              }
+            }}
+            customActions={
+              <div className="flex items-center justify-between w-full">
+                <ToggleSwitch
+                  enabled={riderSettings[rider.id]?.available || rider.status === 'online'}
+                  onChange={(newValue) => handleRiderToggle(rider.id, 'available', newValue)}
+                  size="small"
+                  label="Available"
+                  id={`rider-available-${rider.id}`}
+                />
+                <ToggleSwitch
+                  enabled={riderSettings[rider.id]?.notifications || true}
+                  onChange={(newValue) => handleRiderToggle(rider.id, 'notifications', newValue)}
+                  size="small"
+                  label="Notify"
+                  id={`rider-notifications-${rider.id}`}
+                />
               </div>
-              <div className="flex flex-col items-end space-y-1">
-                <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(rider.status)}`}>
-                  {rider.status.charAt(0).toUpperCase() + rider.status.slice(1)}
-                </span>
-                <div className={`w-3 h-3 rounded-full ${
-                  rider.status === 'online' ? 'bg-emerald-500' : 
-                  rider.status === 'busy' ? 'bg-orange-500' : 'bg-gray-400'
-                }`}></div>
-              </div>
-            </div>
-
-            <div className="space-y-3 mb-4">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Vehicle Type</span>
-                <span className="font-medium">{rider.vehicleType}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Current Orders</span>
-                <span className="font-medium">{rider.currentOrders}/{rider.maxOrders}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Total Deliveries</span>
-                <span className="font-medium">{rider.totalDeliveries}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Rating</span>
-                <span className="font-medium">⭐ {rider.rating}</span>
-              </div>
-            </div>
-
-            <div className="border-t pt-4">
-              <div className="flex items-center space-x-2 text-sm text-gray-600 mb-2">
-                <MapPin className="w-4 h-4" />
-                <span>{rider.currentLocation}</span>
-              </div>
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <Clock className="w-4 h-4" />
-                <span>Last active: {formatDate(rider.lastActive)}</span>
-              </div>
-            </div>
-
-            <div className="flex space-x-2 mb-3">
-              <button
-                onClick={() => {
-                  setSelectedRider(rider);
-                  if (window.showNotification) {
-                    window.showNotification('View Rider', `Viewing details for ${rider.name}`, 'info');
-                  }
-                }}
-                title="View rider details"
-                className="flex-1 bg-emerald-100 text-emerald-700 py-2 px-3 rounded text-sm hover:bg-emerald-200 transition-colors flex items-center justify-center space-x-1"
-              >
-                <Eye className="w-4 h-4" />
-                <span>View</span>
-              </button>
-              <button
-                onClick={() => {
-                  setShowEditModal(true);
-                  setEditingRider(rider);
-                  if (window.showNotification) {
-                    window.showNotification('Edit Mode', `Editing ${rider.name}`, 'info');
-                  }
-                }}
-                title="Edit rider"
-                className="flex-1 bg-blue-100 text-blue-700 py-2 px-3 rounded text-sm hover:bg-blue-200 transition-colors flex items-center justify-center space-x-1"
-              >
-                <Edit className="w-4 h-4" />
-                <span>Edit</span>
-              </button>
-            </div>
-
-            <div className="mt-3 flex items-center justify-between">
-              <ToggleSwitch
-                enabled={riderSettings[rider.id]?.available || rider.status === 'online'}
-                onChange={(newValue) => handleRiderToggle(rider.id, 'available', newValue)}
-                size="small"
-                label="Available"
-                id={`rider-available-${rider.id}`}
-              />
-              <ToggleSwitch
-                enabled={riderSettings[rider.id]?.notifications || true}
-                onChange={(newValue) => handleRiderToggle(rider.id, 'notifications', newValue)}
-                size="small"
-                label="Notifications"
-                id={`rider-notifications-${rider.id}`}
-              />
-            </div>
-
-            {rider.currentOrders > 0 && (
-              <div className="mt-3 p-2 bg-orange-50 rounded-lg">
-                <p className="text-xs text-orange-700 font-medium">
-                  Currently delivering {rider.currentOrders} order(s)
-                </p>
-              </div>
-            )}
-          </div>
+            }
+          />
         ))}
       </div>
 
@@ -325,6 +265,35 @@ const Riders = () => {
           <p className="text-gray-500">No riders found matching your criteria.</p>
         </div>
       )}
+
+      {/* View Rider Modal */}
+      <EntityModal
+        isOpen={!!selectedRider}
+        onClose={() => setSelectedRider(null)}
+        entity={selectedRider}
+        type="rider"
+        title="Rider Details"
+        actions={
+          <>
+            <button 
+              onClick={() => {
+                setShowEditModal(true);
+                setEditingRider(selectedRider);
+                setSelectedRider(null);
+              }}
+              className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors"
+            >
+              Edit Rider
+            </button>
+            <button className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors">
+              View Deliveries
+            </button>
+            <button className="flex-1 bg-blue-100 text-blue-700 py-2 px-4 rounded-lg hover:bg-blue-200 transition-colors">
+              Contact Rider
+            </button>
+          </>
+        }
+      />
     </div>
 
       {/* Add Rider Modal */}

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Plus, Eye, Edit, User, Star, TrendingUp, X } from 'lucide-react';
+import { Search, Filter, Plus, User, Star, TrendingUp, X } from 'lucide-react';
 import { sellersApi } from '../../services/api';
-import { formatDate, formatCurrency, getStatusColor } from '../../utils/helpers';
+import { formatDate, formatCurrency } from '../../utils/helpers';
 import LoadingSpinner from '../common/LoadingSpinner';
 import ToggleSwitch from '../common/ToggleSwitch';
+import EntityCard from '../common/EntityCard';
+import EntityModal from '../common/EntityModal';
 
 const Sellers = () => {
   const [sellers, setSellers] = useState([]);
@@ -204,119 +206,46 @@ const Sellers = () => {
       </div>
 
       {/* Sellers Table */}
-      <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Seller
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Business
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Category
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Products
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Rating
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Revenue
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredSellers.map((seller) => (
-                <tr key={seller.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
-                        <User className="w-5 h-5 text-emerald-600" />
-                      </div>
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">{seller.name}</div>
-                        <div className="text-sm text-gray-500">{seller.email}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div>
-                      <div className="text-sm font-medium text-gray-900">{seller.businessName}</div>
-                      <div className="text-sm text-gray-500">{seller.location}</div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-900">{seller.category}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-900">{seller.productCount}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center space-x-1">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                      <span className="text-sm text-gray-900">{seller.rating}</span>
-                      <span className="text-sm text-gray-500">({seller.reviewCount})</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm font-medium text-gray-900">
-                      {formatCurrency(seller.monthlyRevenue)}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(seller.status)}`}>
-                      {seller.status.charAt(0).toUpperCase() + seller.status.slice(1)}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                    <button
-                      onClick={() => {
-                        setSelectedSeller(seller);
-                        if (window.showNotification) {
-                          window.showNotification('View Seller', `Viewing details for ${seller.name}`, 'info');
-                        }
-                      }}
-                      title="View seller details"
-                      className="text-emerald-600 hover:text-emerald-900"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
-                    <button 
-                      onClick={() => {
-                        setEditingSeller(seller);
-                        setShowEditModal(true);
-                        if (window.showNotification) {
-                          window.showNotification('Edit Mode', `Editing ${seller.name}`, 'info');
-                        }
-                      }}
-                      title="Edit seller"
-                      className="text-blue-600 hover:text-blue-900"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <ToggleSwitch
-                      enabled={sellerSettings[seller.id]?.featured || false}
-                      onChange={(newValue) => handleSellerToggle(seller.id, 'featured', newValue)}
-                      size="small"
-                      label="Featured"
-                      id={`seller-featured-${seller.id}`}
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        {filteredSellers.map((seller) => (
+          <EntityCard
+            key={seller.id}
+            id={seller.id}
+            type="seller"
+            name={seller.name}
+            businessName={seller.businessName}
+            email={seller.email}
+            location={seller.location}
+            category={seller.category}
+            status={seller.status}
+            revenue={seller.monthlyRevenue}
+            orders={seller.productCount}
+            rating={seller.rating}
+            reviewCount={seller.reviewCount}
+            onView={(id) => {
+              setSelectedSeller(seller);
+              if (window.showNotification) {
+                window.showNotification('View Seller', `Viewing details for ${seller.name}`, 'info');
+              }
+            }}
+            onEdit={(id) => {
+              setEditingSeller(seller);
+              setShowEditModal(true);
+              if (window.showNotification) {
+                window.showNotification('Edit Mode', `Editing ${seller.name}`, 'info');
+              }
+            }}
+            customActions={
+              <ToggleSwitch
+                enabled={sellerSettings[seller.id]?.featured || false}
+                onChange={(newValue) => handleSellerToggle(seller.id, 'featured', newValue)}
+                size="small"
+                label="Featured"
+                id={`seller-featured-${seller.id}`}
+              />
+            }
+          />
+        ))}
       </div>
 
       {filteredSellers.length === 0 && (
@@ -325,6 +254,35 @@ const Sellers = () => {
           <p className="text-gray-500">No sellers found matching your criteria.</p>
         </div>
       )}
+
+      {/* View Seller Modal */}
+      <EntityModal
+        isOpen={!!selectedSeller}
+        onClose={() => setSelectedSeller(null)}
+        entity={selectedSeller}
+        type="seller"
+        title="Seller Details"
+        actions={
+          <>
+            <button 
+              onClick={() => {
+                setEditingSeller(selectedSeller);
+                setShowEditModal(true);
+                setSelectedSeller(null);
+              }}
+              className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors"
+            >
+              Edit Seller
+            </button>
+            <button className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors">
+              View Products
+            </button>
+            <button className="flex-1 bg-blue-100 text-blue-700 py-2 px-4 rounded-lg hover:bg-blue-200 transition-colors">
+              Contact Seller
+            </button>
+          </>
+        }
+      />
     </div>
 
     {/* Add Seller Modal */}
