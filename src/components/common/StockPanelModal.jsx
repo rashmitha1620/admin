@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Plus, Upload, Download, Search, Filter, Edit } from 'lucide-react';
 import ToggleSwitch from './ToggleSwitch';
 
+
 const StockPanelModal = ({ 
   isOpen, 
   onClose, 
@@ -13,6 +14,8 @@ const StockPanelModal = ({
   const [categoryFilter, setCategoryFilter] = useState('');
   const [stockFilter, setStockFilter] = useState('');
   const [showAddProductModal, setShowAddProductModal] = useState(false);
+  const [showEditProductModal, setShowEditProductModal] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
   const [newProduct, setNewProduct] = useState({
     name: '',
     sku: '',
@@ -88,6 +91,24 @@ const StockPanelModal = ({
       setShowAddProductModal(false);
       if (window.showNotification) {
         window.showNotification('Success', 'Product added successfully!', 'success');
+      }
+    }
+  };
+
+  const handleEditProduct = (product) => {
+    setEditingProduct(product);
+    setShowEditProductModal(true);
+  };
+
+  const saveEditedProduct = () => {
+    if (editingProduct) {
+      setProducts(prev => 
+        prev.map(p => p.id === editingProduct.id ? editingProduct : p)
+      );
+      setShowEditProductModal(false);
+      setEditingProduct(null);
+      if (window.showNotification) {
+        window.showNotification('Success', 'Product updated successfully!', 'success');
       }
     }
   };
@@ -376,11 +397,7 @@ const StockPanelModal = ({
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className="text-sm font-medium text-gray-900">{product.name}</span>
                           <button
-                            onClick={() => {
-                              if (window.showNotification) {
-                                window.showNotification('Edit Product', `Editing ${product.name}`, 'info');
-                              }
-                            }}
+                            onClick={() => handleEditProduct(product)}
                             className="ml-2 text-blue-600 hover:text-blue-900"
                             title="Edit product"
                           >
@@ -418,11 +435,7 @@ const StockPanelModal = ({
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-center">
                           <button
-                            onClick={() => {
-                              if (window.showNotification) {
-                                window.showNotification('Edit Product', `Editing ${product.name}`, 'info');
-                              }
-                            }}
+                            onClick={() => handleEditProduct(product)}
                             className="text-blue-600 hover:text-blue-900"
                             title="Edit product"
                           >
@@ -465,6 +478,131 @@ const StockPanelModal = ({
           </div>
         </div>
       </div>
+
+      {/* Edit Product Modal */}
+      {showEditProductModal && editingProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
+          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-4 sm:p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-semibold">Edit Product</h3>
+                <button
+                  onClick={() => {
+                    setShowEditProductModal(false);
+                    setEditingProduct(null);
+                  }}
+                  className="text-gray-400 hover:text-gray-600 p-1"
+                  aria-label="Close"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); saveEditedProduct(); }}>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
+                  <div className="flex items-center space-x-4">
+                    <img 
+                      src={editingProduct.image} 
+                      alt={editingProduct.name} 
+                      className="w-16 h-16 object-cover rounded-lg"
+                    />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
+                  <input
+                    type="text"
+                    value={editingProduct.name}
+                    onChange={(e) => setEditingProduct(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter product name"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">SKU</label>
+                  <input
+                    type="text"
+                    value={editingProduct.sku}
+                    onChange={(e) => setEditingProduct(prev => ({ ...prev, sku: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="Enter SKU"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Price</label>
+                  <input
+                    type="text"
+                    value={editingProduct.price}
+                    onChange={(e) => setEditingProduct(prev => ({ ...prev, price: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="$0.00"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Stock Quantity</label>
+                  <input
+                    type="number"
+                    value={editingProduct.stock}
+                    onChange={(e) => setEditingProduct(prev => ({ ...prev, stock: parseInt(e.target.value) || 0 }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="0"
+                    min="0"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+                  <select
+                    value={editingProduct.tags}
+                    onChange={(e) => setEditingProduct(prev => ({ ...prev, tags: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  >
+                    <option value="In Stock">In Stock</option>
+                    <option value="Low Stock">Low Stock</option>
+                    <option value="Out of Stock">Out of Stock</option>
+                    <option value="Bestseller">Bestseller</option>
+                  </select>
+                </div>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-gray-700">Show on Grooso</label>
+                  <ToggleSwitch
+                    enabled={editingProduct.showOnGrooso}
+                    onChange={(newValue) => setEditingProduct(prev => ({ ...prev, showOnGrooso: newValue }))}
+                    size="medium"
+                    id="edit-product-toggle"
+                  />
+                </div>
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowEditProductModal(false);
+                      setEditingProduct(null);
+                    }}
+                    className="flex-1 bg-gray-100 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors"
+                  >
+                    Update Product
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add Product Modal */}
       {showAddProductModal && (
