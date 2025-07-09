@@ -260,30 +260,29 @@ const Riders = () => {
                 <span>Last active: {formatDate(rider.lastActive)}</span>
               </div>
             </div>
-
-            <div className="flex space-x-2">
               <button className="flex-1 bg-emerald-100 text-emerald-700 py-2 px-3 rounded text-sm hover:bg-emerald-200 transition-colors flex items-center justify-center space-x-1">
-                onClick={() => {
                   setSelectedRider(rider);
-                  if (window.showNotification) {
+                  setSelectedRider(rider);
+                    window.showNotification('View Rider', `Viewing details for ${rider.name}`, 'info');
                     window.showNotification('View Rider', `Viewing details for ${rider.name}`, 'info');
                   }
                 title="View rider details"
-                }}
+                className="flex-1 bg-emerald-100 text-emerald-700 py-2 px-3 rounded text-sm hover:bg-emerald-200 transition-colors flex items-center justify-center space-x-1"
+              >
                 <Eye className="w-4 h-4" />
                 <span>View</span>
               </button>
               <button className="flex-1 bg-blue-100 text-blue-700 py-2 px-3 rounded text-sm hover:bg-blue-200 transition-colors flex items-center justify-center space-x-1">
-                onClick={() => {
+                  setShowEditModal(true);
                   setEditingRider(rider);
                   setShowEditModal(true);
-                  if (window.showNotification) {
                     window.showNotification('Edit Mode', `Editing ${rider.name}`, 'info');
                   }
                 title="Edit rider"
                 }}
-                <Edit className="w-4 h-4" />
-                <span>Edit</span>
+                title="Edit rider"
+                className="flex-1 bg-blue-100 text-blue-700 py-2 px-3 rounded text-sm hover:bg-blue-200 transition-colors flex items-center justify-center space-x-1"
+              >
               </button>
             </div>
 

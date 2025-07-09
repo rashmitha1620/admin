@@ -420,14 +420,13 @@ const OrderManagement = () => {
                     {formatDate(order.createdAt)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex items-center space-x-2">
-                      <button
                         onClick={() => {
                           setSelectedOrder(order);
                           if (window.showNotification) {
                             window.showNotification('View Order', `Viewing order ${order.orderNumber}`, 'info');
                           }
                         }}
+                        className="text-blue-600 hover:text-blue-900"
                         onClick={() => setSelectedOrder(order)}
                         className="text-blue-600 hover:text-blue-900"
                         title="View Details"
@@ -437,14 +436,13 @@ const OrderManagement = () => {
 
                       {/* New Orders Actions */}
                       {activeTab === 'new' && order.status === 'pending' && (
-                        <>
-                          <button
                             onClick={() => {
                               acceptOrder(order.id);
                               if (window.showNotification) {
                                 window.showNotification('Order Accepted', `Order ${order.orderNumber} accepted and vendor assignment initiated`, 'success');
                               }
                             }}
+                            className="text-emerald-600 hover:text-emerald-900"
                             onClick={() => acceptOrder(order.id)}
                             className="text-emerald-600 hover:text-emerald-900"
                             title="Accept & Assign Vendor"
@@ -460,7 +458,7 @@ const OrderManagement = () => {
                                 }
                               }
                             }}
-                            onClick={() => rejectOrder(order.id)}
+                                rejectOrder(order.id);
                             className="text-red-600 hover:text-red-900"
                             title="Reject Order"
                           >
@@ -470,14 +468,13 @@ const OrderManagement = () => {
                       )}
 
                       {/* Accepted Orders Actions */}
-                      {activeTab === 'accepted' && (order.status === 'confirmed' || order.status === 'vendor_assigned') && !order.deliveryPartner && (
-                        <button
                           onClick={() => {
                             openAssignModal(order);
                             if (window.showNotification) {
                               window.showNotification('Assign Rider', `Assigning rider for order ${order.orderNumber}`, 'info');
                             }
                           }}
+                          className="text-purple-600 hover:text-purple-900"
                           onClick={() => openAssignModal(order)}
                           className="text-purple-600 hover:text-purple-900"
                           title="Assign Rider"

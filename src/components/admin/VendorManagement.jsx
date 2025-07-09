@@ -259,24 +259,27 @@ const VendorManagement = () => {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                  <button className="text-gray-600 hover:text-emerald-600">
                     onClick={() => {
                       setSelectedVendor(vendor);
                       if (window.showNotification) {
                         window.showNotification('View Vendor', `Viewing ${vendor.storeName}`, 'info');
                       }
-                    title="View vendor details"
                     }}
+                    title="View vendor details"
+                    className="text-gray-600 hover:text-emerald-600"
+                  >
                     <Eye className="w-4 h-4" />
+                  </button>
+                  <button 
                     onClick={() => {
                       setEditingVendor(vendor);
                       if (window.showNotification) {
                         window.showNotification('Edit Mode', `Editing ${vendor.storeName}`, 'info');
                       }
                     }}
-                  </button>
                     title="Edit vendor"
-                  <button className="text-gray-600 hover:text-blue-600">
+                    className="text-gray-600 hover:text-blue-600"
+                  >
                     <Edit className="w-4 h-4" />
                   </button>
                   <ToggleSwitch
@@ -285,15 +288,16 @@ const VendorManagement = () => {
                     size="small"
                     id={`vendor-approved-${vendor.id}`}
                   />
-                  <button className="text-gray-600 hover:text-red-600">
                     onClick={() => {
                       if (window.confirm(`Are you sure you want to suspend ${vendor.storeName}?`)) {
                         if (window.showNotification) {
                           window.showNotification('Vendor Suspended', `${vendor.storeName} has been suspended`, 'warning');
                         }
                       }
-                    title="Suspend vendor"
                     }}
+                    title="Suspend vendor"
+                    className="text-gray-600 hover:text-red-600"
+                  >
                     <Suspend className="w-4 h-4" />
                   </button>
                 </td>

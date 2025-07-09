@@ -279,16 +279,18 @@ const Sellers = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                    <button className="text-emerald-600 hover:text-emerald-900">
                       onClick={() => {
                         setSelectedSeller(seller);
-                        // You can add a view modal here
                         if (window.showNotification) {
                           window.showNotification('View Seller', `Viewing details for ${seller.name}`, 'info');
                         }
-                      title="View seller details"
                       }}
+                      title="View seller details"
+                      className="text-emerald-600 hover:text-emerald-900"
+                    >
                       <Eye className="w-4 h-4" />
+                    </button>
+                    <button 
                       onClick={() => {
                         setEditingSeller(seller);
                         setShowEditModal(true);
@@ -296,9 +298,9 @@ const Sellers = () => {
                           window.showNotification('Edit Mode', `Editing ${seller.name}`, 'info');
                         }
                       }}
-                    </button>
                       title="Edit seller"
-                    <button className="text-blue-600 hover:text-blue-900">
+                      className="text-blue-600 hover:text-blue-900"
+                    >
                       <Edit className="w-4 h-4" />
                     </button>
                     <ToggleSwitch
