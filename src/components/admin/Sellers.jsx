@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Plus, Eye, Edit, User, Star, TrendingUp } from 'lucide-react';
+import { Search, Filter, Plus, Eye, Edit, User, Star, TrendingUp, X } from 'lucide-react';
 import { sellersApi } from '../../services/api';
 import { formatDate, formatCurrency, getStatusColor } from '../../utils/helpers';
 import LoadingSpinner from '../common/LoadingSpinner';
@@ -279,6 +279,7 @@ const Sellers = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                    <button
                       onClick={() => {
                         setSelectedSeller(seller);
                         if (window.showNotification) {

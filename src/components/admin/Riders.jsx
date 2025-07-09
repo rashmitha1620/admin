@@ -250,7 +250,7 @@ const Riders = () => {
               </div>
             </div>
 
-            <div className="border-t pt-4 mb-4">
+            <div className="border-t pt-4">
               <div className="flex items-center space-x-2 text-sm text-gray-600 mb-2">
                 <MapPin className="w-4 h-4" />
                 <span>{rider.currentLocation}</span>
@@ -260,29 +260,34 @@ const Riders = () => {
                 <span>Last active: {formatDate(rider.lastActive)}</span>
               </div>
             </div>
-              <button className="flex-1 bg-emerald-100 text-emerald-700 py-2 px-3 rounded text-sm hover:bg-emerald-200 transition-colors flex items-center justify-center space-x-1">
+
+            <div className="flex space-x-2 mb-3">
+              <button
+                onClick={() => {
                   setSelectedRider(rider);
-                  setSelectedRider(rider);
-                    window.showNotification('View Rider', `Viewing details for ${rider.name}`, 'info');
+                  if (window.showNotification) {
                     window.showNotification('View Rider', `Viewing details for ${rider.name}`, 'info');
                   }
+                }}
                 title="View rider details"
                 className="flex-1 bg-emerald-100 text-emerald-700 py-2 px-3 rounded text-sm hover:bg-emerald-200 transition-colors flex items-center justify-center space-x-1"
               >
                 <Eye className="w-4 h-4" />
                 <span>View</span>
               </button>
-              <button className="flex-1 bg-blue-100 text-blue-700 py-2 px-3 rounded text-sm hover:bg-blue-200 transition-colors flex items-center justify-center space-x-1">
+              <button
+                onClick={() => {
                   setShowEditModal(true);
                   setEditingRider(rider);
-                  setShowEditModal(true);
+                  if (window.showNotification) {
                     window.showNotification('Edit Mode', `Editing ${rider.name}`, 'info');
                   }
-                title="Edit rider"
                 }}
                 title="Edit rider"
                 className="flex-1 bg-blue-100 text-blue-700 py-2 px-3 rounded text-sm hover:bg-blue-200 transition-colors flex items-center justify-center space-x-1"
               >
+                <Edit className="w-4 h-4" />
+                <span>Edit</span>
               </button>
             </div>
 
