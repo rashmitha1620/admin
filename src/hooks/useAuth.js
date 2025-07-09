@@ -13,13 +13,24 @@ export const useAuth = () => {
   });
 
   useEffect(() => {
+    // Check for auth token first
+    const token = localStorage.getItem('grooso-admin-token');
+    
     const savedUser = localStorage.getItem('grooso-admin-user');
     if (savedUser) {
       try {
-        setUser(JSON.parse(savedUser));
+        const userData = JSON.parse(savedUser);
+        // Only set user if we have both user data and valid token
+        if (token) {
+          setUser(userData);
+        } else {
+          // Clear invalid user data if no token
+          localStorage.removeItem('grooso-admin-user');
+        }
       } catch (error) {
         console.error('Error parsing saved user:', error);
         localStorage.removeItem('grooso-admin-user');
+        localStorage.removeItem('grooso-admin-token');
       }
     }
     
@@ -37,11 +48,17 @@ export const useAuth = () => {
   const login = (userData) => {
     setUser(userData);
     localStorage.setItem('grooso-admin-user', JSON.stringify(userData));
+    // Token should already be set in LoginPage, but ensure it's there
+    const token = localStorage.getItem('grooso-admin-token');
+    if (!token) {
+      console.warn('No auth token found after login');
+    }
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('grooso-admin-user');
+    localStorage.removeItem('grooso-admin-token');
     // Force page reload to ensure clean state
     window.location.href = '/login';
   };

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, ArrowRight, Shield, AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { authApi } from '../services/api';
 
 const LoginPage = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -23,11 +25,14 @@ const LoginPage = () => {
       
       // Check if login was successful and user has admin role
       if (response.success && response.data.user.role === 'admin') {
-        // Login successful - pass the user data
+        // Store auth token in localStorage
+        localStorage.setItem('grooso-admin-token', response.data.token);
+        
+        // Login successful - pass the user data and navigate immediately
         login(response.data.user);
         
-        // Navigation will be handled by the ProtectedRoute component
-        console.log('Login successful:', response.data.user);
+        // Navigate to admin dashboard immediately
+        navigate('/admin', { replace: true });
       } else {
         setError('Access denied. Admin privileges required.');
       }

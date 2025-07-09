@@ -13,9 +13,23 @@ import {
 
 // Mock API service - replace with real API calls
 class ApiService {
+  getAuthHeaders() {
+    const token = localStorage.getItem('grooso-admin-token');
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  }
+
   async get(endpoint) {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Check auth for protected endpoints
+    const protectedEndpoints = ['/orders', '/vendors', '/riders', '/delivery-partners'];
+    if (protectedEndpoints.some(ep => endpoint.startsWith(ep))) {
+      const token = localStorage.getItem('grooso-admin-token');
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+    }
     
     switch (endpoint) {
       case '/orders':
@@ -52,6 +66,7 @@ class ApiService {
       case '/auth/login':
         // Mock login with proper validation
         if (data.email === 'admin@grooso.com' && data.password === 'password') {
+          const token = 'mock-jwt-token-' + Date.now();
           return {
             success: true,
             data: {
@@ -62,24 +77,52 @@ class ApiService {
                 role: 'admin',
                 phone: '+919876543210'
               },
-              token: 'mock-jwt-token-' + Date.now()
+              token: token
             }
           };
         } else {
           throw new Error('Invalid credentials');
         }
       default:
+        // Check auth for protected endpoints
+        const protectedEndpoints = ['/orders', '/vendors', '/riders'];
+        if (protectedEndpoints.some(ep => endpoint.startsWith(ep))) {
+          const token = localStorage.getItem('grooso-admin-token');
+          if (!token) {
+            throw new Error('Authentication required');
+          }
+        }
         return { data: { success: true } };
     }
   }
 
   async put(endpoint, data) {
     await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Check auth for protected endpoints
+    const protectedEndpoints = ['/orders', '/vendors', '/riders'];
+    if (protectedEndpoints.some(ep => endpoint.startsWith(ep))) {
+      const token = localStorage.getItem('grooso-admin-token');
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+    }
+    
     return { data: { success: true, ...data } };
   }
 
   async delete(endpoint) {
     await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Check auth for protected endpoints
+    const protectedEndpoints = ['/orders', '/vendors', '/riders'];
+    if (protectedEndpoints.some(ep => endpoint.startsWith(ep))) {
+      const token = localStorage.getItem('grooso-admin-token');
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+    }
+    
     return { data: { success: true } };
   }
 }
