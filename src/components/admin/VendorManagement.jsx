@@ -259,6 +259,7 @@ const VendorManagement = () => {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                  <button
                     onClick={() => {
                       setSelectedVendor(vendor);
                       if (window.showNotification) {
@@ -288,6 +289,7 @@ const VendorManagement = () => {
                     size="small"
                     id={`vendor-approved-${vendor.id}`}
                   />
+                  <button
                     onClick={() => {
                       if (window.confirm(`Are you sure you want to suspend ${vendor.storeName}?`)) {
                         if (window.showNotification) {
