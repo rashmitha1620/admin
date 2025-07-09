@@ -210,16 +210,16 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Mobile Sidebar Overlay */}
-      <div 
-        className={`fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden transition-opacity duration-300 ${
-          sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}
-        onClick={() => setSidebarOpen(false)}
-      />
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
       {/* Sidebar */}
       <div className={`
-        fixed lg:static inset-y-0 left-0 z-50 w-64 bg-emerald-600 text-white shadow-lg transform transition-transform duration-300 ease-in-out overflow-y-auto
+        fixed lg:static inset-y-0 left-0 z-50 w-64 bg-emerald-600 text-white shadow-lg transform transition-transform duration-300 ease-in-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="flex flex-col h-full">
@@ -240,7 +240,7 @@ const AdminDashboard = () => {
           </div>
           
           {/* Navigation */}
-          <nav className="flex-1 mt-2 sm:mt-6 overflow-y-auto sidebar-nav">
+          <nav className="flex-1 mt-2 sm:mt-6 overflow-y-auto">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
@@ -249,7 +249,7 @@ const AdminDashboard = () => {
                   onClick={() => handleTabChange(tab.id)}
                   className={`w-full flex items-center space-x-3 px-4 sm:px-6 py-3 text-left transition-all duration-200 ${
                     activeTab === tab.id 
-                      ? 'bg-emerald-700 border-r-4 border-white font-medium' 
+                      ? 'bg-emerald-700 border-r-4 border-white' 
                       : 'hover:bg-emerald-700'
                   }`}
                 >
@@ -283,21 +283,21 @@ const AdminDashboard = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 w-full">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className="bg-white shadow-sm border-b px-3 sm:px-6 py-2 sm:py-4 sticky top-0 z-30">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center space-x-2 sm:space-x-4">
+        <header className="bg-white shadow-sm border-b px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden text-gray-600 hover:text-emerald-600 p-1 flex-shrink-0"
+                className="lg:hidden text-gray-600 hover:text-emerald-600 p-1"
               >
                 <Menu className="w-5 h-5" />
               </button>
 
               {/* Search Bar */}
-              <div className="relative flex-1 max-w-xs sm:max-w-md hidden sm:block">
+              <div className="relative flex-1 max-w-xs sm:max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
                   type="text"
@@ -307,12 +307,12 @@ const AdminDashboard = () => {
               </div>
             </div>
 
-            <div className="flex items-center gap-1 sm:gap-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               {/* Notifications */}
               <NotificationDropdown />
               
               {/* Dashboard Settings */}
-              <div className="hidden md:flex items-center space-x-2">
+              <div className="hidden lg:flex items-center space-x-2">
                 <ToggleSwitch
                   enabled={dashboardPreferences.compactView}
                   onChange={(newValue) => handleDashboardToggle('compactView', newValue)}
@@ -324,7 +324,7 @@ const AdminDashboard = () => {
               </div>
               
               {/* User Profile - Hidden on mobile, shown on larger screens */}
-              <div className="hidden md:flex items-center space-x-2">
+              <div className="hidden sm:flex items-center space-x-2">
                 <div className="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center">
                   <User className="w-4 h-4 text-emerald-600" />
                 </div>
@@ -338,8 +338,8 @@ const AdminDashboard = () => {
         </header>
 
         {/* Content */}
-        <main className={`flex-1 bg-gray-50 overflow-auto ${dashboardPreferences.compactView ? 'is-compact' : ''}`}>
-          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
+        <main className={`flex-1 bg-gray-50 overflow-auto min-h-screen ${dashboardPreferences.compactView ? 'is-compact' : ''}`}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             {renderContent()}
           </div>
         </main>

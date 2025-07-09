@@ -79,8 +79,8 @@ const OrderManagement = () => {
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200 overflow-x-auto">
-        <nav className="-mb-px flex space-x-4 sm:space-x-8 min-w-max">
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8">
           {['new', 'accepted', 'in-progress', 'completed'].map((tab) => (
             <button
               key={tab}
@@ -98,8 +98,8 @@ const OrderManagement = () => {
       </div>
 
       {/* Search and Filter */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-6">
-        <div className="relative flex-1 w-full sm:max-w-md">
+      <div className="flex items-center space-x-4">
+        <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input
             type="text"
@@ -109,10 +109,10 @@ const OrderManagement = () => {
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
           />
         </div>
-        <select 
+        <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
         >
           <option value="">All Status</option>
           <option value="pending">Pending</option>
@@ -124,7 +124,7 @@ const OrderManagement = () => {
 
       {/* Orders Table */}
       <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-        <div className="overflow-x-auto orders-table-container">
+        <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>

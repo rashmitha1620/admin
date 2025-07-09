@@ -211,7 +211,7 @@ const StoreOwners = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -251,8 +251,8 @@ const StoreOwners = () => {
       </div>
 
       {/* Search and Filter */}
-      <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4 mb-6">
-        <div className="relative flex-1 w-full sm:max-w-md">
+      <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4">
+        <div className="relative flex-1 max-w-full sm:max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input
             type="text"
@@ -275,7 +275,7 @@ const StoreOwners = () => {
       </div>
 
       {/* Store Owners Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {filteredStoreOwners.map((owner) => (
           <EntityCard
             key={owner.id}

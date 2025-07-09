@@ -169,7 +169,7 @@ const NotificationDropdown = () => {
 
       {/* Notification Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-72 sm:w-80 md:w-96 bg-white rounded-lg shadow-xl border z-50 max-h-[80vh] sm:max-h-96 overflow-hidden notification-dropdown">
+        <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-lg shadow-xl border z-50 max-h-96 overflow-hidden">
           {/* Header */}
           <div className="px-4 py-3 border-b bg-gray-50">
             <div className="flex items-center justify-between">
@@ -199,21 +199,21 @@ const NotificationDropdown = () => {
           </div>
 
           {/* Notifications List */}
-          <div className="max-h-60 sm:max-h-80 overflow-y-auto">
+          <div className="max-h-80 overflow-y-auto">
             {notifications.length > 0 ? (
               notifications.map((notification) => {
                 const IconComponent = notification.icon;
                 return (
                   <div
                     key={notification.id}
-                    className={`px-3 sm:px-4 py-2 sm:py-3 border-b hover:bg-gray-50 transition-colors ${
+                    className={`px-4 py-3 border-b hover:bg-gray-50 transition-colors ${
                       !notification.isRead ? 'bg-blue-50' : ''
                     }`}
                   >
-                    <div className="flex items-start space-x-2 sm:space-x-3">
+                    <div className="flex items-start space-x-3">
                       {/* Icon */}
-                      <div className={`flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 rounded-full ${notification.bgColor} flex items-center justify-center`}>
-                        <IconComponent className={`w-3 h-3 ${notification.color}`} />
+                      <div className={`flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 rounded-full ${notification.bgColor} flex items-center justify-center`}>
+                        <IconComponent className={`w-3 h-3 sm:w-4 sm:h-4 ${notification.color}`} />
                       </div>
 
                       {/* Content */}
@@ -223,10 +223,10 @@ const NotificationDropdown = () => {
                             <p className={`text-xs sm:text-sm font-medium ${!notification.isRead ? 'text-gray-900' : 'text-gray-700'} truncate`}>
                               {notification.title}
                             </p>
-                            <p className="text-xs text-gray-600 mt-1 line-clamp-2">
+                            <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">
                               {notification.message}
                             </p>
-                            <div className="flex items-center space-x-2 mt-1 sm:mt-2">
+                            <div className="flex items-center space-x-2 mt-2">
                               <span className="text-xs text-gray-500">
                                 {getTimeAgo(notification.timestamp)}
                               </span>
@@ -272,6 +272,26 @@ const NotificationDropdown = () => {
           {/* Footer */}
           {notifications.length > 0 && (
             <div className="px-4 py-3 border-t bg-gray-50 space-y-3">
+              {/* Notification Settings */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-medium text-gray-700">Notification Settings</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  <ToggleSwitch
+                    enabled={notificationSettings.soundEnabled}
+                    onChange={(newValue) => handleNotificationToggle('soundEnabled', newValue)}
+                    label="Sound"
+                    id="notification-sound"
+                    size="small"
+                  />
+                  <ToggleSwitch
+                    enabled={notificationSettings.pushNotifications}
+                    onChange={(newValue) => handleNotificationToggle('pushNotifications', newValue)}
+                    label="Push"
+                    id="notification-push"
+                    size="small"
+                  />
+                </div>
+              </div>
               <button className="w-full text-center text-xs sm:text-sm text-emerald-600 hover:text-emerald-700 font-medium">
                 View all notifications
               </button>

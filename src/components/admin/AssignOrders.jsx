@@ -100,7 +100,7 @@ const AssignOrders = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -140,7 +140,7 @@ const AssignOrders = () => {
       </div>
 
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Unassigned Orders */}
         <div className="bg-white rounded-lg shadow-sm border">
           <div className="p-6 border-b">
@@ -181,7 +181,7 @@ const AssignOrders = () => {
         {/* Available Riders */}
         <div className="bg-white rounded-lg shadow-sm border">
           <div className="p-6 border-b">
-            <h3 className="text-lg font-semibold flex-1">Available Riders</h3>
+            <h3 className="text-lg font-semibold">Available Riders</h3>
             {selectedOrder && (
               <p className="text-sm text-gray-600 mt-1">
                 Select a rider for order #{selectedOrder.orderNumber}
@@ -246,7 +246,7 @@ const AssignOrders = () => {
       {/* Order Details Modal */}
       {selectedOrder && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-md w-full p-4 sm:p-6 order-modal">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold">Order Details</h3>
               <button

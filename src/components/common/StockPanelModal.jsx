@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Plus, Upload, Download, Search, Filter, Edit } from 'lucide-react';
 import ToggleSwitch from './ToggleSwitch';
-import './StockPanelModal.css';
+
 
 const StockPanelModal = ({ 
   isOpen, 
@@ -168,7 +168,7 @@ const StockPanelModal = ({
   return (
     <>
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg max-w-6xl w-full max-h-[95vh] overflow-y-auto stock-panel-container">
+        <div className="bg-white rounded-lg max-w-6xl w-full max-h-[95vh] overflow-y-auto">
           <div className="p-4 sm:p-6">
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
@@ -196,43 +196,43 @@ const StockPanelModal = ({
             </div>
 
             {/* Store Info Card */}
-            <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6 mb-6">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
-                <div className="w-full sm:w-auto">
+            <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
                   <h2 className="text-xl font-semibold">
                     {getEntityName()}
                   </h2>
                   <p className="text-gray-600">{getEntityLocation()}</p>
                   <p className="text-sm text-gray-500">Last synced 5 mins ago</p>
                 </div>
-                <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-3 sm:gap-6">
-                  <div className="text-center flex-1 sm:flex-auto">
-                    <div className="bg-emerald-600 text-white px-3 sm:px-4 py-1 sm:py-2 rounded-lg font-semibold text-base sm:text-lg">
+                <div className="flex items-center space-x-6">
+                  <div className="text-center">
+                    <div className="bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold text-lg">
                       {totalProducts}
                     </div>
                   </div>
-                  <div className="text-center flex-1 sm:flex-auto">
+                  <div className="text-center">
                     <p className="text-sm text-gray-600">In Stock</p>
-                    <p className="text-xl sm:text-2xl font-bold">{inStockCount}</p>
+                    <p className="text-2xl font-bold">{inStockCount}</p>
                   </div>
-                  <div className="text-center flex-1 sm:flex-auto">
+                  <div className="text-center">
                     <p className="text-sm text-gray-600">Out of Stock</p>
-                    <p className="text-xl sm:text-2xl font-bold">{outOfStockCount}</p>
+                    <p className="text-2xl font-bold">{outOfStockCount}</p>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-6">
+            <div className="flex flex-wrap items-center gap-3 mb-6">
               <button 
                 onClick={() => setShowAddProductModal(true)}
-                className="bg-emerald-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-emerald-700 transition-colors flex items-center space-x-1 sm:space-x-2 text-sm sm:text-base"
+                className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors flex items-center space-x-2"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add New Product</span>
               </button>
-              <button className="bg-gray-100 text-gray-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center space-x-1 sm:space-x-2 text-sm sm:text-base">
+              <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center space-x-2">
                 <Upload className="w-4 h-4" />
                 <span>Import CSV</span>
               </button>
@@ -257,7 +257,7 @@ const StockPanelModal = ({
                   a.download = 'products.csv';
                   a.click();
                 }}
-                className="bg-gray-100 text-gray-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center space-x-1 sm:space-x-2 text-sm sm:text-base"
+                className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center space-x-2"
               >
                 <Download className="w-4 h-4" />
                 <span>Export Stock</span>
@@ -265,9 +265,9 @@ const StockPanelModal = ({
             </div>
 
             {/* File Upload Area */}
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-8 text-center mb-6">
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-6">
               <Upload className="w-8 h-8 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 mb-2 text-sm sm:text-base">
+              <p className="text-gray-600 mb-2">
                 Drag and drop a CSV file here, or <button className="text-emerald-600 hover:text-emerald-700">browse</button>
               </p>
               <button className="text-sm text-gray-500 hover:text-gray-700 flex items-center justify-center space-x-1 mx-auto">
@@ -277,9 +277,9 @@ const StockPanelModal = ({
             </div>
 
             {/* Bulk Actions */}
-            <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6 mb-6">
+            <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
               <h3 className="text-lg font-semibold mb-4">Bulk Actions</h3>
-              <div className="flex flex-wrap gap-2 sm:gap-3">
+              <div className="flex flex-wrap gap-3">
                 <button 
                   onClick={() => {
                     setProducts(prev => prev.map(p => ({ ...p, showOnGrooso: true })));
@@ -287,7 +287,7 @@ const StockPanelModal = ({
                       window.showNotification('Success', 'All products enabled on Grooso', 'success');
                     }
                   }}
-                  className="bg-emerald-100 text-emerald-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-emerald-200 transition-colors text-sm sm:text-base"
+                  className="bg-emerald-100 text-emerald-700 px-4 py-2 rounded-lg hover:bg-emerald-200 transition-colors"
                 >
                   Enable All on Grooso
                 </button>
@@ -298,7 +298,7 @@ const StockPanelModal = ({
                       window.showNotification('Success', 'All products disabled on Grooso', 'success');
                     }
                   }}
-                  className="bg-red-100 text-red-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-red-200 transition-colors text-sm sm:text-base"
+                  className="bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition-colors"
                 >
                   Disable All on Grooso
                 </button>
@@ -309,7 +309,7 @@ const StockPanelModal = ({
                       window.showNotification('Info', `${lowStockProducts.length} products have low stock`, 'warning');
                     }
                   }}
-                  className="bg-yellow-100 text-yellow-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-yellow-200 transition-colors text-sm sm:text-base"
+                  className="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-lg hover:bg-yellow-200 transition-colors"
                 >
                   Check Low Stock
                 </button>
@@ -317,8 +317,8 @@ const StockPanelModal = ({
             </div>
 
             {/* Search and Filters */}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-6">
-              <div className="relative flex-1 min-w-0 w-full sm:min-w-64">
+            <div className="flex flex-wrap items-center gap-3 mb-6">
+              <div className="relative flex-1 min-w-64">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
                   type="text"
@@ -328,35 +328,33 @@ const StockPanelModal = ({
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                 />
               </div>
-              <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
-                <select
-                  value={categoryFilter}
-                  onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm sm:text-base flex-1 sm:flex-auto"
-                >
-                  <option value="">Category</option>
-                  <option value="food">Food</option>
-                  <option value="beverages">Beverages</option>
-                  <option value="household">Household</option>
-                </select>
-                <select
-                  value={stockFilter}
-                  onChange={(e) => setStockFilter(e.target.value)}
-                  className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm sm:text-base flex-1 sm:flex-auto"
-                >
-                  <option value="">In Stock</option>
-                  <option value="low">Low Stock</option>
-                  <option value="out">Out of Stock</option>
-                </select>
-                <button className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm sm:text-base flex-1 sm:flex-auto">
-                  Filter
-                </button>
-              </div>
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              >
+                <option value="">Category</option>
+                <option value="food">Food</option>
+                <option value="beverages">Beverages</option>
+                <option value="household">Household</option>
+              </select>
+              <select
+                value={stockFilter}
+                onChange={(e) => setStockFilter(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              >
+                <option value="">In Stock</option>
+                <option value="low">Low Stock</option>
+                <option value="out">Out of Stock</option>
+              </select>
+              <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                Filter
+              </button>
             </div>
 
             {/* Products Table */}
-            <div className="bg-white rounded-lg shadow-sm border overflow-hidden mb-6 stock-table-container">
-              <div className="overflow-x-auto stock-table-wrapper">
+            <div className="bg-white rounded-lg shadow-sm border overflow-hidden mb-6">
+              <div className="overflow-x-auto">
                 <table className="min-w-full">
                   <thead className="bg-gray-50">
                     <tr>
@@ -378,10 +376,10 @@ const StockPanelModal = ({
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Tags
                       </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24 sm:w-32">
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
                         Show on Grooso
                       </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-16 sm:w-20">
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-20">
                         Actions
                       </th>
                     </tr>
@@ -393,7 +391,7 @@ const StockPanelModal = ({
                           <img
                             src={product.image}
                             alt={product.name}
-                            className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-lg"
+                            className="w-12 h-12 object-cover rounded-lg"
                           />
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -452,15 +450,15 @@ const StockPanelModal = ({
             </div>
 
             {/* Bottom Actions */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <button className="text-emerald-600 hover:text-emerald-700 font-medium flex items-center space-x-1">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
                 <span>Sync Now</span>
               </button>
-              <div className="flex items-center space-x-2 sm:space-x-3 w-full sm:w-auto">
-                <button className="bg-gray-100 text-gray-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm sm:text-base flex-1 sm:flex-auto">
+              <div className="flex items-center space-x-3">
+                <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
                   Actions
                 </button>
                 <button 
@@ -471,7 +469,7 @@ const StockPanelModal = ({
                       window.showNotification('Success', 'Changes saved successfully!', 'success');
                     }
                   }}
-                  className="bg-emerald-600 text-white px-4 sm:px-6 py-1.5 sm:py-2 rounded-lg hover:bg-emerald-700 transition-colors text-sm sm:text-base flex-1 sm:flex-auto"
+                  className="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 transition-colors"
                 >
                   Save Changes
                 </button>
@@ -484,7 +482,7 @@ const StockPanelModal = ({
       {/* Edit Product Modal */}
       {showEditProductModal && editingProduct && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
-          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto edit-product-modal">
+          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="p-4 sm:p-6">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-semibold">Edit Product</h3>
@@ -503,11 +501,11 @@ const StockPanelModal = ({
               <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); saveEditedProduct(); }}>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:space-x-4">
+                  <div className="flex items-center space-x-4">
                     <img 
                       src={editingProduct.image} 
                       alt={editingProduct.name} 
-                      className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
+                      className="w-16 h-16 object-cover rounded-lg"
                     />
                     <input
                       type="file"
@@ -578,7 +576,7 @@ const StockPanelModal = ({
                   <ToggleSwitch
                     enabled={editingProduct.showOnGrooso}
                     onChange={(newValue) => setEditingProduct(prev => ({ ...prev, showOnGrooso: newValue }))}
-                    size="small"
+                    size="medium"
                     id="edit-product-toggle"
                   />
                 </div>
@@ -595,7 +593,7 @@ const StockPanelModal = ({
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors flex items-center justify-center"
+                    className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors"
                   >
                     Update Product
                   </button>
@@ -609,7 +607,7 @@ const StockPanelModal = ({
       {/* Add Product Modal */}
       {showAddProductModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
-          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto add-product-modal">
+          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="p-4 sm:p-6">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-semibold">Add New Product</h3>
@@ -702,7 +700,7 @@ const StockPanelModal = ({
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors flex items-center justify-center"
+                    className="flex-1 bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors"
                   >
                     Add Product
                   </button>
