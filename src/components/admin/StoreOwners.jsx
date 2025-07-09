@@ -5,6 +5,7 @@ import { formatDate } from '../../utils/helpers';
 import LoadingSpinner from '../common/LoadingSpinner';
 import EntityCard from '../common/EntityCard';
 import EntityModal from '../common/EntityModal';
+import ToggleSwitch from '../common/ToggleSwitch';
 
 const StoreOwners = () => {
   const [storeOwners, setStoreOwners] = useState([]);
