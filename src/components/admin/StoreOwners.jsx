@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Plus, Store, X, Upload, Download, User } from 'lucide-react';
+import { Search, Filter, Plus, Store, X, Upload, Download, User, MapPin } from 'lucide-react';
 import { storeOwnersApi } from '../../services/api';
 import { formatDate } from '../../utils/helpers';
 import LoadingSpinner from '../common/LoadingSpinner';
