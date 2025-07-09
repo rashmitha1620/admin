@@ -138,7 +138,11 @@ const StockPanelModal = ({
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center space-x-3">
-                <h3 className="text-xl font-semibold">Vendor Stock Panel</h3>
+                <h3 className="text-xl font-semibold">
+                  {type === 'vendor' ? 'Vendor Stock Panel' : 
+                   type === 'seller' ? 'Seller Inventory Panel' : 
+                   type === 'store' ? 'Store Inventory Panel' : 'Stock Panel'}
+                </h3>
                 <div className="flex items-center space-x-2">
                   <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
                     <img 
@@ -164,7 +168,9 @@ const StockPanelModal = ({
             <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h2 className="text-xl font-semibold">{getEntityName()}</h2>
+                  <h2 className="text-xl font-semibold">
+                    {getEntityName()}
+                  </h2>
                   <p className="text-gray-600">{getEntityLocation()}</p>
                   <p className="text-sm text-gray-500">Last synced 5 mins ago</p>
                 </div>
