@@ -34,7 +34,7 @@ import ToggleSwitch from '../components/common/ToggleSwitch';
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user, logout, preferences, togglePreference } = useAuth();
+  const { user, logout, preferences, togglePreference, updatePreferences } = useAuth();
   const [dashboardPreferences, setDashboardPreferences] = useState({
     compactView: false,
     darkMode: false,
