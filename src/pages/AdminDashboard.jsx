@@ -151,12 +151,17 @@ const AdminDashboard = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Theme</label>
                     <select 
                       value={preferences.theme}
-                      onChange={(e) => updatePreferences({ theme: e.target.value })}
+                      onChange={(e) => {
+                        const newTheme = e.target.value;
+                        updatePreferences({ theme: newTheme });
+                        if (window.showNotification) {
+                          window.showNotification('Theme Changed', `Switched to ${newTheme} theme`, 'success');
+                        }
+                      }}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     >
                       <option value="light">Light</option>
                       <option value="dark">Dark</option>
-                      <option value="auto">Auto</option>
                     </select>
                   </div>
                 </div>

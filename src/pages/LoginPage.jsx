@@ -15,6 +15,19 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const { login } = useAuth();
 
+  // Apply theme on login page load
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('grooso-admin-theme') || 'light';
+    const root = document.documentElement;
+    if (savedTheme === 'dark') {
+      root.classList.add('theme-dark');
+      root.classList.remove('theme-light');
+    } else {
+      root.classList.add('theme-light');
+      root.classList.remove('theme-dark');
+    }
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
