@@ -318,15 +318,29 @@ const StoreOwners = () => {
               
               <div className="flex space-x-2">
                 <button 
+                  onClick={() => {
+                    setSelectedOwner(owner);
+                    if (window.showNotification) {
+                      window.showNotification('View Store', `Viewing ${owner.storeName}`, 'info');
+                    }
+                  }}
                   onClick={() => setSelectedOwner(owner)}
                   className="flex-1 bg-emerald-100 text-emerald-700 py-2 px-3 rounded text-sm hover:bg-emerald-200 transition-colors flex items-center justify-center space-x-1"
+                  title="View store details"
                 >
                   <Eye className="w-4 h-4" />
                   <span>View</span>
                 </button>
                 <button 
+                  onClick={() => {
+                    handleEditClick(owner);
+                    if (window.showNotification) {
+                      window.showNotification('Edit Mode', `Editing ${owner.storeName}`, 'info');
+                    }
+                  }}
                   onClick={() => handleEditClick(owner)}
                   className="flex-1 bg-blue-100 text-blue-700 py-2 px-3 rounded text-sm hover:bg-blue-200 transition-colors flex items-center justify-center space-x-1"
+                  title="Edit store"
                 >
                   <Edit className="w-4 h-4" />
                   <span>Edit</span>

@@ -422,6 +422,12 @@ const OrderManagement = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
                       <button
+                        onClick={() => {
+                          setSelectedOrder(order);
+                          if (window.showNotification) {
+                            window.showNotification('View Order', `Viewing order ${order.orderNumber}`, 'info');
+                          }
+                        }}
                         onClick={() => setSelectedOrder(order)}
                         className="text-blue-600 hover:text-blue-900"
                         title="View Details"
@@ -433,6 +439,12 @@ const OrderManagement = () => {
                       {activeTab === 'new' && order.status === 'pending' && (
                         <>
                           <button
+                            onClick={() => {
+                              acceptOrder(order.id);
+                              if (window.showNotification) {
+                                window.showNotification('Order Accepted', `Order ${order.orderNumber} accepted and vendor assignment initiated`, 'success');
+                              }
+                            }}
                             onClick={() => acceptOrder(order.id)}
                             className="text-emerald-600 hover:text-emerald-900"
                             title="Accept & Assign Vendor"
@@ -440,6 +452,14 @@ const OrderManagement = () => {
                             <CheckCircle className="w-4 h-4" />
                           </button>
                           <button
+                            onClick={() => {
+                              if (window.confirm(`Are you sure you want to reject order ${order.orderNumber}?`)) {
+                                rejectOrder(order.id);
+                                if (window.showNotification) {
+                                  window.showNotification('Order Rejected', `Order ${order.orderNumber} has been rejected`, 'warning');
+                                }
+                              }
+                            }}
                             onClick={() => rejectOrder(order.id)}
                             className="text-red-600 hover:text-red-900"
                             title="Reject Order"
@@ -452,6 +472,12 @@ const OrderManagement = () => {
                       {/* Accepted Orders Actions */}
                       {activeTab === 'accepted' && (order.status === 'confirmed' || order.status === 'vendor_assigned') && !order.deliveryPartner && (
                         <button
+                          onClick={() => {
+                            openAssignModal(order);
+                            if (window.showNotification) {
+                              window.showNotification('Assign Rider', `Assigning rider for order ${order.orderNumber}`, 'info');
+                            }
+                          }}
                           onClick={() => openAssignModal(order)}
                           className="text-purple-600 hover:text-purple-900"
                           title="Assign Rider"

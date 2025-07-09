@@ -13,6 +13,9 @@ const Riders = () => {
   const [riderSettings, setRiderSettings] = useState({});
   const [showAddRiderModal, setShowAddRiderModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const [selectedRider, setSelectedRider] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingRider, setEditingRider] = useState(null);
   const [newRider, setNewRider] = useState({
     name: '',
     phone: '',
@@ -260,10 +263,25 @@ const Riders = () => {
 
             <div className="flex space-x-2">
               <button className="flex-1 bg-emerald-100 text-emerald-700 py-2 px-3 rounded text-sm hover:bg-emerald-200 transition-colors flex items-center justify-center space-x-1">
+                onClick={() => {
+                  setSelectedRider(rider);
+                  if (window.showNotification) {
+                    window.showNotification('View Rider', `Viewing details for ${rider.name}`, 'info');
+                  }
+                title="View rider details"
+                }}
                 <Eye className="w-4 h-4" />
                 <span>View</span>
               </button>
               <button className="flex-1 bg-blue-100 text-blue-700 py-2 px-3 rounded text-sm hover:bg-blue-200 transition-colors flex items-center justify-center space-x-1">
+                onClick={() => {
+                  setEditingRider(rider);
+                  setShowEditModal(true);
+                  if (window.showNotification) {
+                    window.showNotification('Edit Mode', `Editing ${rider.name}`, 'info');
+                  }
+                title="Edit rider"
+                }}
                 <Edit className="w-4 h-4" />
                 <span>Edit</span>
               </button>

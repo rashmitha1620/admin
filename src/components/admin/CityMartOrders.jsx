@@ -11,6 +11,8 @@ const CityMartOrders = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [orderSettings, setOrderSettings] = useState({});
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [editingOrder, setEditingOrder] = useState(null);
   const [viewSettings, setViewSettings] = useState({
     showPickupOnly: false,
     autoAssign: true,
@@ -235,8 +237,22 @@ const CityMartOrders = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                     <button className="text-emerald-600 hover:text-emerald-900">
+                      onClick={() => {
+                        setSelectedOrder(order);
+                        if (window.showNotification) {
+                          window.showNotification('View Order', `Viewing order ${order.orderNumber}`, 'info');
+                        }
+                      title="View order details"
+                      }}
                       <Eye className="w-4 h-4" />
+                      onClick={() => {
+                        setEditingOrder(order);
+                        if (window.showNotification) {
+                          window.showNotification('Edit Mode', `Editing order ${order.orderNumber}`, 'info');
+                        }
+                      }}
                     </button>
+                      title="Edit order"
                     <button className="text-blue-600 hover:text-blue-900">
                       <Edit className="w-4 h-4" />
                     </button>

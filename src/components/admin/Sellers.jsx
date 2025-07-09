@@ -13,6 +13,9 @@ const Sellers = () => {
   const [sellerSettings, setSellerSettings] = useState({});
   const [showAddSellerModal, setShowAddSellerModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const [selectedSeller, setSelectedSeller] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingSeller, setEditingSeller] = useState(null);
   const [newSeller, setNewSeller] = useState({
     name: '',
     businessName: '',
@@ -277,8 +280,24 @@ const Sellers = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                     <button className="text-emerald-600 hover:text-emerald-900">
+                      onClick={() => {
+                        setSelectedSeller(seller);
+                        // You can add a view modal here
+                        if (window.showNotification) {
+                          window.showNotification('View Seller', `Viewing details for ${seller.name}`, 'info');
+                        }
+                      title="View seller details"
+                      }}
                       <Eye className="w-4 h-4" />
+                      onClick={() => {
+                        setEditingSeller(seller);
+                        setShowEditModal(true);
+                        if (window.showNotification) {
+                          window.showNotification('Edit Mode', `Editing ${seller.name}`, 'info');
+                        }
+                      }}
                     </button>
+                      title="Edit seller"
                     <button className="text-blue-600 hover:text-blue-900">
                       <Edit className="w-4 h-4" />
                     </button>

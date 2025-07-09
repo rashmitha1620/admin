@@ -7,6 +7,7 @@ const VendorManagement = () => {
   const [filterBy, setFilterBy] = useState('');
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [vendorSettings, setVendorSettings] = useState({});
+  const [editingVendor, setEditingVendor] = useState(null);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteData, setInviteData] = useState({
     email: '',
@@ -259,8 +260,22 @@ const VendorManagement = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                   <button className="text-gray-600 hover:text-emerald-600">
+                    onClick={() => {
+                      setSelectedVendor(vendor);
+                      if (window.showNotification) {
+                        window.showNotification('View Vendor', `Viewing ${vendor.storeName}`, 'info');
+                      }
+                    title="View vendor details"
+                    }}
                     <Eye className="w-4 h-4" />
+                    onClick={() => {
+                      setEditingVendor(vendor);
+                      if (window.showNotification) {
+                        window.showNotification('Edit Mode', `Editing ${vendor.storeName}`, 'info');
+                      }
+                    }}
                   </button>
+                    title="Edit vendor"
                   <button className="text-gray-600 hover:text-blue-600">
                     <Edit className="w-4 h-4" />
                   </button>
@@ -271,6 +286,14 @@ const VendorManagement = () => {
                     id={`vendor-approved-${vendor.id}`}
                   />
                   <button className="text-gray-600 hover:text-red-600">
+                    onClick={() => {
+                      if (window.confirm(`Are you sure you want to suspend ${vendor.storeName}?`)) {
+                        if (window.showNotification) {
+                          window.showNotification('Vendor Suspended', `${vendor.storeName} has been suspended`, 'warning');
+                        }
+                      }
+                    title="Suspend vendor"
+                    }}
                     <Suspend className="w-4 h-4" />
                   </button>
                 </td>
