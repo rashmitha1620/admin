@@ -311,6 +311,7 @@ const VendorManagement = () => {
                 <button
                   onClick={() => setShowInviteModal(false)}
                   className="text-gray-400 hover:text-gray-600"
+                  aria-label="Close"
                 >
                   ×
                 </button>
@@ -390,6 +391,7 @@ const VendorManagement = () => {
                 <button
                   onClick={() => setEditingVendor(null)}
                   className="text-gray-400 hover:text-gray-600 p-1"
+                  aria-label="Close"
                 >
                   <X className="w-5 h-5" />
                 </button>

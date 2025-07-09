@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Plus, Upload, Download, Search, Filter } from 'lucide-react';
+import { X, Plus, Upload, Download, Search, Filter, Edit } from 'lucide-react';
 import ToggleSwitch from './ToggleSwitch';
 
 const StockPanelModal = ({ 
@@ -337,7 +337,7 @@ const StockPanelModal = ({
                 <table className="min-w-full">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">
                         Product Image
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -355,8 +355,11 @@ const StockPanelModal = ({
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Tags
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-32">
                         Show on Grooso
+                      </th>
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-20">
+                        Actions
                       </th>
                     </tr>
                   </thead>
@@ -372,6 +375,17 @@ const StockPanelModal = ({
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className="text-sm font-medium text-gray-900">{product.name}</span>
+                          <button
+                            onClick={() => {
+                              if (window.showNotification) {
+                                window.showNotification('Edit Product', `Editing ${product.name}`, 'info');
+                              }
+                            }}
+                            className="ml-2 text-blue-600 hover:text-blue-900"
+                            title="Edit product"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className="text-sm text-gray-900">{product.sku}</span>
@@ -394,13 +408,26 @@ const StockPanelModal = ({
                             {product.tags}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
                           <ToggleSwitch
                             enabled={product.showOnGrooso}
                             onChange={(newValue) => handleToggleProduct(product.id, newValue)}
                             size="medium"
                             id={`product-toggle-${product.id}`}
                           />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          <button
+                            onClick={() => {
+                              if (window.showNotification) {
+                                window.showNotification('Edit Product', `Editing ${product.name}`, 'info');
+                              }
+                            }}
+                            className="text-blue-600 hover:text-blue-900"
+                            title="Edit product"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
                         </td>
                       </tr>
                     ))}

@@ -724,6 +724,7 @@ const StoreOwners = () => {
                 <button
                   onClick={() => setShowAddModal(false)}
                   className="text-gray-400 hover:text-gray-600 p-1"
+                  aria-label="Close"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -813,6 +814,7 @@ const StoreOwners = () => {
                 <button
                   onClick={() => setShowAddProductModal(false)}
                   className="text-gray-400 hover:text-gray-600 p-1"
+                  aria-label="Close"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -920,6 +922,7 @@ const StoreOwners = () => {
                 <button
                   onClick={() => setShowInviteModal(false)}
                   className="text-gray-400 hover:text-gray-600 p-1"
+                  aria-label="Close"
                 >
                   <X className="w-5 h-5" />
                 </button>

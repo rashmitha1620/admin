@@ -421,6 +421,7 @@ const Sellers = () => {
                 <button
                   onClick={() => setShowAddSellerModal(false)}
                   className="text-gray-400 hover:text-gray-600 p-1"
+                  aria-label="Close"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -527,6 +528,7 @@ const Sellers = () => {
                 <button
                   onClick={() => setShowInviteModal(false)}
                   className="text-gray-400 hover:text-gray-600"
+                  aria-label="Close"
                 >
                   ×
                 </button>
