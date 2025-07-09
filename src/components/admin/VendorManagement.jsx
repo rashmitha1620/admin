@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Filter, Send as Suspend, CheckCircle } from 'lucide-react';
+import { Search, Filter, Send as Suspend, CheckCircle, X } from 'lucide-react';
 import ToggleSwitch from '../common/ToggleSwitch';
 import EntityCard from '../common/EntityCard';
 import EntityModal from '../common/EntityModal';

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Filter, Eye, Edit, Package, Truck, MapPin } from 'lucide-react';
+import { Search, Filter, Eye, Edit, Package, Truck, MapPin, X } from 'lucide-react';
 import { ordersApi } from '../../services/api';
 import { formatCurrency, formatDate, getStatusColor } from '../../utils/helpers';
 import LoadingSpinner from '../common/LoadingSpinner';
