@@ -2,6 +2,230 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== THEME SYSTEM ===== */
+:root {
+  /* Light theme colors (default) */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+  --border-primary: #e5e7eb;
+  --border-secondary: #d1d5db;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.theme-dark {
+  /* Dark theme colors */
+  --bg-primary: #1f2937;
+  --bg-secondary: #111827;
+  --bg-tertiary: #374151;
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-tertiary: #9ca3af;
+  --border-primary: #374151;
+  --border-secondary: #4b5563;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
+}
+
+/* Apply theme colors to common elements */
+body {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Card backgrounds */
+.bg-white {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.bg-gray-50 {
+  background-color: var(--bg-secondary) !important;
+}
+
+.bg-gray-100 {
+  background-color: var(--bg-tertiary) !important;
+}
+
+/* Text colors */
+.text-gray-900 {
+  color: var(--text-primary) !important;
+}
+
+.text-gray-700 {
+  color: var(--text-primary) !important;
+}
+
+.text-gray-600 {
+  color: var(--text-secondary) !important;
+}
+
+.text-gray-500 {
+  color: var(--text-tertiary) !important;
+}
+
+.text-gray-400 {
+  color: var(--text-tertiary) !important;
+}
+
+/* Border colors */
+.border-gray-200 {
+  border-color: var(--border-primary) !important;
+}
+
+.border-gray-300 {
+  border-color: var(--border-secondary) !important;
+}
+
+.divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--border-primary) !important;
+}
+
+/* Shadows */
+.shadow-sm {
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.shadow-md {
+  box-shadow: var(--shadow-md) !important;
+}
+
+.shadow-lg {
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.shadow-xl {
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* Form elements */
+input, select, textarea {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-secondary) !important;
+}
+
+input:focus, select:focus, textarea:focus {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Placeholder text */
+input::placeholder, textarea::placeholder {
+  color: var(--text-tertiary) !important;
+}
+
+/* Table styles */
+table {
+  background-color: var(--bg-primary) !important;
+}
+
+thead {
+  background-color: var(--bg-secondary) !important;
+}
+
+tbody tr:hover {
+  background-color: var(--bg-tertiary) !important;
+}
+
+/* Button hover states for dark theme */
+.theme-dark .hover\:bg-gray-50:hover {
+  background-color: var(--bg-tertiary) !important;
+}
+
+.theme-dark .hover\:bg-gray-100:hover {
+  background-color: var(--border-primary) !important;
+}
+
+.theme-dark .hover\:bg-gray-200:hover {
+  background-color: var(--border-secondary) !important;
+}
+
+/* Specific dark theme adjustments */
+.theme-dark .bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+}
+
+.theme-dark .bg-blue-50 {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+}
+
+.theme-dark .bg-red-50 {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+}
+
+.theme-dark .bg-yellow-50 {
+  background-color: rgba(245, 158, 11, 0.1) !important;
+}
+
+.theme-dark .bg-purple-50 {
+  background-color: rgba(139, 92, 246, 0.1) !important;
+}
+
+.theme-dark .bg-orange-50 {
+  background-color: rgba(249, 115, 22, 0.1) !important;
+}
+
+/* Status badge adjustments for dark theme */
+.theme-dark .bg-emerald-100 {
+  background-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+.theme-dark .bg-blue-100 {
+  background-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+.theme-dark .bg-red-100 {
+  background-color: rgba(239, 68, 68, 0.2) !important;
+}
+
+.theme-dark .bg-yellow-100 {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+}
+
+.theme-dark .bg-purple-100 {
+  background-color: rgba(139, 92, 246, 0.2) !important;
+}
+
+.theme-dark .bg-orange-100 {
+  background-color: rgba(249, 115, 22, 0.2) !important;
+}
+
+.theme-dark .bg-gray-100 {
+  background-color: var(--bg-tertiary) !important;
+}
+
+/* Modal and dropdown backgrounds */
+.theme-dark .bg-black {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Sidebar theme adjustments */
+.theme-dark .bg-emerald-600 {
+  background-color: #047857 !important;
+}
+
+.theme-dark .bg-emerald-700 {
+  background-color: #065f46 !important;
+}
+
+/* Ensure emerald colors remain consistent */
+.bg-emerald-600, .bg-emerald-700 {
+  color: white !important;
+}
+
+/* Theme transition for all elements */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
 /* Admin-specific styles with emerald theme */
 .admin-gradient {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);

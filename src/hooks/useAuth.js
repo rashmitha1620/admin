@@ -6,13 +6,17 @@ export const useAuth = () => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [preferences, setPreferences] = useState({
-    theme: 'light',
+    theme: 'light', // Default to light theme
     notifications: true,
     autoLogout: false,
     twoFactorAuth: false
   });
 
   useEffect(() => {
+    // Apply theme on mount
+    const savedTheme = localStorage.getItem('grooso-admin-theme') || 'light';
+    applyTheme(savedTheme);
+    
     // Check for auth token first
     const token = localStorage.getItem('grooso-admin-token');
     
@@ -37,14 +41,34 @@ export const useAuth = () => {
     const savedPreferences = localStorage.getItem('grooso-admin-preferences');
     if (savedPreferences) {
       try {
-        setPreferences(JSON.parse(savedPreferences));
+        const parsedPreferences = JSON.parse(savedPreferences);
+        setPreferences({
+          ...parsedPreferences,
+          theme: savedTheme // Ensure theme is consistent
+        });
       } catch (error) {
         console.error('Error parsing saved preferences:', error);
       }
+    } else {
+      // Set default preferences with saved theme
+      setPreferences(prev => ({
+        ...prev,
+        theme: savedTheme
+      }));
     }
     setIsLoading(false);
   }, []);
 
+  const applyTheme = (theme) => {
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('theme-dark');
+      root.classList.remove('theme-light');
+    } else {
+      root.classList.add('theme-light');
+      root.classList.remove('theme-dark');
+    }
+  };
   const login = (userData) => {
     setUser(userData);
     localStorage.setItem('grooso-admin-user', JSON.stringify(userData));
@@ -77,6 +101,12 @@ export const useAuth = () => {
     const updatedPreferences = { ...preferences, ...newPreferences };
     setPreferences(updatedPreferences);
     localStorage.setItem('grooso-admin-preferences', JSON.stringify(updatedPreferences));
+    
+    // Handle theme change
+    if (newPreferences.theme && newPreferences.theme !== preferences.theme) {
+      localStorage.setItem('grooso-admin-theme', newPreferences.theme);
+      applyTheme(newPreferences.theme);
+    }
     
     // Log for debugging
     console.log('Auth preferences updated:', updatedPreferences);
