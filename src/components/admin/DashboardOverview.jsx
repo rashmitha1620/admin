@@ -79,33 +79,8 @@ const DashboardOverview = () => {
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
-        {/* Order Assignment */}
-        <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
-          <h3 className="text-base sm:text-lg font-semibold mb-4">Order Assign</h3>
-          <div className="space-y-3 sm:space-y-4">
-            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 text-sm">
-              <option>Select Product</option>
-              <option>Product 1</option>
-              <option>Product 2</option>
-            </select>
-            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 text-sm">
-              <option>Select Seller</option>
-              <option>Seller 1</option>
-              <option>Seller 2</option>
-            </select>
-            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 text-sm">
-              <option>Select Rider</option>
-              <option>Rider 1</option>
-              <option>Rider 2</option>
-            </select>
-            <button className="w-full bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 transition-colors text-sm sm:text-base">
-              Assign
-            </button>
-          </div>
-        </div>
-
         {/* Orders Overview & Stock Alert */}
-        <div className="space-y-4 sm:space-y-6">
+        <div className="xl:col-span-2 space-y-4 sm:space-y-6">
           {/* Orders Overview */}
           <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
             <h3 className="text-base sm:text-lg font-semibold mb-4">Orders Overview</h3>
