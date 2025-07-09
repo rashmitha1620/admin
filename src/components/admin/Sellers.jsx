@@ -6,6 +6,7 @@ import LoadingSpinner from '../common/LoadingSpinner';
 import ToggleSwitch from '../common/ToggleSwitch';
 import EntityCard from '../common/EntityCard';
 import EntityModal from '../common/EntityModal';
+import StockPanelModal from '../common/StockPanelModal';
 
 const Sellers = () => {
   const [sellers, setSellers] = useState([]);
@@ -18,6 +19,7 @@ const Sellers = () => {
   const [selectedSeller, setSelectedSeller] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingSeller, setEditingSeller] = useState(null);
+  const [showStockPanel, setShowStockPanel] = useState(false);
   const [newSeller, setNewSeller] = useState({
     name: '',
     businessName: '',
@@ -222,15 +224,15 @@ const Sellers = () => {
             orders={seller.productCount}
             rating={seller.rating}
             reviewCount={seller.reviewCount}
-            onView={(id) => {
+            onView={() => {
               setSelectedSeller(seller);
               if (window.showNotification) {
                 window.showNotification('View Seller', `Viewing details for ${seller.name}`, 'info');
               }
             }}
-            onEdit={(id) => {
+            onEdit={() => {
               setEditingSeller(seller);
-              setShowEditModal(true);
+              setShowStockPanel(true);
               if (window.showNotification) {
                 window.showNotification('Edit Mode', `Editing ${seller.name}`, 'info');
               }
@@ -388,10 +390,29 @@ const Sellers = () => {
           </>
         }
       />
+
+      {/* Stock Panel Modal */}
+      <StockPanelModal
+        isOpen={showStockPanel && editingSeller}
+        onClose={() => {
+          setShowStockPanel(false);
+          setEditingSeller(null);
+        }}
+        entity={editingSeller}
+        type="seller"
+        onSave={(products) => {
+          console.log('Saving products for seller:', editingSeller?.businessName, products);
+          if (window.showNotification) {
+            window.showNotification('Success', `Stock updated for ${editingSeller?.businessName}`, 'success');
+          }
+          setShowStockPanel(false);
+          setEditingSeller(null);
+        }}
+      />
     </div>
 
     {/* Add Seller Modal */}
-    {showAddSellerModal && (
+    {showAddSellerModal && !showStockPanel && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="p-4 sm:p-6">
@@ -497,7 +518,7 @@ const Sellers = () => {
     )}
 
     {/* Send Invite Modal */}
-    {showInviteModal && (
+    {showInviteModal && !showStockPanel && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-md w-full">
             <div className="p-6">
