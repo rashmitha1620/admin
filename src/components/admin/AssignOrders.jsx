@@ -217,13 +217,21 @@ const AssignOrders = () => {
                   </div>
                   {selectedOrder && (
                     <button
-                      onClick={() => assignOrder(selectedOrder.id, rider.id)}
+                      onClick={() => {
+                        if (window.confirm(`Assign order ${selectedOrder.orderNumber} to ${rider.name}?`)) {
+                          assignOrder(selectedOrder.id, rider.id);
+                          if (window.showNotification) {
+                            window.showNotification('Order Assigned', `Order ${selectedOrder.orderNumber} assigned to ${rider.name}`, 'success');
+                          }
+                        }
+                      }}
                       disabled={rider.currentOrders >= rider.maxOrders}
                       className={`px-3 py-1 text-xs rounded-lg font-medium ${
                         rider.currentOrders >= rider.maxOrders
                           ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                           : 'bg-emerald-600 text-white hover:bg-emerald-700'
                       }`}
+                      title={rider.currentOrders >= rider.maxOrders ? 'Rider at capacity' : `Assign to ${rider.name}`}
                     >
                       Assign
                     </button>
