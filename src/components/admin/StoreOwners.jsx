@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Plus, Eye, Edit, Store, MapPin, Phone, X, Calendar, DollarSign, Package, Upload, Download, User } from 'lucide-react';
 import { storeOwnersApi } from '../../services/api';
-import { formatDate } from '../../utils/helpers';
+import { formatDate, getStatusColor } from '../../utils/helpers';
 import LoadingSpinner from '../common/LoadingSpinner';
 import EntityCard from '../common/EntityCard';
 import EntityModal from '../common/EntityModal';
 import ToggleSwitch from '../common/ToggleSwitch';
+import StockPanelModal from '../common/StockPanelModal';
 
 const StoreOwners = () => {
   const [storeOwners, setStoreOwners] = useState([]);
@@ -15,6 +16,7 @@ const StoreOwners = () => {
   const [selectedOwner, setSelectedOwner] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showStockPanel, setShowStockPanel] = useState(false);
   const [editingOwner, setEditingOwner] = useState(null);
   const [showAddProductModal, setShowAddProductModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
@@ -289,14 +291,15 @@ const StoreOwners = () => {
             status={owner.status}
             revenue={owner.monthlyRevenue}
             orders={owner.monthlyOrders}
-            onView={(id) => {
+            onView={() => {
               setSelectedOwner(owner);
               if (window.showNotification) {
                 window.showNotification('View Store', `Viewing ${owner.storeName}`, 'info');
               }
             }}
-            onEdit={(id) => {
-              handleEditClick(owner);
+            onEdit={() => {
+              setEditingOwner(owner);
+              setShowStockPanel(true);
               if (window.showNotification) {
                 window.showNotification('Edit Mode', `Editing ${owner.storeName}`, 'info');
               }
@@ -432,8 +435,27 @@ const StoreOwners = () => {
         }
       />
 
+      {/* Stock Panel Modal */}
+      <StockPanelModal
+        isOpen={showStockPanel && editingOwner}
+        onClose={() => {
+          setShowStockPanel(false);
+          setEditingOwner(null);
+        }}
+        entity={editingOwner}
+        type="store"
+        onSave={(products) => {
+          console.log('Saving products for store:', editingOwner?.storeName, products);
+          if (window.showNotification) {
+            window.showNotification('Success', `Stock updated for ${editingOwner?.storeName}`, 'success');
+          }
+          setShowStockPanel(false);
+          setEditingOwner(null);
+        }}
+      />
+
       {/* Edit Store Owner Modal - Vendor Stock Panel */}
-      {showEditModal && editingOwner && (
+      {showEditModal && editingOwner && !showStockPanel && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-6xl w-full max-h-[95vh] overflow-y-auto">
             <div className="p-4 sm:p-6">

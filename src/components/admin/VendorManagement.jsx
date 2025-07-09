@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Filter, Eye, Edit, Send as Suspend, CheckCircle, X } from 'lucide-react';
 import ToggleSwitch from '../common/ToggleSwitch';
+import StockPanelModal from '../common/StockPanelModal';
 import EntityCard from '../common/EntityCard';
 import EntityModal from '../common/EntityModal';
 
@@ -10,6 +11,7 @@ const VendorManagement = () => {
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [vendorSettings, setVendorSettings] = useState({});
   const [editingVendor, setEditingVendor] = useState(null);
+  const [showStockPanel, setShowStockPanel] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteData, setInviteData] = useState({
     email: '',
@@ -218,6 +220,7 @@ const VendorManagement = () => {
             }}
             onEdit={(id) => {
               setEditingVendor(vendor);
+              setShowStockPanel(true);
               if (window.showNotification) {
                 window.showNotification('Edit Mode', `Editing ${vendor.storeName}`, 'info');
               }
@@ -277,6 +280,25 @@ const VendorManagement = () => {
             </button>
           </>
         }
+      />
+
+      {/* Stock Panel Modal */}
+      <StockPanelModal
+        isOpen={showStockPanel && editingVendor}
+        onClose={() => {
+          setShowStockPanel(false);
+          setEditingVendor(null);
+        }}
+        entity={editingVendor}
+        type="vendor"
+        onSave={(products) => {
+          console.log('Saving products for vendor:', editingVendor?.storeName, products);
+          if (window.showNotification) {
+            window.showNotification('Success', `Stock updated for ${editingVendor?.storeName}`, 'success');
+          }
+          setShowStockPanel(false);
+          setEditingVendor(null);
+        }}
       />
 
       {/* Send Invite Modal */}
@@ -359,7 +381,7 @@ const VendorManagement = () => {
       )}
 
       {/* Edit Vendor Modal */}
-      {editingVendor && (
+      {editingVendor && !showStockPanel && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="p-4 sm:p-6">
