@@ -1,0 +1,104 @@
+/* Stock Panel Modal Responsive Styles */
+
+/* Container styles */
+.stock-panel-container {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Table container */
+.stock-table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.stock-table-wrapper {
+  min-width: 100%;
+}
+
+/* Edit and Add Product Modals */
+.edit-product-modal,
+.add-product-modal {
+  width: 95%;
+  max-width: 500px;
+}
+
+/* Mobile styles */
+@media (max-width: 640px) {
+  .stock-panel-container {
+    padding: 0.75rem;
+  }
+  
+  /* Adjust table for mobile */
+  .stock-table-wrapper table {
+    font-size: 0.75rem;
+  }
+  
+  .stock-table-wrapper th,
+  .stock-table-wrapper td {
+    padding: 0.5rem 0.5rem;
+  }
+  
+  /* Hide less important columns on mobile */
+  .stock-table-wrapper th:nth-child(3),
+  .stock-table-wrapper td:nth-child(3) {
+    display: none;
+  }
+  
+  /* Make product name column smaller */
+  .stock-table-wrapper th:nth-child(2),
+  .stock-table-wrapper td:nth-child(2) {
+    max-width: 100px;
+    white-space: normal;
+  }
+  
+  /* Adjust image size */
+  .stock-table-wrapper td:first-child img {
+    width: 32px;
+    height: 32px;
+  }
+  
+  /* Make buttons more compact */
+  .stock-panel-container button {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* Tablet styles */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .stock-panel-container {
+    padding: 1rem;
+  }
+  
+  /* Adjust table for tablet */
+  .stock-table-wrapper table {
+    font-size: 0.875rem;
+  }
+  
+  .stock-table-wrapper th,
+  .stock-table-wrapper td {
+    padding: 0.75rem 0.75rem;
+  }
+}
+
+/* Larger screens */
+@media (min-width: 1025px) {
+  .stock-panel-container {
+    padding: 1.5rem;
+  }
+}
+
+/* Dark mode support */
+.theme-dark .stock-panel-container {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.theme-dark .stock-table-wrapper thead {
+  background-color: var(--bg-tertiary);
+}
+
+.theme-dark .stock-table-wrapper tbody tr:hover {
+  background-color: var(--bg-secondary);
+}

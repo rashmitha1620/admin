@@ -36,8 +36,11 @@
 /* Apply theme colors to common elements */
 body {
   background-color: var(--bg-secondary);
-  color: var(--text-primary);
+  color: var(--text-primary); 
   transition: background-color 0.3s ease, color 0.3s ease;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overflow-x: hidden;
 }
 
 /* Card backgrounds */
@@ -106,10 +109,12 @@ body {
 }
 
 /* Form elements */
-input, select, textarea {
+input, select, textarea, button {
   background-color: var(--bg-primary) !important;
   color: var(--text-primary) !important;
   border-color: var(--border-secondary) !important;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 input:focus, select:focus, textarea:focus {
@@ -328,47 +333,112 @@ tbody tr:hover {
 }
 
 /* Mobile-first responsive design improvements */
+/* Base responsive styles */
+html {
+  font-size: 16px;
+}
+
+/* Ensure proper touch targets */
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
+  }
+  
+  button, a, input, select, textarea {
+    min-height: 40px;
+  }
+  
+  .p-6 {
+    padding: 1rem !important;
+  }
+  
+  .gap-6 {
+    gap: 1rem !important;
+  }
+  
+  .text-2xl {
+    font-size: 1.25rem !important;
+  }
+  
+  .text-xl {
+    font-size: 1.125rem !important;
+  }
+}
+
 @media (max-width: 768px) {
   /* Ensure proper content spacing on mobile */
   .admin-content {
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding: 0.75rem;
   }
   
   /* Ensure proper touch targets */
   button, a, input, select, textarea {
-    min-height: 44px;
+    min-height: 42px;
   }
   
-  /* Improve text readability on mobile */
-  body {
-    -webkit-text-size-adjust: 100%;
-    text-size-adjust: 100%;
+  /* Table adjustments for mobile */
+  .orders-table-container {
+    margin: 0 -0.75rem;
+    width: calc(100% + 1.5rem);
+    border-radius: 0;
   }
   
-  /* Better spacing for mobile */
-  .mobile-spacing {
-    padding: 1rem;
+  .orders-table-container table {
+    font-size: 0.75rem;
+  }
+  
+  .orders-table-container th,
+  .orders-table-container td {
+    padding: 0.5rem;
+  }
+  
+  /* Hide less important columns on mobile */
+  .orders-table-container th:nth-child(6),
+  .orders-table-container td:nth-child(6) {
+    display: none;
+  }
+  
+  /* Notification dropdown adjustments */
+  .notification-dropdown {
+    position: fixed;
+    top: 4rem;
+    right: 1rem;
+    left: 1rem;
+    width: auto;
+    max-width: none;
+    max-height: 80vh;
   }
 }
 
 /* Tablet optimizations */
 @media (min-width: 768px) and (max-width: 1024px) {
-  .tablet-grid {
-    grid-template-columns: repeat(2, 1fr);
+  /* Adjust grid layouts for tablets */
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  /* Table adjustments for tablets */
+  .orders-table-container table {
+    font-size: 0.875rem;
+  }
+  
+  .orders-table-container th,
+  .orders-table-container td {
+    padding: 0.75rem 0.5rem;
   }
 }
 
 /* Desktop optimizations */
 @media (min-width: 1024px) {
-  /* Better content centering on desktop */
-  .admin-content {
-    max-width: 1280px;
-    margin: 0 auto;
+  /* Sidebar improvements */
+  .sidebar-nav {
+    padding-bottom: 2rem;
   }
   
-  .desktop-grid {
-    grid-template-columns: repeat(3, 1fr);
+  /* Table adjustments for desktop */
+  .orders-table-container {
+    border-radius: 0.5rem;
+    overflow: hidden;
   }
 }
 
@@ -564,6 +634,30 @@ tbody tr:hover {
 }
 
 /* ===== MOBILE RESPONSIVE IMPROVEMENTS ===== */
+/* Stock Panel Modal Responsive Styles */
+.stock-panel-container {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Table container */
+.stock-table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.stock-table-wrapper {
+  min-width: 100%;
+}
+
+/* Edit and Add Product Modals */
+.edit-product-modal,
+.add-product-modal {
+  width: 95%;
+  max-width: 500px;
+}
+
+/* Mobile styles */
 @media (max-width: 640px) {
   /* Mobile-specific compact adjustments */
   .is-compact .admin-content {
@@ -643,6 +737,46 @@ tbody tr:hover {
   .is-compact table td {
     padding: 0.375rem 0.5rem !important;
     font-size: 0.75rem !important;
+  }
+  
+  /* Stock panel adjustments */
+  .stock-panel-container {
+    padding: 0.75rem;
+  }
+  
+  /* Adjust table for mobile */
+  .stock-table-wrapper table {
+    font-size: 0.75rem;
+  }
+  
+  .stock-table-wrapper th,
+  .stock-table-wrapper td {
+    padding: 0.5rem 0.5rem;
+  }
+  
+  /* Hide less important columns on mobile */
+  .stock-table-wrapper th:nth-child(3),
+  .stock-table-wrapper td:nth-child(3) {
+    display: none;
+  }
+  
+  /* Make product name column smaller */
+  .stock-table-wrapper th:nth-child(2),
+  .stock-table-wrapper td:nth-child(2) {
+    max-width: 100px;
+    white-space: normal;
+  }
+  
+  /* Adjust image size */
+  .stock-table-wrapper td:first-child img {
+    width: 32px;
+    height: 32px;
+  }
+  
+  /* Make buttons more compact */
+  .stock-panel-container button {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
   }
 }
 

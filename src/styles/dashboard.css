@@ -1,7 +1,6 @@
 /* Dashboard Card Styles */
 .admin-card {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  transform: translateY(0);
 }
 
 .admin-card:hover {
@@ -104,6 +103,32 @@
 }
 
 /* Responsive Design */
+/* Entity Card Responsive Styles */
+.entity-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Entity Modal Responsive Styles */
+.entity-modal {
+  width: 95%;
+  max-width: 700px;
+}
+
+/* Order Modal Responsive Styles */
+.order-modal {
+  width: 95%;
+  max-width: 600px;
+}
+
+/* Table Responsive Styles */
+.orders-table-container {
+  min-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 @media (max-width: 768px) {
   .admin-card {
     padding: 1rem;
@@ -121,6 +146,11 @@
   .action-buttons {
     flex-direction: column;
     gap: 0.5rem;
+    width: 100%;
+  }
+  
+  .orders-table-container table {
+    font-size: 0.875rem;
   }
 }
 
@@ -137,6 +167,27 @@
   .modal-actions {
     flex-direction: column;
     gap: 0.75rem;
+  }
+  
+  /* Adjust table for mobile */
+  .orders-table-container table {
+    font-size: 0.75rem;
+  }
+  
+  .orders-table-container th,
+  .orders-table-container td {
+    padding: 0.5rem 0.5rem;
+  }
+  
+  /* Make buttons more compact */
+  button {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  /* Ensure proper spacing for mobile */
+  .space-y-6 > * + * {
+    margin-top: 1rem;
   }
 }
 

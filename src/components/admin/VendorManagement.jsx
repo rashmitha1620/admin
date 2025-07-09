@@ -120,7 +120,7 @@ const VendorManagement = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         {vendorStats.map((stat, index) => (
           <div key={index} className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between mb-4">
@@ -144,36 +144,35 @@ const VendorManagement = () => {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center space-x-4">
-        <button className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-4">
+        <button className="bg-emerald-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-emerald-700 transition-colors text-sm sm:text-base">
           Approve
         </button>
-        <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
+        <button className="bg-gray-100 text-gray-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm sm:text-base">
           Suspend
         </button>
-        <div className="relative">
-          <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center space-x-2">
+        <div className="relative flex-1 sm:flex-none">
+          <button className="bg-gray-100 text-gray-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center space-x-1 sm:space-x-2 text-sm sm:text-base">
             <span>Export</span>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
           </button>
         </div>
-        <div className="flex-1"></div>
-        <button className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors">
+        <button className="bg-emerald-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-emerald-700 transition-colors text-sm sm:text-base ml-auto">
           Invite
         </button>
         <button 
           onClick={() => setShowInviteModal(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          className="bg-blue-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
         >
           Send Invite Link
         </button>
       </div>
 
       {/* Search and Filter */}
-      <div className="flex items-center space-x-4">
-        <div className="relative flex-1 max-w-md">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-6">
+        <div className="relative flex-1 w-full sm:max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input
             type="text"
@@ -183,11 +182,11 @@ const VendorManagement = () => {
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
           />
         </div>
-        <div className="relative">
+        <div className="relative w-full sm:w-auto">
           <select
             value={filterBy}
             onChange={(e) => setFilterBy(e.target.value)}
-            className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+            className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-emerald-500 focus:border-transparent w-full"
           >
             <option value="">Filter by</option>
             <option value="active">Active</option>
@@ -199,7 +198,7 @@ const VendorManagement = () => {
       </div>
 
       {/* Vendors Table */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
         {vendors.map((vendor) => (
           <EntityCard
             key={vendor.id}

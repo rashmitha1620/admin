@@ -45,7 +45,7 @@ const EntityModal = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto entity-modal">
         <div className="p-4 sm:p-6">
           {/* Header */}
           <div className="flex justify-between items-center mb-6">
@@ -62,12 +62,12 @@ const EntityModal = ({
           <div className="space-y-6">
             {/* Main Info Card */}
             <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
-                  <TypeIcon className="w-6 h-6 text-emerald-600" />
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:space-x-3 mb-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                  <TypeIcon className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-900">{getDisplayName()}</h4>
+                  <h4 className="text-base sm:text-lg font-semibold text-gray-900">{getDisplayName()}</h4>
                   <p className="text-gray-600">{getSubtitle()}</p>
                 </div>
               </div>
@@ -96,7 +96,7 @@ const EntityModal = ({
             {/* Contact Information */}
             <div>
               <h5 className="text-lg font-semibold mb-3">Contact Information</h5>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {entity.phone && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
@@ -135,7 +135,7 @@ const EntityModal = ({
                 <h5 className="text-lg font-semibold mb-3">
                   {type === 'rider' ? 'Performance Metrics' : 'Business Metrics'}
                 </h5>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                   {(entity.monthlyRevenue || entity.revenue) && (
                     <div className="bg-emerald-50 p-4 rounded-lg">
                       <div className="flex items-center space-x-2 mb-2">
@@ -144,7 +144,7 @@ const EntityModal = ({
                           {type === 'rider' ? 'Monthly Earnings' : 'Monthly Revenue'}
                         </span>
                       </div>
-                      <p className="text-xl font-bold text-emerald-600">
+                      <p className="text-lg sm:text-xl font-bold text-emerald-600">
                         {formatCurrency(entity.monthlyRevenue || entity.revenue)}
                       </p>
                     </div>
@@ -158,7 +158,7 @@ const EntityModal = ({
                           {type === 'rider' ? 'Total Deliveries' : 'Monthly Orders'}
                         </span>
                       </div>
-                      <p className="text-xl font-bold text-blue-600">
+                      <p className="text-lg sm:text-xl font-bold text-blue-600">
                         {entity.monthlyOrders || entity.orders || entity.totalDeliveries}
                       </p>
                     </div>
@@ -171,7 +171,7 @@ const EntityModal = ({
                         <span className="text-sm font-medium text-yellow-800">Rating</span>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <p className="text-xl font-bold text-yellow-600">{entity.rating}</p>
+                        <p className="text-lg sm:text-xl font-bold text-yellow-600">{entity.rating}</p>
                         {entity.reviewCount && (
                           <span className="text-sm text-yellow-700">({entity.reviewCount} reviews)</span>
                         )}
@@ -185,8 +185,8 @@ const EntityModal = ({
             {/* Rider Specific Info */}
             {type === 'rider' && (
               <div>
-                <h5 className="text-lg font-semibold mb-3">Rider Information</h5>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <h5 className="text-base sm:text-lg font-semibold mb-3">Rider Information</h5>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {entity.vehicleType && (
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Vehicle Type</label>
@@ -223,7 +223,7 @@ const EntityModal = ({
             {/* Additional Info */}
             {(entity.joinedDate || entity.createdAt) && (
               <div>
-                <h5 className="text-lg font-semibold mb-3">Additional Information</h5>
+                <h5 className="text-base sm:text-lg font-semibold mb-3">Additional Information</h5>
                 <div className="bg-purple-50 p-4 rounded-lg">
                   <div className="flex items-center space-x-2 mb-2">
                     <Calendar className="w-5 h-5 text-purple-600" />
@@ -243,7 +243,7 @@ const EntityModal = ({
 
             {/* Action Buttons */}
             {actions && (
-              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 pt-4 border-t">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-4 border-t">
                 {actions}
               </div>
             )}

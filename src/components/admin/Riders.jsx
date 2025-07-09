@@ -144,7 +144,7 @@ const Riders = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -184,8 +184,8 @@ const Riders = () => {
       </div>
 
       {/* Search and Filter */}
-      <div className="flex items-center space-x-4">
-        <div className="relative flex-1 max-w-md">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-6">
+        <div className="relative flex-1 w-full sm:max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input
             type="text"
@@ -195,10 +195,10 @@ const Riders = () => {
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
           />
         </div>
-        <select
+        <select 
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+          className="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
         >
           <option value="">All Status</option>
           <option value="online">Online</option>
@@ -209,7 +209,7 @@ const Riders = () => {
       </div>
 
       {/* Riders Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
         {filteredRiders.map((rider) => (
           <EntityCard
             key={rider.id}
@@ -238,7 +238,7 @@ const Riders = () => {
               }
             }}
             customActions={
-              <div className="flex items-center justify-between w-full">
+              <div className="flex flex-wrap items-center justify-between w-full gap-2">
                 <ToggleSwitch
                   enabled={riderSettings[rider.id]?.available || rider.status === 'online'}
                   onChange={(newValue) => handleRiderToggle(rider.id, 'available', newValue)}

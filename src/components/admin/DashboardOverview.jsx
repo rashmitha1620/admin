@@ -52,9 +52,9 @@ const DashboardOverview = () => {
   ];
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-3 sm:space-y-6">
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         {stats.map((stat, index) => (
           <div key={index} className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
             <div className="flex items-center justify-between">
@@ -78,7 +78,7 @@ const DashboardOverview = () => {
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
         {/* Orders Overview & Stock Alert */}
         <div className="xl:col-span-2 space-y-4 sm:space-y-6">
           {/* Orders Overview */}
@@ -185,9 +185,9 @@ const DashboardOverview = () => {
       </div>
 
       {/* Bottom Chart */}
-      <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
+      <div className="bg-white rounded-lg shadow-sm border p-3 sm:p-6">
         <h3 className="text-base sm:text-lg font-semibold mb-4">Orders Overview</h3>
-        <div className="space-y-2 mb-4">
+        <div className="space-y-2 mb-3 sm:mb-4">
           <div className="flex items-center justify-between">
             <p className="text-xs sm:text-sm text-gray-600">Express</p>
             <span className="text-xs text-emerald-600 font-medium">↗ +15%</span>
@@ -201,7 +201,7 @@ const DashboardOverview = () => {
             <span className="text-xs text-purple-600 font-medium">↗ +12%</span>
           </div>
         </div>
-        <div className="h-24 sm:h-32 flex items-end justify-between">
+        <div className="h-20 sm:h-32 flex items-end justify-between">
           <svg className="w-full h-full" viewBox="0 0 400 100">
             <polyline
               fill="none"
@@ -216,7 +216,7 @@ const DashboardOverview = () => {
             <circle cx="400" cy="20" r="3" fill="#10b981" />
           </svg>
         </div>
-        <div className="flex justify-between text-xs text-gray-500 mt-2">
+        <div className="flex justify-between text-xs text-gray-500 mt-1 sm:mt-2">
           <span>6 days ago</span>
           <span className="hidden sm:inline">6 Apr</span>
           <span className="hidden sm:inline">Apr Day</span>

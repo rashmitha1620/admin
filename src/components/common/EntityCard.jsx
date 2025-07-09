@@ -82,11 +82,11 @@ const EntityCard = ({
   };
 
   return (
-    <div className={`bg-white rounded-lg shadow-sm border hover:shadow-md transition-all duration-200 ${
+    <div className={`bg-white rounded-lg shadow-sm border hover:shadow-md transition-all duration-200 entity-card ${
       compact ? 'p-4' : 'p-4 sm:p-6'
     }`}>
       {/* Header Section */}
-      <div className="flex items-start justify-between mb-4">
+      <div className="flex flex-wrap items-start justify-between mb-4 gap-2">
         <div className="flex items-center space-x-3 flex-1 min-w-0">
           <div className={`${compact ? 'w-10 h-10' : 'w-12 h-12'} bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0`}>
             <TypeIcon className={`${compact ? 'w-5 h-5' : 'w-6 h-6'} text-emerald-600`} />
@@ -102,7 +102,7 @@ const EntityCard = ({
         </div>
         
         {/* Status Badge */}
-        <span className={`px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap ${getStatusColor(status)} flex-shrink-0`}>
+        <span className={`px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap ${getStatusColor(status)} flex-shrink-0 mt-1 sm:mt-0`}>
           {status?.charAt(0).toUpperCase() + status?.slice(1)}
         </span>
       </div>
@@ -145,7 +145,7 @@ const EntityCard = ({
       {/* Business Metrics */}
       {(revenue || orders || rating) && (
         <div className={`border-t pt-4 mb-4 ${compact ? 'space-y-2' : 'space-y-3'}`}>
-          <div className={`grid ${revenue && orders ? 'grid-cols-2' : 'grid-cols-1'} gap-3`}>
+          <div className={`grid ${revenue && orders ? 'grid-cols-2' : 'grid-cols-1'} gap-2 sm:gap-3`}>
             {revenue && (
               <div className="text-center">
                 <div className="flex items-center justify-center space-x-1 mb-1">
@@ -201,10 +201,10 @@ const EntityCard = ({
       )}
 
       {/* Action Buttons */}
-      <div className="flex space-x-2">
+      <div className="flex flex-wrap gap-2">
         <button
           onClick={() => onView && onView(id)}
-          className={`flex-1 bg-emerald-100 text-emerald-700 ${compact ? 'py-1.5 px-2 text-xs' : 'py-2 px-3 text-sm'} rounded hover:bg-emerald-200 transition-colors flex items-center justify-center space-x-1`}
+          className={`flex-1 min-w-0 bg-emerald-100 text-emerald-700 ${compact ? 'py-1.5 px-2 text-xs' : 'py-2 px-3 text-sm'} rounded hover:bg-emerald-200 transition-colors flex items-center justify-center space-x-1`}
           title="View details"
         >
           <Eye className={`${compact ? 'w-3 h-3' : 'w-4 h-4'}`} />
@@ -213,7 +213,7 @@ const EntityCard = ({
         
         <button
           onClick={() => onEdit && onEdit(id)}
-          className={`flex-1 bg-blue-100 text-blue-700 ${compact ? 'py-1.5 px-2 text-xs' : 'py-2 px-3 text-sm'} rounded hover:bg-blue-200 transition-colors flex items-center justify-center space-x-1`}
+          className={`flex-1 min-w-0 bg-blue-100 text-blue-700 ${compact ? 'py-1.5 px-2 text-xs' : 'py-2 px-3 text-sm'} rounded hover:bg-blue-200 transition-colors flex items-center justify-center space-x-1`}
           title="Edit"
         >
           <Edit className={`${compact ? 'w-3 h-3' : 'w-4 h-4'}`} />
@@ -221,7 +221,7 @@ const EntityCard = ({
         </button>
         
         {/* Custom Actions */}
-        {customActions && customActions}
+        {customActions && <div className="w-full mt-2">{customActions}</div>}
       </div>
 
       {/* Special status indicators */}
