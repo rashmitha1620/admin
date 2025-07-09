@@ -1,24 +1,7 @@
 import React from 'react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
-import ToggleSwitch from '../common/ToggleSwitch';
 
 const DashboardOverview = () => {
-  const [dashboardSettings, setDashboardSettings] = React.useState({
-    autoRefresh: true,
-    notifications: true,
-    realTimeUpdates: false
-  });
-
-  const handleDashboardToggle = (setting, newValue) => {
-    setDashboardSettings(prev => ({
-      ...prev,
-      [setting]: newValue
-    }));
-    
-    // Log for debugging
-    console.log(`Dashboard setting ${setting} changed to:`, newValue);
-  };
-
   const stats = [
     {
       title: 'Total Orders Today',
@@ -70,37 +53,6 @@ const DashboardOverview = () => {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Dashboard Settings */}
-      <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6">
-        <h3 className="text-base sm:text-lg font-semibold mb-4">Dashboard Settings</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <ToggleSwitch
-            enabled={dashboardSettings.autoRefresh}
-            onChange={(newValue) => handleDashboardToggle('autoRefresh', newValue)}
-            label="Auto Refresh"
-            id="dashboard-auto-refresh"
-            size="small"
-            compact={true}
-          />
-          <ToggleSwitch
-            enabled={dashboardSettings.notifications}
-            onChange={(newValue) => handleDashboardToggle('notifications', newValue)}
-            label="Notifications"
-            id="dashboard-notifications"
-            size="small"
-            compact={true}
-          />
-          <ToggleSwitch
-            enabled={dashboardSettings.realTimeUpdates}
-            onChange={(newValue) => handleDashboardToggle('realTimeUpdates', newValue)}
-            label="Real-time Updates"
-            id="dashboard-realtime"
-            size="small"
-            compact={true}
-          />
-        </div>
-      </div>
-
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         {stats.map((stat, index) => (
