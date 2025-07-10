@@ -369,7 +369,6 @@ const StockPanelModal = ({
                 <Plus className="w-4 h-4" />
                 <span>Add New Product</span>
               </button>
-              <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center space-x-2">
               {/* Import CSV Button */}
               <label className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center space-x-2 cursor-pointer">
                 <Upload className="w-4 h-4" />
