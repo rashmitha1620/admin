@@ -16,6 +16,7 @@ const StockPanelModal = ({
   const [showAddProductModal, setShowAddProductModal] = useState(false);
   const [showEditProductModal, setShowEditProductModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [isImporting, setIsImporting] = useState(false);
   const [newProduct, setNewProduct] = useState({
     name: '',
     sku: '',
@@ -137,6 +138,142 @@ const StockPanelModal = ({
     }
   };
 
+  const handleImportCSV = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type === 'text/csv') {
+      setIsImporting(true);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const csv = event.target.result;
+          const lines = csv.split('\n');
+          const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+          
+          const importedProducts = [];
+          for (let i = 1; i < lines.length; i++) {
+            if (lines[i].trim()) {
+              const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+              const product = {
+                id: Date.now() + i,
+                name: values[headers.indexOf('name')] || values[headers.indexOf('Product Name')] || '',
+                sku: values[headers.indexOf('sku')] || values[headers.indexOf('SKU')] || '',
+                price: values[headers.indexOf('price')] || values[headers.indexOf('Price')] || '',
+                stock: parseInt(values[headers.indexOf('stock')] || values[headers.indexOf('Stock')] || '0'),
+                tags: values[headers.indexOf('tags')] || values[headers.indexOf('Tags')] || 'In Stock',
+                showOnGrooso: values[headers.indexOf('showOnGrooso')] === 'true' || values[headers.indexOf('Show on Grooso')] === 'true',
+                image: 'https://images.pexels.com/photos/5946080/pexels-photo-5946080.jpeg?auto=compress&cs=tinysrgb&w=100'
+              };
+              
+              if (product.name && product.sku) {
+                importedProducts.push(product);
+              }
+            }
+          }
+          
+          setProducts(prev => [...prev, ...importedProducts]);
+          setIsImporting(false);
+          
+          if (window.showNotification) {
+            window.showNotification('Import Successful', `${importedProducts.length} products imported successfully!`, 'success');
+          }
+        } catch (error) {
+          setIsImporting(false);
+          if (window.showNotification) {
+            window.showNotification('Import Failed', 'Error parsing CSV file. Please check the format.', 'error');
+          }
+        }
+      };
+      reader.readAsText(file);
+    } else {
+      if (window.showNotification) {
+        window.showNotification('Invalid File', 'Please select a valid CSV file.', 'error');
+      }
+    }
+    // Reset the input
+    e.target.value = '';
+  };
+
+  const handleExportStock = () => {
+    const csvData = products.map(p => ({
+      'Product Name': p.name,
+      'SKU': p.sku,
+      'Price': p.price,
+      'Stock': p.stock,
+      'Tags': p.tags,
+      'Show on Grooso': p.showOnGrooso
+    }));
+    
+    const headers = Object.keys(csvData[0]);
+    const csvContent = [
+      headers.join(','),
+      ...csvData.map(row => headers.map(header => `"${row[header] || ''}"`).join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${getEntityName()}_products_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    if (window.showNotification) {
+      window.showNotification('Export Successful', 'Products exported to CSV successfully!', 'success');
+    }
+  };
+
+  const handleDownloadSample = () => {
+    const sampleData = [
+      {
+        'Product Name': 'Sample Product 1',
+        'SKU': 'SKU001',
+        'Price': '$19.99',
+        'Stock': '50',
+        'Tags': 'In Stock',
+        'Show on Grooso': 'true'
+      },
+      {
+        'Product Name': 'Sample Product 2',
+        'SKU': 'SKU002',
+        'Price': '$29.99',
+        'Stock': '5',
+        'Tags': 'Low Stock',
+        'Show on Grooso': 'true'
+      },
+      {
+        'Product Name': 'Sample Product 3',
+        'SKU': 'SKU003',
+        'Price': '$39.99',
+        'Stock': '0',
+        'Tags': 'Out of Stock',
+        'Show on Grooso': 'false'
+      }
+    ];
+    
+    const headers = Object.keys(sampleData[0]);
+    const csvContent = [
+      headers.join(','),
+      ...sampleData.map(row => headers.map(header => `"${row[header]}"`).join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'sample_products.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    if (window.showNotification) {
+      window.showNotification('Sample Downloaded', 'Sample CSV file downloaded successfully!', 'success');
+    }
+  };
   const getEntityName = () => {
     if (type === 'store') return entity.storeName || entity.name;
     if (type === 'vendor') return entity.businessName || entity.storeName || entity.name;
@@ -233,30 +370,24 @@ const StockPanelModal = ({
                 <span>Add New Product</span>
               </button>
               <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center space-x-2">
+              {/* Import CSV Button */}
+              <label className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center space-x-2 cursor-pointer">
+                <Upload className="w-4 h-4" />
+                <span>{isImporting ? 'Importing...' : 'Import CSV'}</span>
+                <input
+                  type="file"
+                  accept=".csv"
+                  onChange={handleImportCSV}
+                  className="hidden"
+                  disabled={isImporting}
+                />
+              </label>
+              
                 <Upload className="w-4 h-4" />
                 <span>Import CSV</span>
               </button>
               <button 
-                onClick={() => {
-                  const csvData = products.map(p => ({
-                    name: p.name,
-                    sku: p.sku,
-                    price: p.price,
-                    stock: p.stock,
-                    tags: p.tags,
-                    showOnGrooso: p.showOnGrooso
-                  }));
-                  const csv = [
-                    Object.keys(csvData[0]).join(','),
-                    ...csvData.map(row => Object.values(row).join(','))
-                  ].join('\n');
-                  const blob = new Blob([csv], { type: 'text/csv' });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement('a');
-                  a.href = url;
-                  a.download = 'products.csv';
-                  a.click();
-                }}
+                onClick={handleExportStock}
                 className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center space-x-2"
               >
                 <Download className="w-4 h-4" />
@@ -265,15 +396,54 @@ const StockPanelModal = ({
             </div>
 
             {/* File Upload Area */}
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-6">
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-6 relative">
               <Upload className="w-8 h-8 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-600 mb-2">
-                Drag and drop a CSV file here, or <button className="text-emerald-600 hover:text-emerald-700">browse</button>
+                Drag and drop a CSV file here, or 
+                <label className="text-emerald-600 hover:text-emerald-700 cursor-pointer ml-1">
+                  browse
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={handleImportCSV}
+                    className="hidden"
+                  />
+                </label>
               </p>
-              <button className="text-sm text-gray-500 hover:text-gray-700 flex items-center justify-center space-x-1 mx-auto">
+              <button 
+                onClick={handleDownloadSample}
+                className="text-sm text-gray-500 hover:text-gray-700 flex items-center justify-center space-x-1 mx-auto"
+              >
                 <Download className="w-4 h-4" />
                 <span>Download sample CSV</span>
               </button>
+              
+              {/* Drag and Drop Overlay */}
+              <div 
+                className="absolute inset-0 bg-emerald-50 border-2 border-dashed border-emerald-300 rounded-lg flex items-center justify-center opacity-0 pointer-events-none transition-opacity"
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.currentTarget.style.opacity = '1';
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  e.currentTarget.style.opacity = '0';
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  e.currentTarget.style.opacity = '0';
+                  const files = e.dataTransfer.files;
+                  if (files.length > 0 && files[0].type === 'text/csv') {
+                    const event = { target: { files: [files[0]] } };
+                    handleImportCSV(event);
+                  }
+                }}
+              >
+                <div className="text-center">
+                  <Upload className="w-12 h-12 text-emerald-500 mx-auto mb-2" />
+                  <p className="text-emerald-700 font-medium">Drop CSV file here</p>
+                </div>
+              </div>
             </div>
 
             {/* Bulk Actions */}
