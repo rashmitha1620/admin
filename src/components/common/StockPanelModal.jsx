@@ -382,10 +382,6 @@ const StockPanelModal = ({
                   disabled={isImporting}
                 />
               </label>
-              
-                <Upload className="w-4 h-4" />
-                <span>Import CSV</span>
-              </button>
               <button 
                 onClick={handleExportStock}
                 className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center space-x-2"
